@@ -11,6 +11,10 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredCustomers, setFilteredCustomers] = useState([]);
 
+  const deleteCustomer = (id) => {
+    setCustomers((prevCustomers) => prevCustomers.filter(customer => customer.id !== id));
+  };
+
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
@@ -62,7 +66,8 @@ function App() {
                     filteredCustomers={filteredCustomers}
                   />
                   <CustomerForm addCustomer={(newCustomer) => setCustomers([...customers, newCustomer])} />
-                  <CustomerList customers={filteredCustomers} />
+                  <CustomerList customers={filteredCustomers} deleteCustomer={deleteCustomer} />
+
                 </>
               }
             />
