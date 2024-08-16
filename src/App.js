@@ -4,12 +4,12 @@ import CustomerForm from './CustomerForm';
 import CustomerList from './CustomerList';
 import CustomerDetails from './CustomerDetails';
 import EditCustomer from './EditCustomer';
+import SearchBar from './SearchBar';
 
 function App() {
   const [customers, setCustomers] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredCustomers, setFilteredCustomers] = useState([]);
-  const [phoneNumber, setPhoneNumber] = useState('');
 
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -37,22 +37,11 @@ function App() {
       customer.email.toLowerCase().includes(searchQuery.toLowerCase())
     );
     setFilteredCustomers(results);
-
-    if (searchQuery.length === 8 && !customers.some(c => c.phoneNumber === searchQuery)) {
-      setPhoneNumber(searchQuery);
-    } else {
-      setPhoneNumber('');
-    }
-
   }, [searchQuery, customers]);
-
-  const addCustomer = (newCustomer) => {
-    setCustomers((prevCustomers) => [...prevCustomers, newCustomer]);
-  };
 
   return (
     <Router>
-      <div className="min-h-screen bg-gray-100">
+      <div>
         <nav className="bg-gray-800 p-4">
           <ul className="flex space-x-4 text-white">
             <li>
@@ -61,7 +50,7 @@ function App() {
           </ul>
         </nav>
 
-        <div className="container mx-auto p-4">
+        <div className="p-4">
           <Routes>
             <Route
               path="/"
@@ -71,9 +60,8 @@ function App() {
                     searchQuery={searchQuery}
                     setSearchQuery={setSearchQuery}
                     filteredCustomers={filteredCustomers}
-                    setPhoneNumber={setPhoneNumber}
                   />
-                  <CustomerForm addCustomer={addCustomer} phoneNumber={phoneNumber} />
+                  <CustomerForm addCustomer={(newCustomer) => setCustomers([...customers, newCustomer])} />
                   <CustomerList customers={filteredCustomers} />
                 </>
               }
@@ -90,42 +78,6 @@ function App() {
         </div>
       </div>
     </Router>
-  );
-}
-
-function SearchBar({ searchQuery, setSearchQuery, filteredCustomers, setPhoneNumber }) {
-  const handleSelect = (customer) => {
-    setSearchQuery(customer.firstName + ' ' + customer.lastName);
-    setPhoneNumber('');  // Reset phone number if a customer is selected
-  };
-
-  return (
-    <div className="mb-6 relative">
-      <input
-        type="text"
-        placeholder="Søk etter kunde..."
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-      />
-      {searchQuery.length > 0 && (
-        <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-2 shadow-lg max-h-60 overflow-y-auto">
-          {filteredCustomers.length > 0 ? (
-            filteredCustomers.map((customer) => (
-              <li
-                key={customer.id}
-                onClick={() => handleSelect(customer)}
-                className="p-2 cursor-pointer hover:bg-gray-100"
-              >
-                {customer.firstName} {customer.lastName} - {customer.email}
-              </li>
-            ))
-          ) : (
-            <li className="p-2 text-red-500">Ingen treff</li>
-          )}
-        </ul>
-      )}
-    </div>
   );
 }
 
