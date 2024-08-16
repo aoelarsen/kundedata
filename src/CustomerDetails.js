@@ -1,9 +1,27 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
-function CustomerDetails({ customers }) {
+function CustomerDetails() {
   const { id } = useParams();
-  const customer = customers.find(cust => cust.id.toString() === id);
+  const [customer, setCustomer] = useState(null);
+
+  useEffect(() => {
+    const fetchCustomer = async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/customers/${id}`);
+        if (response.ok) {
+          const customerData = await response.json();
+          setCustomer(customerData);
+        } else {
+          console.error('Kunde ble ikke funnet');
+        }
+      } catch (error) {
+        console.error('Feil ved henting av kunden:', error);
+      }
+    };
+
+    fetchCustomer();
+  }, [id]);
 
   if (!customer) {
     return <p>Kunde ikke funnet</p>;

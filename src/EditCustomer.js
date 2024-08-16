@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
-function EditCustomer({ customers, updateCustomer }) {
+function EditCustomer({ customers }) {
   const { id } = useParams();
-  const customer = customers.find(cust => cust.id.toString() === id);
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -11,7 +11,10 @@ function EditCustomer({ customers, updateCustomer }) {
     email: '',
   });
 
+  // Dette vil kjøres når komponenten laster, og når `customers` endres
   useEffect(() => {
+    const customer = customers.find((cust) => cust.id.toString() === id); // Sammenlign som streng
+    console.log("Customer found:", customer); // Debugging
     if (customer) {
       setFormData({
         firstName: customer.firstName,
@@ -20,7 +23,7 @@ function EditCustomer({ customers, updateCustomer }) {
         email: customer.email,
       });
     }
-  }, [customer]);
+  }, [id, customers]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -30,18 +33,33 @@ function EditCustomer({ customers, updateCustomer }) {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
     const updatedCustomer = {
       ...formData,
       lastModified: new Date().toLocaleString(),
     };
-    updateCustomer(customer.id, updatedCustomer);
-  };
 
-  if (!customer) {
-    return <p>Kunde ikke funnet</p>;
-  }
+    try {
+      const response = await fetch(`http://localhost:5000/customers/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedCustomer),
+      });
+
+      if (response.ok) {
+        // Hvis oppdateringen er vellykket, rutes til CustomerDetails
+        navigate(`/customer-details/${id}`);
+      } else {
+        console.error('Feil ved oppdatering av kunde');
+      }
+    } catch (error) {
+      console.error('Feil ved kommunikasjon med serveren:', error);
+    }
+  };
 
   return (
     <div className="max-w-lg mx-auto py-8">
@@ -77,7 +95,6 @@ function EditCustomer({ customers, updateCustomer }) {
             value={formData.phoneNumber}
             onChange={handleChange}
             required
-            pattern="\d{8}"
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
           />
         </div>

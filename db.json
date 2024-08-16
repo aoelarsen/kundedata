@@ -1,13 +1,12 @@
 {
   "customers": [
     {
-      "id": "1",
-      "firstName": "Johnn",
-      "lastName": "Doe",
+      "firstName": "Johnnn",
+      "lastName": "Doe1",
       "phoneNumber": "12345678",
-      "email": "john.doe@example.com",
-      "registrationDate": "2024-08-15",
-      "lastModified": "2024-08-15"
+      "email": "",
+      "lastModified": "16.8.2024, 22:19:16",
+      "id": "1"
     },
     {
       "id": "2",
