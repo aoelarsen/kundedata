@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
-import CustomerForm from './CustomerForm';  // Sørg for at denne importen er riktig
-import CustomerList from './CustomerList';  // Sørg for at denne importen er riktig
-import CustomerDetails from './CustomerDetails'; // Hvis denne komponenten er laget
-import EditCustomer from './EditCustomer';  // Hvis denne komponenten er laget
+import CustomerForm from './CustomerForm';
+import CustomerList from './CustomerList';
+import CustomerDetails from './CustomerDetails';
+import EditCustomer from './EditCustomer';
 
 function App() {
   const [customers, setCustomers] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredCustomers, setFilteredCustomers] = useState([]);
+  const [phoneNumber, setPhoneNumber] = useState('');
 
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -32,9 +33,18 @@ function App() {
     const results = customers.filter((customer) =>
       customer.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       customer.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      customer.phoneNumber.includes(searchQuery)
+      customer.phoneNumber.includes(searchQuery) ||
+      customer.email.toLowerCase().includes(searchQuery.toLowerCase())
     );
     setFilteredCustomers(results);
+
+    // Sjekk om søkefeltet inneholder et 8-sifret nummer som ikke er registrert
+    if (searchQuery.length === 8 && !customers.some(c => c.phoneNumber === searchQuery)) {
+      setPhoneNumber(searchQuery);
+    } else {
+      setPhoneNumber('');
+    }
+
   }, [searchQuery, customers]);
 
   const addCustomer = (newCustomer) => {
@@ -58,7 +68,13 @@ function App() {
               path="/"
               element={
                 <>
-                  <CustomerForm addCustomer={addCustomer} />
+                  <SearchBar
+                    searchQuery={searchQuery}
+                    setSearchQuery={setSearchQuery}
+                    filteredCustomers={filteredCustomers}
+                    setPhoneNumber={setPhoneNumber}
+                  />
+                  <CustomerForm addCustomer={addCustomer} phoneNumber={phoneNumber} />
                   <CustomerList customers={filteredCustomers} />
                 </>
               }
@@ -75,6 +91,42 @@ function App() {
         </div>
       </div>
     </Router>
+  );
+}
+
+function SearchBar({ searchQuery, setSearchQuery, filteredCustomers, setPhoneNumber }) {
+  const handleSelect = (customer) => {
+    setSearchQuery(customer.firstName + ' ' + customer.lastName);
+    setPhoneNumber('');  // Reset phone number if a customer is selected
+  };
+
+  return (
+    <div className="mb-6 relative">
+      <input
+        type="text"
+        placeholder="Søk etter kunde..."
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+      />
+      {searchQuery.length > 0 && (
+        <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-2 shadow-lg">
+          {filteredCustomers.length > 0 ? (
+            filteredCustomers.map((customer) => (
+              <li
+                key={customer.id}
+                onClick={() => handleSelect(customer)}
+                className="p-2 cursor-pointer hover:bg-gray-100"
+              >
+                {customer.firstName} {customer.lastName} - {customer.email}
+              </li>
+            ))
+          ) : (
+            <li className="p-2 text-red-500">Ingen treff</li>
+          )}
+        </ul>
+      )}
+    </div>
   );
 }
 
