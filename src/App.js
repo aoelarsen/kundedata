@@ -1,34 +1,80 @@
 import React, { useState, useEffect } from 'react';
-import CustomerForm from './CustomerForm';
-import CustomerList from './CustomerList';
+import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import CustomerForm from './CustomerForm';  // Sørg for at denne importen er riktig
+import CustomerList from './CustomerList';  // Sørg for at denne importen er riktig
+import CustomerDetails from './CustomerDetails'; // Hvis denne komponenten er laget
+import EditCustomer from './EditCustomer';  // Hvis denne komponenten er laget
 
 function App() {
   const [customers, setCustomers] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredCustomers, setFilteredCustomers] = useState([]);
 
   useEffect(() => {
     const fetchCustomers = async () => {
-      const response = await fetch('http://localhost:5000/customers');
-      const data = await response.json();
-      setCustomers(data);
+      try {
+        const response = await fetch('http://localhost:5000/customers');
+        if (response.ok) {
+          const customersData = await response.json();
+          setCustomers(customersData);
+        } else {
+          console.error('Feil ved henting av kunder');
+        }
+      } catch (error) {
+        console.error('Feil ved kommunikasjon med serveren:', error);
+      }
     };
 
     fetchCustomers();
   }, []);
 
+  useEffect(() => {
+    const results = customers.filter((customer) =>
+      customer.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      customer.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      customer.phoneNumber.includes(searchQuery)
+    );
+    setFilteredCustomers(results);
+  }, [searchQuery, customers]);
+
   const addCustomer = (newCustomer) => {
-    setCustomers([...customers, newCustomer]);
+    setCustomers((prevCustomers) => [...prevCustomers, newCustomer]);
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <nav className="bg-gray-800 p-4">
-        <h1 className="text-white text-2xl">Kunderegistrering</h1>
-      </nav>
-      <div className="container mx-auto p-4">
-        <CustomerForm addCustomer={addCustomer} />
-        <CustomerList customers={customers} />
+    <Router>
+      <div>
+        <nav className="bg-gray-800 p-4">
+          <ul className="flex space-x-4 text-white">
+            <li>
+              <Link to="/" className="hover:text-gray-300">Registrer Kunde</Link>
+            </li>
+          </ul>
+        </nav>
+
+        <div className="p-4">
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <>
+                  <CustomerForm addCustomer={addCustomer} />
+                  <CustomerList customers={filteredCustomers} />
+                </>
+              }
+            />
+            <Route
+              path="/customer-details/:id"
+              element={<CustomerDetails customers={customers} />}
+            />
+            <Route
+              path="/edit-customer/:id"
+              element={<EditCustomer customers={customers} />}
+            />
+          </Routes>
+        </div>
       </div>
-    </div>
+    </Router>
   );
 }
 
