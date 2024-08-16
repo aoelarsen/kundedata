@@ -67,8 +67,8 @@ function App() {
               }
             />
             <Route
-              path="/customer-details/:id"
-              element={<CustomerDetails customers={customers} />}
+        path="/customer-details/:id"
+        element={<CustomerDetails customers={customers} />}
             />
             <Route
               path="/edit-customer/:id"
