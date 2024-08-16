@@ -38,7 +38,6 @@ function App() {
     );
     setFilteredCustomers(results);
 
-    // Sjekk om søkefeltet inneholder et 8-sifret nummer som ikke er registrert
     if (searchQuery.length === 8 && !customers.some(c => c.phoneNumber === searchQuery)) {
       setPhoneNumber(searchQuery);
     } else {
@@ -53,7 +52,7 @@ function App() {
 
   return (
     <Router>
-      <div>
+      <div className="min-h-screen bg-gray-100">
         <nav className="bg-gray-800 p-4">
           <ul className="flex space-x-4 text-white">
             <li>
@@ -62,7 +61,7 @@ function App() {
           </ul>
         </nav>
 
-        <div className="p-4">
+        <div className="container mx-auto p-4">
           <Routes>
             <Route
               path="/"
@@ -110,7 +109,7 @@ function SearchBar({ searchQuery, setSearchQuery, filteredCustomers, setPhoneNum
         className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
       />
       {searchQuery.length > 0 && (
-        <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-2 shadow-lg">
+        <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-2 shadow-lg max-h-60 overflow-y-auto">
           {filteredCustomers.length > 0 ? (
             filteredCustomers.map((customer) => (
               <li
