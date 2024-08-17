@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 function CustomerForm({ addCustomer, customers }) {
-  const [formData, setFormData] = useState({
+      const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     phoneNumber: '',
