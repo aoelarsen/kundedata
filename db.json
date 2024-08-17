@@ -1,38 +1,102 @@
 {
   "customers": [
     {
-      "firstName": "Vida",
-      "lastName": "dss",
-      "phoneNumber": "09879087121",
-      "email": "",
-      "lastModified": "17.8.2024, 22:59:32",
-      "id": "19"
+      "id": "1",
+      "firstName": "Ola",
+      "lastName": "Nordmann",
+      "phoneNumber": "98000001",
+      "email": "ola.nordmann@example.com",
+      "registrationDate": "18.8.2024, 10:00:00",
+      "lastModified": "18.8.2024, 10:00:00"
+    },
+    {
+      "id": "2",
+      "firstName": "Kari",
+      "lastName": "Nordmann",
+      "phoneNumber": "98000002",
+      "email": "kari.nordmann@example.com",
+      "registrationDate": "18.8.2024, 10:05:00",
+      "lastModified": "18.8.2024, 10:05:00"
+    },
+    {
+      "id": "3",
+      "firstName": "Per",
+      "lastName": "Hansen",
+      "phoneNumber": "98000003",
+      "email": "per.hansen@example.com",
+      "registrationDate": "18.8.2024, 10:10:00",
+      "lastModified": "18.8.2024, 10:10:00"
+    },
+    {
+      "id": "4",
+      "firstName": "Lise",
+      "lastName": "Larsen",
+      "phoneNumber": "98000004",
+      "email": "lise.larsen@example.com",
+      "registrationDate": "18.8.2024, 10:15:00",
+      "lastModified": "18.8.2024, 10:15:00"
+    },
+    {
+      "id": "5",
+      "firstName": "Jonas",
+      "lastName": "Berg",
+      "phoneNumber": "98000005",
+      "email": "jonas.berg@example.com",
+      "registrationDate": "18.8.2024, 10:20:00",
+      "lastModified": "18.8.2024, 10:20:00"
+    },
+    {
+      "id": "6",
+      "firstName": "Eva",
+      "lastName": "Kristoffersen",
+      "phoneNumber": "98000006",
+      "email": "eva.kristoffersen@example.com",
+      "registrationDate": "18.8.2024, 10:25:00",
+      "lastModified": "18.8.2024, 10:25:00"
+    },
+    {
+      "id": "7",
+      "firstName": "Marius",
+      "lastName": "Johansen",
+      "phoneNumber": "98000007",
+      "email": "marius.johansen@example.com",
+      "registrationDate": "18.8.2024, 10:30:00",
+      "lastModified": "18.8.2024, 10:30:00"
+    },
+    {
+      "id": "8",
+      "firstName": "Anna",
+      "lastName": "Mikkelsen",
+      "phoneNumber": "98000008",
+      "email": "anna.mikkelsen@example.com",
+      "registrationDate": "18.8.2024, 10:35:00",
+      "lastModified": "18.8.2024, 10:35:00"
+    },
+    {
+      "id": "9",
+      "firstName": "Henrik",
+      "lastName": "Olsen",
+      "phoneNumber": "98000009",
+      "email": "henrik.olsen@example.com",
+      "registrationDate": "18.8.2024, 10:40:00",
+      "lastModified": "18.8.2024, 10:40:00"
+    },
+    {
+      "id": "10",
+      "firstName": "Ingrid",
+      "lastName": "Nilsen",
+      "phoneNumber": "98000010",
+      "email": "ingrid.nilsen@example.com",
+      "registrationDate": "18.8.2024, 10:45:00",
+      "lastModified": "18.8.2024, 10:45:00"
     },
     {
       "firstName": "Vidar",
       "lastName": "Innselset",
       "phoneNumber": "98015736",
-      "email": "",
-      "lastModified": "17.8.2024, 20:32:54",
-      "id": "20"
-    },
-    {
-      "id": "21",
-      "firstName": "sdfs",
-      "lastName": "lksdfs",
-      "phoneNumber": "797987987",
-      "email": "",
-      "registrationDate": "17.8.2024, 22:42:15",
-      "lastModified": "17.8.2024, 22:42:15"
-    },
-    {
-      "id": "22",
-      "firstName": "sf",
-      "lastName": "lksdfs",
-      "phoneNumber": "997878789",
-      "email": "",
-      "registrationDate": "17.8.2024, 22:56:45",
-      "lastModified": "17.8.2024, 22:56:45"
+      "email": "vinnsel@hotmail.com",
+      "lastModified": "17.8.2024, 23:49:54",
+      "id": "11"
     }
   ],
   "employees": [

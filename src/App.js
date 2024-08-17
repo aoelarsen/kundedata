@@ -1,21 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import CustomerForm from './CustomerForm';
-import CustomerList from './CustomerList';
 import CustomerDetails from './CustomerDetails';
 import EditCustomer from './EditCustomer';
 import SearchBar from './SearchBar';
-import NavBar from './NavBar';  // Importer NavBar-komponenten
+import NavBar from './NavBar';
 import Ordre from './Ordre';
 import Service from './Service';
-import Hjelpemidler from './Hjelpemidler';
 import Calculator from './Calculator';
-
+import CustomerListPage from './CustomerListPage';
 
 function App() {
   const [customers, setCustomers] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredCustomers, setFilteredCustomers] = useState([]);
+  const [phoneNumber, setPhoneNumber] = useState('');
 
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -43,6 +42,19 @@ function App() {
       customer.email.toLowerCase().includes(searchQuery.toLowerCase())
     );
     setFilteredCustomers(results);
+
+    // Sjekk for 8-sifret telefonnummer som ikke finnes i kundelisten
+    if (searchQuery.length === 8 && /^\d{8}$/.test(searchQuery)) {
+      const phoneExists = customers.some(c => c.phoneNumber === searchQuery);
+      if (!phoneExists) {
+        setPhoneNumber(searchQuery);
+      } else {
+        setPhoneNumber('');
+      }
+    } else {
+      setPhoneNumber('');
+    }
+
   }, [searchQuery, customers]);
 
   const updateCustomer = (updatedCustomer) => {
@@ -56,31 +68,32 @@ function App() {
   return (
     <Router>
       <div>
-        <NavBar />  {/* Inkluder NavBar-komponenten */}
+        <NavBar />
         <div className="p-4">
           <Routes>
           <Route
-        path="/customer-details/:id"
-        element={<CustomerDetails customers={customers} />}
+  path="/"
+  element={
+    <>
+      <SearchBar
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        filteredCustomers={filteredCustomers}
+        setPhoneNumber={setPhoneNumber}
       />
-      <Route
-        path="/edit-customer/:id"
-        element={<EditCustomer customers={customers} />}
+      <CustomerForm 
+        addCustomer={(newCustomer) => setCustomers([...customers, newCustomer])} 
+        customers={customers} 
+        phoneNumber={phoneNumber} 
       />
-            <Route
-              path="/"
-              element={
-                <>
-                  <SearchBar
-                    searchQuery={searchQuery}
-                    setSearchQuery={setSearchQuery}
-                    filteredCustomers={filteredCustomers}
-                  />
-                  <CustomerForm addCustomer={(newCustomer) => setCustomers([...customers, newCustomer])} customers={customers} />
-                  <CustomerList customers={filteredCustomers} deleteCustomer={(id) => setCustomers(customers.filter(customer => customer.id !== id))} />
-                </>
+
+    </>
               }
             />
+            <Route
+  path="/customer-list"
+  element={<CustomerListPage customers={customers} deleteCustomer={(id) => setCustomers(customers.filter(customer => customer.id !== id))} />}
+/>
             <Route
               path="/customer-details/:id"
               element={<CustomerDetails customers={customers} />}
@@ -89,11 +102,9 @@ function App() {
               path="/edit-customer/:id"
               element={<EditCustomer customers={customers} updateCustomer={updateCustomer} />}
             />
-<Route path="/ordre" element={<Ordre />} />
-             <Route path="/service" element={<Service />} />
-            
-             <Route path="/hjelpemidler" element={<Calculator />} />
-             <Route path="/tools/calculator" element={<Calculator />} />
+            <Route path="/ordre" element={<Ordre />} />
+            <Route path="/service" element={<Service />} />
+            <Route path="/hjelpemidler" element={<Calculator />} />
           </Routes>
         </div>
       </div>

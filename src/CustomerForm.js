@@ -1,15 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-function CustomerForm({ addCustomer, customers }) {
+function CustomerForm({ addCustomer, customers, phoneNumber }) { // Mottar phoneNumber som prop
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     phoneNumber: '',
     email: ''
   });
-
+  
+  const [errorMessage, setErrorMessage] = useState(''); // For feilmelding
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setFormData((prevData) => ({
+      ...prevData,
+      phoneNumber: phoneNumber // Setter telefonnummer hvis det er satt
+    }));
+  }, [phoneNumber]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -22,12 +30,18 @@ function CustomerForm({ addCustomer, customers }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Sjekk om telefonnummeret har nøyaktig 8 sifre
+    if (formData.phoneNumber.length !== 8 || !/^\d{8}$/.test(formData.phoneNumber)) {
+      setErrorMessage('Telefonnummer må være nøyaktig 8 sifre.');
+      return;
+    }
+
     // Finn den høyeste eksisterende ID
     const highestId = customers.length > 0 ? Math.max(...customers.map(c => parseInt(c.id, 10))) : 0;
 
-    // Sett ID til én høyere enn den høyeste eksisterende ID
-    const newId = highestId + 1;
-    console.log("Generated ID:", newId, "Type of ID:", typeof newId); // Legg til denne linjen for å vise ID-format
+    // Sett ID til én høyere enn den høyeste eksisterende ID og konverter til streng
+    const newId = (highestId + 1).toString();
+    console.log("Generated ID:", newId, "Type of ID:", typeof newId); // Viser ID-format
 
     const newCustomer = {
       ...formData,
@@ -95,6 +109,7 @@ function CustomerForm({ addCustomer, customers }) {
           required
           className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
         />
+        {errorMessage && <p className="text-red-500 text-sm mt-2">{errorMessage}</p>}
       </div>
       <div>
         <label className="block text-sm font-medium text-gray-700">E-post</label>

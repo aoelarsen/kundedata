@@ -9,6 +9,9 @@ function NavBar() {
           <Link to="/" className="hover:text-gray-300">Registrer/Søk</Link>
         </li>
         <li>
+          <Link to="/customer-list" className="hover:text-gray-300">Kundeliste</Link>
+        </li>
+        <li>
           <Link to="/ordre" className="hover:text-gray-300">Ordre</Link>
         </li>
         <li>
