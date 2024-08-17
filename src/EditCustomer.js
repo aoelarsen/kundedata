@@ -13,7 +13,7 @@ function EditCustomer({ customers }) {
 
   // Dette vil kjøres når komponenten laster, og når `customers` endres
   useEffect(() => {
-    const customer = customers.find((cust) => cust.id.toString() === id); // Sammenlign som streng
+    const customer = customers.find((cust) => cust.id.toString() === id); // Sammenlign som streng.
     console.log("Customer found:", customer); // Debugging
     if (customer) {
       setFormData({
