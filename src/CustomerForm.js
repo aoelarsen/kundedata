@@ -25,9 +25,9 @@ function CustomerForm({ addCustomer, customers }) {
     // Finn den høyeste eksisterende ID
     const highestId = customers.length > 0 ? Math.max(...customers.map(c => parseInt(c.id, 10))) : 0;
 
-    // Sett ID til én høyere enn den høyeste eksisterende ID og konverter til streng
-    const newId = (highestId + 1).toString();
-    console.log("Generated ID:", newId, "Type of ID:", typeof newId); // Viser ID-format
+    // Sett ID til én høyere enn den høyeste eksisterende ID
+    const newId = highestId + 1;
+    console.log("Generated ID:", newId, "Type of ID:", typeof newId); // Legg til denne linjen for å vise ID-format
 
     const newCustomer = {
       ...formData,

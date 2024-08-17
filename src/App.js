@@ -9,6 +9,7 @@ import NavBar from './NavBar';  // Importer NavBar-komponenten
 import Ordre from './Ordre';
 import Service from './Service';
 import Hjelpemidler from './Hjelpemidler';
+import Calculator from './Calculator';
 
 
 function App() {
@@ -91,8 +92,8 @@ function App() {
 <Route path="/ordre" element={<Ordre />} />
              <Route path="/service" element={<Service />} />
             
-             <Route path="/hjelpemidler" element={<Hjelpemidler />} />
-
+             <Route path="/hjelpemidler" element={<Calculator />} />
+             <Route path="/tools/calculator" element={<Calculator />} />
           </Routes>
         </div>
       </div>

@@ -6,7 +6,7 @@ function SearchBar({ searchQuery, setSearchQuery, filteredCustomers }) {
 
   const handleSelect = (customer) => {
     setSearchQuery('');  // Nullstill søkefeltet
-    navigate(`/customer-details/${customer.id}`);  // Naviger til kundens detaljer.
+    navigate(`/customer-details/${customer.id}`);  // Naviger til kundens detaljer
   };
 
   return (
