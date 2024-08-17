@@ -17,12 +17,12 @@
       "registrationDate": "13.8.2024, 23:22:57"
     },
     {
-      "id": "9",
       "firstName": "Amalie",
       "lastName": "Pettersen",
       "phoneNumber": "45678909",
-      "email": "amalie.pettersen@example.com",
-      "registrationDate": "13.8.2024, 23:22:57"
+      "email": "amalie.pettersen@example.comm",
+      "lastModified": "17.8.2024, 08:20:01",
+      "id": "9"
     },
     {
       "id": "10",
@@ -33,31 +33,49 @@
       "registrationDate": "13.8.2024, 23:22:57"
     },
     {
-      "id": 1723785421740,
-      "firstName": "lkjhk",
-      "lastName": "vlkjhl",
+      "id": 11,
+      "firstName": "Pet",
+      "lastName": "lksdf",
+      "phoneNumber": "78786890",
+      "email": "",
+      "registrationDate": "17.8.2024, 08:29:21",
+      "lastModified": "17.8.2024, 08:29:21"
+    },
+    {
+      "id": 12,
+      "firstName": "Vidar",
+      "lastName": "Innselset",
       "phoneNumber": "98015736",
       "email": "",
-      "registrationDate": "16.8.2024, 07:17:01",
-      "lastModified": "16.8.2024, 07:17:01"
+      "registrationDate": "17.8.2024, 08:36:15",
+      "lastModified": "17.8.2024, 08:36:15"
     },
     {
-      "id": 1723785749361,
-      "firstName": "dfs",
-      "lastName": "jlkø",
-      "phoneNumber": "80989887",
+      "id": 13,
+      "firstName": "Per",
+      "lastName": "Persson",
+      "phoneNumber": "6876786",
       "email": "",
-      "registrationDate": "16.8.2024, 07:22:29",
-      "lastModified": "16.8.2024, 07:22:29"
+      "registrationDate": "17.8.2024, 08:46:14",
+      "lastModified": "17.8.2024, 08:46:14"
     },
     {
-      "id": 1723796973599,
-      "firstName": "jkljø",
-      "lastName": "m.m.",
-      "phoneNumber": "98989898",
+      "id": 14,
+      "firstName": "Vidar",
+      "lastName": "Person",
+      "phoneNumber": "98015736",
       "email": "",
-      "registrationDate": "16.8.2024, 10:29:33",
-      "lastModified": "16.8.2024, 10:29:33"
+      "registrationDate": "17.8.2024, 08:48:59",
+      "lastModified": "17.8.2024, 08:48:59"
+    },
+    {
+      "id": 15,
+      "firstName": "asdf",
+      "lastName": "asdf",
+      "phoneNumber": "790789790",
+      "email": "",
+      "registrationDate": "17.8.2024, 08:51:52",
+      "lastModified": "17.8.2024, 08:51:52"
     }
   ],
   "employees": [

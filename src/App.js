@@ -65,7 +65,7 @@ function App() {
                     setSearchQuery={setSearchQuery}
                     filteredCustomers={filteredCustomers}
                   />
-                  <CustomerForm addCustomer={(newCustomer) => setCustomers([...customers, newCustomer])} />
+<CustomerForm addCustomer={(newCustomer) => setCustomers([...customers, newCustomer])} customers={customers} />
                   <CustomerList customers={filteredCustomers} deleteCustomer={deleteCustomer} />
 
                 </>

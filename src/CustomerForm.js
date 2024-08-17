@@ -1,88 +1,116 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-function CustomerForm({ addCustomer, phoneNumber }) {
+function CustomerForm({ addCustomer, customers }) {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
-    phoneNumber: phoneNumber || '',
+    phoneNumber: '',
     email: ''
   });
 
-  const [errorMessage, setErrorMessage] = useState('');
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
+    setFormData({
+      ...formData,
       [name]: value
-    }));
+    });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.firstName || !formData.lastName || !formData.phoneNumber) {
-      setErrorMessage('Fornavn, etternavn og telefonnummer er obligatoriske.');
-      return;
-    }
+    // Finn den høyeste eksisterende ID
+    const highestId = customers.length > 0 ? Math.max(...customers.map(c => parseInt(c.id, 10))) : 0;
 
-    if (formData.phoneNumber.length !== 8) {
-      setErrorMessage('Telefonnummer må være 8 sifre.');
-      return;
-    }
+    // Sett ID til én høyere enn den høyeste eksisterende ID
+    const newCustomer = {
+      ...formData,
+      id: highestId + 1,
+      registrationDate: new Date().toLocaleString(),
+      lastModified: new Date().toLocaleString()
+    };
 
-    setErrorMessage('');
-    addCustomer({ ...formData, id: Date.now(), registrationDate: new Date().toLocaleString() });
-    setFormData({ firstName: '', lastName: '', phoneNumber: '', email: '' });
+    try {
+      console.log('Sender data til server:', newCustomer);
+      
+      // Send en POST-forespørsel til JSON-serveren
+      const response = await fetch('http://localhost:5000/customers', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newCustomer),
+      });
+
+      if (response.ok) {
+        const addedCustomer = await response.json();
+        console.log('Suksess! Kunde lagt til:', addedCustomer);
+        addCustomer(addedCustomer);
+        navigate(`/customer-details/${addedCustomer.id}`);
+      } else {
+        console.error('Feil ved registrering av kunde:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Feil ved kommunikasjon med serveren:', error);
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md max-w-md mx-auto">
-      <h2 className="text-xl font-bold mb-4">Registrer Kunde</h2>
-      {errorMessage && <p className="text-red-500 mb-4">{errorMessage}</p>}
-      <div className="mb-4">
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
         <label className="block text-sm font-medium text-gray-700">Fornavn</label>
         <input
           type="text"
           name="firstName"
           value={formData.firstName}
           onChange={handleChange}
-          className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          required
+          className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
         />
       </div>
-      <div className="mb-4">
+      <div>
         <label className="block text-sm font-medium text-gray-700">Etternavn</label>
         <input
           type="text"
           name="lastName"
           value={formData.lastName}
           onChange={handleChange}
-          className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          required
+          className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
         />
       </div>
-      <div className="mb-4">
+      <div>
         <label className="block text-sm font-medium text-gray-700">Telefonnummer</label>
         <input
-          type="text"
+          type="tel"
           name="phoneNumber"
           value={formData.phoneNumber}
           onChange={handleChange}
-          className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          required
+          className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
         />
       </div>
-      <div className="mb-4">
+      <div>
         <label className="block text-sm font-medium text-gray-700">E-post</label>
         <input
           type="email"
           name="email"
           value={formData.email}
           onChange={handleChange}
-          className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
         />
       </div>
-      <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600">
-        Registrer
-      </button>
+      <div className="text-center">
+        <button
+          type="submit"
+          className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600"
+        >
+          Registrer Kunde
+        </button>
+      </div>
     </form>
   );
 }
