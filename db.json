@@ -1,38 +1,6 @@
 {
   "customers": [
     {
-      "id": "7",
-      "firstName": "Mia",
-      "lastName": "Kristiansen",
-      "phoneNumber": "45678907",
-      "email": "mia.kristiansen@example.com",
-      "registrationDate": "13.8.2024, 23:22:57"
-    },
-    {
-      "id": "8",
-      "firstName": "Oliver",
-      "lastName": "Olsen",
-      "phoneNumber": "45678908",
-      "email": "oliver.olsen@example.com",
-      "registrationDate": "13.8.2024, 23:22:57"
-    },
-    {
-      "firstName": "Amalie",
-      "lastName": "Pettersen",
-      "phoneNumber": "45678909",
-      "email": "amalie.pettersen@example.comm",
-      "lastModified": "17.8.2024, 08:20:01",
-      "id": "9"
-    },
-    {
-      "id": "10",
-      "firstName": "William",
-      "lastName": "Andersen",
-      "phoneNumber": "45678910",
-      "email": "william.andersen@example.com",
-      "registrationDate": "13.8.2024, 23:22:57"
-    },
-    {
       "id": 11,
       "firstName": "Pet",
       "lastName": "lksdf",
@@ -76,6 +44,33 @@
       "email": "",
       "registrationDate": "17.8.2024, 08:51:52",
       "lastModified": "17.8.2024, 08:51:52"
+    },
+    {
+      "id": 16,
+      "firstName": "TEst",
+      "lastName": "Rønsåsbjørg",
+      "phoneNumber": "98015736",
+      "email": "",
+      "registrationDate": "17.8.2024, 09:24:57",
+      "lastModified": "17.8.2024, 09:24:57"
+    },
+    {
+      "id": 17,
+      "firstName": "Vidar",
+      "lastName": "Persson",
+      "phoneNumber": "98015736",
+      "email": "",
+      "registrationDate": "17.8.2024, 09:26:51",
+      "lastModified": "17.8.2024, 09:26:51"
+    },
+    {
+      "id": 18,
+      "firstName": "hlkøj",
+      "lastName": "løkjløj",
+      "phoneNumber": "89868796",
+      "email": "",
+      "registrationDate": "17.8.2024, 17:28:49",
+      "lastModified": "17.8.2024, 17:28:50"
     }
   ],
   "employees": [
