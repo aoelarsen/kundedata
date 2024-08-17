@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 function CustomerForm({ addCustomer, customers }) {
-      const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     phoneNumber: '',
@@ -25,10 +25,13 @@ function CustomerForm({ addCustomer, customers }) {
     // Finn den høyeste eksisterende ID
     const highestId = customers.length > 0 ? Math.max(...customers.map(c => parseInt(c.id, 10))) : 0;
 
-    // Sett ID til én høyere enn den høyeste eksisterende ID
+    // Sett ID til én høyere enn den høyeste eksisterende ID og konverter til streng
+    const newId = (highestId + 1).toString();
+    console.log("Generated ID:", newId, "Type of ID:", typeof newId); // Viser ID-format
+
     const newCustomer = {
       ...formData,
-      id: highestId + 1,
+      id: newId,
       registrationDate: new Date().toLocaleString(),
       lastModified: new Date().toLocaleString()
     };

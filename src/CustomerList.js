@@ -8,7 +8,7 @@ function CustomerList({ customers, deleteCustomer }) {
         method: 'DELETE',
       });
       if (response.ok) {
-        deleteCustomer(id); // Oppdaterer tilstanden i App.js etter sletting.
+        deleteCustomer(id); // Oppdaterer tilstanden i App.js etter sletting
       } else {
         console.error('Feil ved sletting av kunde');
       }

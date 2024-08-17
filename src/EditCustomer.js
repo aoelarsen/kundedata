@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 function EditCustomer({ customers }) {
-  const { id } = useParams();
-  const navigate = useNavigate();
+  const { id } = useParams(); // Fanger opp id fra URL-en
+  const navigate = useNavigate(); // Brukes til å navigere programmatisk
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -13,7 +13,8 @@ function EditCustomer({ customers }) {
 
   // Dette vil kjøres når komponenten laster, og når `customers` endres
   useEffect(() => {
-    const customer = customers.find((cust) => cust.id.toString() === id); // Sammenlign som streng.
+    const customer = customers.find((cust) => cust.id.toString() === id); // Sammenligner som streng
+    console.log("Fetching customer with ID:", id, "Type of ID:", typeof id);
     console.log("Customer found:", customer); // Debugging
     if (customer) {
       setFormData({
@@ -41,6 +42,9 @@ function EditCustomer({ customers }) {
       lastModified: new Date().toLocaleString(),
     };
 
+    console.log("Oppdaterer kunde med ID:", id);
+    console.log("Oppdaterer kunde med data:", updatedCustomer);
+
     try {
       const response = await fetch(`http://localhost:5000/customers/${id}`, {
         method: 'PUT',
@@ -51,10 +55,11 @@ function EditCustomer({ customers }) {
       });
 
       if (response.ok) {
+        console.log('Kunde oppdatert!');
         // Hvis oppdateringen er vellykket, rutes til CustomerDetails
         navigate(`/customer-details/${id}`);
       } else {
-        console.error('Feil ved oppdatering av kunde');
+        console.error('Feil ved oppdatering av kunde:', response.statusText);
       }
     } catch (error) {
       console.error('Feil ved kommunikasjon med serveren:', error);

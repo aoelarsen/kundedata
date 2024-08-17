@@ -1,19 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 
-function CustomerDetails({ customers }) {
+function CustomerDetails() {
   const { id } = useParams();
   const [customer, setCustomer] = useState(null);
 
-  useEffect(() => {
-    const customerData = customers.find((cust) => cust.id.toString() === id);
-    console.log("Fetching customer with ID:", id);
-    if (customerData) {
-      setCustomer(customerData);
-    } else {
-      console.error('Kunde ble ikke funnet');
+  const fetchCustomer = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/customers/${id}`);
+      if (response.ok) {
+        const customerData = await response.json();
+        setCustomer(customerData);
+      } else {
+        console.error('Kunde ble ikke funnet');
+      }
+    } catch (error) {
+      console.error('Feil ved henting av kunden:', error);
     }
-  }, [id, customers]);
+  };
+
+  useEffect(() => {
+    fetchCustomer();
+  }, [id]);
 
   if (!customer) {
     return <p className="text-red-500 text-center mt-4">Kunde ikke funnet</p>;
@@ -46,6 +54,14 @@ function CustomerDetails({ customers }) {
         <div className="flex justify-between">
           <span className="text-sm font-medium text-gray-700">Sist endret:</span>
           <span className="text-gray-900">{customer.lastModified}</span>
+        </div>
+        <div className="text-center mt-6">
+          <Link 
+            to={`/edit-customer/${customer.id}`} 
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          >
+            Endre Kunde
+          </Link>
         </div>
       </div>
     </div>
