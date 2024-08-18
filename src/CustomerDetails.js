@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import OrderList from './OrderList';
 
 function CustomerDetails() {
   const { id } = useParams();
@@ -28,42 +29,46 @@ function CustomerDetails() {
   }
 
   return (
-    <div className="max-w-lg mx-auto py-8 bg-white shadow-md rounded-lg p-6">
-      <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Kundedetaljer</h2>
-      <div className="space-y-4">
-        <div className="flex justify-between">
-          <span className="text-sm font-medium text-gray-700">Fornavn:</span>
-          <span className="text-gray-900">{customer.firstName}</span>
+    <div className="max-w-4xl mx-auto py-8 bg-white shadow-lg rounded-lg p-6">
+      <h2 className="text-4xl font-semibold mb-8 text-center text-gray-800">Kundedetaljer</h2>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <p className="text-lg font-medium text-gray-600">Fornavn:</p>
+          <p className="text-xl text-gray-900">{customer.firstName}</p>
         </div>
-        <div className="flex justify-between">
-          <span className="text-sm font-medium text-gray-700">Etternavn:</span>
-          <span className="text-gray-900">{customer.lastName}</span>
+        <div>
+          <p className="text-lg font-medium text-gray-600">Etternavn:</p>
+          <p className="text-xl text-gray-900">{customer.lastName}</p>
         </div>
-        <div className="flex justify-between">
-          <span className="text-sm font-medium text-gray-700">Telefonnummer:</span>
-          <span className="text-gray-900">{customer.phoneNumber}</span>
+        <div>
+          <p className="text-lg font-medium text-gray-600">Telefonnummer:</p>
+          <p className="text-xl text-gray-900">{customer.phoneNumber}</p>
         </div>
-        <div className="flex justify-between">
-          <span className="text-sm font-medium text-gray-700">Epost:</span>
-          <span className="text-gray-900">{customer.email}</span>
+        <div>
+          <p className="text-lg font-medium text-gray-600">Epost:</p>
+          <p className="text-xl text-gray-900">{customer.email}</p>
         </div>
-        <div className="flex justify-between">
-          <span className="text-sm font-medium text-gray-700">Registrert dato:</span>
-          <span className="text-gray-900">{customer.registrationDate}</span>
+        <div>
+          <p className="text-lg font-medium text-gray-600">Registrert dato:</p>
+          <p className="text-xl text-gray-900">{customer.registrationDate}</p>
         </div>
-        <div className="flex justify-between">
-          <span className="text-sm font-medium text-gray-700">Sist endret:</span>
-          <span className="text-gray-900">{customer.lastModified}</span>
-        </div>
-        <div className="text-center mt-6">
-          <Link 
-            to={`/edit-customer/${customer.id}`} 
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-          >
-            Endre Kunde
-          </Link>
+        <div>
+          <p className="text-lg font-medium text-gray-600">Sist endret:</p>
+          <p className="text-xl text-gray-900">{customer.lastModified}</p>
         </div>
       </div>
+      <div className="text-center mt-8">
+        <Link 
+          to={`/edit-customer/${customer.id}`} 
+          className="inline-block bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-600"
+        >
+          Endre Kunde
+        </Link>
+      </div>
+
+      <hr className="my-8" />
+
+      <OrderList customerId={customer.id} />
     </div>
   );
 }
