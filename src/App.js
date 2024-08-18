@@ -71,29 +71,34 @@ function App() {
         <NavBar />
         <div className="p-4">
           <Routes>
-          <Route
-  path="/"
-  element={
-    <>
-      <SearchBar
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        filteredCustomers={filteredCustomers}
-        setPhoneNumber={setPhoneNumber}
-      />
-      <CustomerForm 
-        addCustomer={(newCustomer) => setCustomers([...customers, newCustomer])} 
-        customers={customers} 
-        phoneNumber={phoneNumber} 
-      />
-
-    </>
+            <Route
+              path="/"
+              element={
+                <>
+                  <SearchBar
+                    searchQuery={searchQuery}
+                    setSearchQuery={setSearchQuery}
+                    filteredCustomers={filteredCustomers}
+                    setPhoneNumber={setPhoneNumber} // Passer setPhoneNumber til SearchBar
+                  />
+                  <CustomerForm 
+                    addCustomer={(newCustomer) => setCustomers([...customers, newCustomer])} 
+                    customers={customers} 
+                    phoneNumber={phoneNumber} // Passer phoneNumber til CustomerForm
+                    setSearchQuery={setSearchQuery} // Passer setSearchQuery til CustomerForm
+                  />
+                </>
               }
             />
             <Route
-  path="/customer-list"
-  element={<CustomerListPage customers={customers} deleteCustomer={(id) => setCustomers(customers.filter(customer => customer.id !== id))} />}
-/>
+              path="/customer-list"
+              element={
+                <CustomerListPage 
+                  customers={customers} 
+                  deleteCustomer={(id) => setCustomers(customers.filter(customer => customer.id !== id))} 
+                />
+              }
+            />
             <Route
               path="/customer-details/:id"
               element={<CustomerDetails customers={customers} />}

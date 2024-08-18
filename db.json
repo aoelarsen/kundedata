@@ -97,6 +97,15 @@
       "email": "vinnsel@hotmail.com",
       "lastModified": "17.8.2024, 23:49:54",
       "id": "11"
+    },
+    {
+      "id": "12",
+      "firstName": "Amund",
+      "lastName": "Rønsåsbjørg",
+      "phoneNumber": "78675645",
+      "email": "",
+      "registrationDate": "18.8.2024, 16:09:16",
+      "lastModified": "18.8.2024, 16:09:16"
     }
   ],
   "employees": [

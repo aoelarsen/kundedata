@@ -25,8 +25,8 @@ function CustomerList({ customers, deleteCustomer }) {
           <tr>
             <th className="py-2 px-4 border-b">Fornavn</th>
             <th className="py-2 px-4 border-b">Etternavn</th>
-            <th className="py-2 px-4 border-b">Telefonnummer</th>
-            <th className="py-2 px-4 border-b">E-post</th>
+            <th className="py-2 px-4 border-b hidden sm:table-cell">Telefonnummer</th>
+            <th className="py-2 px-4 border-b hidden sm:table-cell">E-post</th>
             <th className="py-2 px-4 border-b">Handlinger</th>
           </tr>
         </thead>
@@ -36,27 +36,29 @@ function CustomerList({ customers, deleteCustomer }) {
               <tr key={customer.id}>
                 <td className="py-2 px-4 border-b">{customer.firstName}</td>
                 <td className="py-2 px-4 border-b">{customer.lastName}</td>
-                <td className="py-2 px-4 border-b">{customer.phoneNumber}</td>
-                <td className="py-2 px-4 border-b">{customer.email}</td>
+                <td className="py-2 px-4 border-b hidden sm:table-cell">{customer.phoneNumber}</td>
+                <td className="py-2 px-4 border-b hidden sm:table-cell">{customer.email}</td>
                 <td className="py-2 px-4 border-b">
-                  <Link 
-                    to={`/edit-customer/${customer.id}`}
-                    className="bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-600"
-                  >
-                    Rediger
-                  </Link>
-                  <button 
-                    onClick={() => handleDelete(customer.id)}
-                    className="bg-red-500 text-white px-4 py-1 ml-2 rounded hover:bg-red-600"
-                  >
-                    Slett
-                  </button>
-                  <Link 
-                    to={`/customer-details/${customer.id}`}
-                    className="bg-green-500 text-white px-4 py-1 ml-2 rounded hover:bg-green-600"
-                  >
-                    Detaljer
-                  </Link>
+                  <div className="flex flex-col sm:flex-row sm:space-x-2">
+                    <Link 
+                      to={`/edit-customer/${customer.id}`}
+                      className="bg-blue-500 text-white px-4 py-1 mb-2 sm:mb-0 rounded hover:bg-blue-600"
+                    >
+                      Rediger
+                    </Link>
+                    <button 
+                      onClick={() => handleDelete(customer.id)}
+                      className="bg-red-500 text-white px-4 py-1 mb-2 sm:mb-0 rounded hover:bg-red-600 hidden sm:inline-block"
+                    >
+                      Slett
+                    </button>
+                    <Link 
+                      to={`/customer-details/${customer.id}`}
+                      className="bg-green-500 text-white px-4 py-1 rounded hover:bg-green-600"
+                    >
+                      Detaljer
+                    </Link>
+                  </div>
                 </td>
               </tr>
             ))

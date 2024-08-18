@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-function CustomerForm({ addCustomer, customers, phoneNumber }) { // Mottar phoneNumber som prop
+function CustomerForm({ addCustomer, customers, phoneNumber, setSearchQuery }) {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -25,6 +25,18 @@ function CustomerForm({ addCustomer, customers, phoneNumber }) { // Mottar phone
       ...formData,
       [name]: value
     });
+
+    if (name === 'phoneNumber' && value.length === 8) {
+      // Sjekk om telefonnummeret allerede er registrert
+      const existingCustomer = customers.find(customer => customer.phoneNumber === value);
+      if (existingCustomer) {
+        setErrorMessage('Kunde er allerede registrert.');
+        setSearchQuery(value); // Oppdaterer søkefeltet med telefonnummeret
+      } else {
+        setErrorMessage(''); // Fjern feilmelding hvis nummeret ikke er registrert
+        setSearchQuery(''); // Tøm søkefeltet
+      }
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -36,12 +48,16 @@ function CustomerForm({ addCustomer, customers, phoneNumber }) { // Mottar phone
       return;
     }
 
+    // Hvis det er en feil, skal man ikke tillate innsending
+    if (errorMessage) {
+      return;
+    }
+
     // Finn den høyeste eksisterende ID
     const highestId = customers.length > 0 ? Math.max(...customers.map(c => parseInt(c.id, 10))) : 0;
 
     // Sett ID til én høyere enn den høyeste eksisterende ID og konverter til streng
     const newId = (highestId + 1).toString();
-    console.log("Generated ID:", newId, "Type of ID:", typeof newId); // Viser ID-format
 
     const newCustomer = {
       ...formData,
@@ -101,6 +117,7 @@ function CustomerForm({ addCustomer, customers, phoneNumber }) { // Mottar phone
       </div>
       <div>
         <label className="block text-sm font-medium text-gray-700">Telefonnummer</label>
+        {errorMessage && <p className="text-red-500 text-sm mt-1 mb-1">{errorMessage}</p>}
         <input
           type="tel"
           name="phoneNumber"
@@ -109,7 +126,6 @@ function CustomerForm({ addCustomer, customers, phoneNumber }) { // Mottar phone
           required
           className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
         />
-        {errorMessage && <p className="text-red-500 text-sm mt-2">{errorMessage}</p>}
       </div>
       <div>
         <label className="block text-sm font-medium text-gray-700">E-post</label>
