@@ -1,74 +1,41 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-function CustomerList({ customers, deleteCustomer }) {
-  const handleDelete = async (id) => {
-    try {
-      const response = await fetch(`http://localhost:5000/customers/${id}`, {
-        method: 'DELETE',
-      });
-      if (response.ok) {
-        deleteCustomer(id); // Oppdaterer tilstanden i App.js etter sletting
-      } else {
-        console.error('Feil ved sletting av kunde');
-      }
-    } catch (error) {
-      console.error('Feil ved kommunikasjon med serveren:', error);
-    }
-  };
-
+function CustomerList({ customers }) {
   return (
     <div className="mt-8">
-      <h2 className="text-2xl font-bold mb-4">Kundeoversikt</h2>
-      <table className="min-w-full bg-white border border-gray-200">
-        <thead>
-          <tr>
-            <th className="py-2 px-4 border-b">Fornavn</th>
-            <th className="py-2 px-4 border-b">Etternavn</th>
-            <th className="py-2 px-4 border-b hidden sm:table-cell">Telefonnummer</th>
-            <th className="py-2 px-4 border-b hidden sm:table-cell">E-post</th>
-            <th className="py-2 px-4 border-b">Handlinger</th>
-          </tr>
-        </thead>
-        <tbody>
-          {customers.length > 0 ? (
-            customers.map((customer) => (
-              <tr key={customer.id}>
-                <td className="py-2 px-4 border-b">{customer.firstName}</td>
-                <td className="py-2 px-4 border-b">{customer.lastName}</td>
-                <td className="py-2 px-4 border-b hidden sm:table-cell">{customer.phoneNumber}</td>
-                <td className="py-2 px-4 border-b hidden sm:table-cell">{customer.email}</td>
-                <td className="py-2 px-4 border-b">
-                  <div className="flex flex-col sm:flex-row sm:space-x-2">
-                    <Link 
-                      to={`/edit-customer/${customer.id}`}
-                      className="bg-blue-500 text-white px-4 py-1 mb-2 sm:mb-0 rounded hover:bg-blue-600"
-                    >
-                      Rediger
-                    </Link>
-                    <button 
-                      onClick={() => handleDelete(customer.id)}
-                      className="bg-red-500 text-white px-4 py-1 mb-2 sm:mb-0 rounded hover:bg-red-600 hidden sm:inline-block"
-                    >
-                      Slett
-                    </button>
-                    <Link 
-                      to={`/customer-details/${customer.id}`}
-                      className="bg-green-500 text-white px-4 py-1 rounded hover:bg-green-600"
-                    >
-                      Detaljer
-                    </Link>
-                  </div>
+      <h3 className="text-2xl font-semibold mb-4 text-gray-800">Kunder</h3>
+      <div className="overflow-x-auto">
+        <table className="min-w-full bg-white border border-gray-300 rounded-lg">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Fornavn</th>
+              <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Etternavn</th>
+              <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Telefonnummer</th>
+              <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">E-post</th>
+              <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Handlinger</th>
+            </tr>
+          </thead>
+          <tbody>
+            {customers.map((customer) => (
+              <tr key={customer.id} className="hover:bg-gray-50">
+                <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{customer.firstName}</td>
+                <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{customer.lastName}</td>
+                <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{customer.phoneNumber}</td>
+                <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{customer.email}</td>
+                <td className="px-6 py-4 border-b border-gray-200 text-sm">
+                  <Link
+                    to={`/customer-details/${customer.id}`}
+                    className="text-blue-500 hover:underline"
+                  >
+                    Se detaljer
+                  </Link>
                 </td>
               </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="5" className="text-center py-4">Ingen kunder funnet</td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

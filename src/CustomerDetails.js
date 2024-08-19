@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import OrderList from './OrderList';
+import OrderListCustomer from './OrderListCustomer';
 
 function CustomerDetails() {
   const { id } = useParams();
@@ -29,35 +29,52 @@ function CustomerDetails() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto py-8 bg-white shadow-lg rounded-lg p-6">
-      <h2 className="text-4xl font-semibold mb-8 text-center text-gray-800">Kundedetaljer</h2>
-      <div className="grid grid-cols-2 gap-4">
+    <div className="p-4">
+      <h2 className="text-2xl font-bold mb-4 text-center">Kundedetaljer</h2>
+      <table className="min-w-full bg-white border border-gray-200">
+        <tbody>
+          <tr>
+            <th className="py-2 px-4 border-b">Fornavn</th>
+            <td className="py-2 px-4 border-b">{customer.firstName}</td>
+          </tr>
+          <tr>
+            <th className="py-2 px-4 border-b">Etternavn</th>
+            <td className="py-2 px-4 border-b">{customer.lastName}</td>
+          </tr>
+          <tr>
+            <th className="py-2 px-4 border-b">Telefonnummer</th>
+            <td className="py-2 px-4 border-b">{customer.phoneNumber}</td>
+          </tr>
+          <tr>
+            <th className="py-2 px-4 border-b">Epost</th>
+            <td className="py-2 px-4 border-b">{customer.email}</td>
+          </tr>
+          <tr>
+            <th className="py-2 px-4 border-b">Registrert dato</th>
+            <td className="py-2 px-4 border-b">{customer.registrationDate}</td>
+          </tr>
+          <tr>
+            <th className="py-2 px-4 border-b">Sist endret</th>
+            <td className="py-2 px-4 border-b">{customer.lastModified}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div className="flex justify-between mt-8">
         <div>
-          <p className="text-lg font-medium text-gray-600">Fornavn:</p>
-          <p className="text-xl text-gray-900">{customer.firstName}</p>
+          <Link 
+            to={`/create-order/${customer.id}`} 
+            className="inline-block bg-green-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-600 mr-2"
+          >
+            Opprett Ordre
+          </Link>
+          <Link 
+            to={`/create-service/${customer.id}`} 
+            className="inline-block bg-yellow-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-yellow-600"
+          >
+            Opprett Service
+          </Link>
         </div>
-        <div>
-          <p className="text-lg font-medium text-gray-600">Etternavn:</p>
-          <p className="text-xl text-gray-900">{customer.lastName}</p>
-        </div>
-        <div>
-          <p className="text-lg font-medium text-gray-600">Telefonnummer:</p>
-          <p className="text-xl text-gray-900">{customer.phoneNumber}</p>
-        </div>
-        <div>
-          <p className="text-lg font-medium text-gray-600">Epost:</p>
-          <p className="text-xl text-gray-900">{customer.email}</p>
-        </div>
-        <div>
-          <p className="text-lg font-medium text-gray-600">Registrert dato:</p>
-          <p className="text-xl text-gray-900">{customer.registrationDate}</p>
-        </div>
-        <div>
-          <p className="text-lg font-medium text-gray-600">Sist endret:</p>
-          <p className="text-xl text-gray-900">{customer.lastModified}</p>
-        </div>
-      </div>
-      <div className="text-center mt-8">
         <Link 
           to={`/edit-customer/${customer.id}`} 
           className="inline-block bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-600"
@@ -68,7 +85,7 @@ function CustomerDetails() {
 
       <hr className="my-8" />
 
-      <OrderList customerId={customer.id} />
+      <OrderListCustomer customerId={customer.id} />
     </div>
   );
 }

@@ -81,12 +81,12 @@
       "lastModified": "18.8.2024, 10:45:00"
     },
     {
-      "id": "11",
       "firstName": "Vidar",
       "lastName": "Innselset",
       "phoneNumber": "98015736",
       "email": "vinnsel@hotmail.com",
-      "lastModified": "17.8.2024, 23:49:54"
+      "lastModified": "19.8.2024, 22:33:51",
+      "id": "11"
     },
     {
       "id": "12",
@@ -138,13 +138,13 @@
   "orders": [
     {
       "Varemerke": "Nike",
-      "Produkt": "Løpesko",
+      "Produkt": "Løpeskoen",
       "Størrelse": "43",
       "Farge": "Svart",
       "Status": "Under behandling",
       "Kommentar": "Ingen kommentarer",
       "Ansatt": "Ola Nordmann",
-      "Endretdato": "2024-08-18T20:30:38.694Z",
+      "Endretdato": "2024-08-19T21:11:01.450Z",
       "id": "1"
     },
     {

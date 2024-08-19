@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-function OrderList() {
+function OrderList({ customerId }) {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await fetch('http://localhost:5000/orders');
+        const response = await fetch(`http://localhost:5000/orders?kundeid=${customerId}`);
         if (response.ok) {
           const data = await response.json();
           setOrders(data);
@@ -23,14 +23,14 @@ function OrderList() {
     };
 
     fetchOrders();
-  }, []);
+  }, [customerId]);
 
   if (loading) {
     return <p>Laster ordrer...</p>;
   }
 
   if (orders.length === 0) {
-    return <p className="text-center text-lg text-gray-600">Ingen ordrer funnet.</p>;
+    return <p className="text-center text-lg text-gray-600">Ingen ordre er registrert for denne kunden.</p>;
   }
 
   const formatDate = (dateString) => {
@@ -40,7 +40,7 @@ function OrderList() {
 
   return (
     <div className="mt-8">
-      <h3 className="text-2xl font-semibold mb-4 text-gray-800">Ordre</h3>
+      <h3 className="text-2xl font-semibold mb-4 text-gray-800">Ordrer</h3>
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white border border-gray-300 rounded-lg">
           <thead>

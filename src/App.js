@@ -5,11 +5,11 @@ import CustomerDetails from './CustomerDetails';
 import EditCustomer from './EditCustomer';
 import SearchBar from './SearchBar';
 import NavBar from './NavBar';
-import Ordre from './Ordre';
 import Service from './Service';
 import Calculator from './Calculator';
-import CustomerListPage from './CustomerListPage';
+import CustomerList from './CustomerList';
 import OrderDetails from './OrderDetails'; // Importer OrderDetails
+import OrderList from './OrderList';
 
 function App() {
   const [customers, setCustomers] = useState([]);
@@ -94,7 +94,7 @@ function App() {
             <Route
               path="/customer-list"
               element={
-                <CustomerListPage 
+                <CustomerList 
                   customers={customers} 
                   deleteCustomer={(id) => setCustomers(customers.filter(customer => customer.id !== id))} 
                 />
@@ -108,8 +108,8 @@ function App() {
               path="/edit-customer/:id"
               element={<EditCustomer customers={customers} updateCustomer={updateCustomer} />}
             />
-                        <Route path="/order-details/:id" element={<OrderDetails />} /> {/* Legg til denne ruten */}
-            <Route path="/ordre" element={<Ordre />} />
+            <Route path="/order-details/:id" element={<OrderDetails />} /> {/* Legg til denne ruten */}
+            <Route path="/ordre" element={<OrderList />} />
             <Route path="/service" element={<Service />} />
             <Route path="/hjelpemidler" element={<Calculator />} />
           </Routes>
