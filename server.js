@@ -46,6 +46,99 @@ const orderSchema = new mongoose.Schema({
 
 const Order = mongoose.model('Order', orderSchema);
 
+// Schema and Model for Employees
+const employeeSchema = new mongoose.Schema({
+  navn: String,
+  telefon: String,
+  epost: String,
+  tilgang: String,
+});
+
+const Employee = mongoose.model('Employee', employeeSchema);
+
+// Endpoint to get all employees
+app.get('/employees', async (req, res) => {
+  try {
+    const employees = await Employee.find();
+    res.json(employees);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Endpoint to get a single employee by ID
+app.get('/employees/:id', async (req, res) => {
+  try {
+    const employee = await Employee.findById(req.params.id);
+    if (employee == null) {
+      return res.status(404).json({ message: 'Ansatt ikke funnet' });
+    }
+    res.json(employee);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Endpoint to create a new employee
+app.post('/employees', async (req, res) => {
+  const employee = new Employee({
+    navn: req.body.navn,
+    telefon: req.body.telefon,
+    epost: req.body.epost,
+    tilgang: req.body.tilgang,
+  });
+
+  try {
+    const newEmployee = await employee.save();
+    res.status(201).json(newEmployee);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+// Endpoint to update an employee
+app.patch('/employees/:id', async (req, res) => {
+  try {
+    const employee = await Employee.findById(req.params.id);
+    if (employee == null) {
+      return res.status(404).json({ message: 'Ansatt ikke funnet' });
+    }
+
+    if (req.body.navn != null) {
+      employee.navn = req.body.navn;
+    }
+    if (req.body.telefon != null) {
+      employee.telefon = req.body.telefon;
+    }
+    if (req.body.epost != null) {
+      employee.epost = req.body.epost;
+    }
+    if (req.body.tilgang != null) {
+      employee.tilgang = req.body.tilgang;
+    }
+
+    const updatedEmployee = await employee.save();
+    res.json(updatedEmployee);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+// Endpoint to delete an employee
+app.delete('/employees/:id', async (req, res) => {
+  try {
+    const employee = await Employee.findById(req.params.id);
+    if (employee == null) {
+      return res.status(404).json({ message: 'Ansatt ikke funnet' });
+    }
+
+    await employee.remove();
+    res.json({ message: 'Ansatt slettet' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // Endpoint to get all customers
 app.get('/customers', async (req, res) => {
   try {

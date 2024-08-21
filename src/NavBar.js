@@ -20,7 +20,7 @@ function NavBar() {
             setSelectedEmployee(savedEmployee);
           }
         } else {
-          console.error('Feil ved henting av ansatte');
+          console.error('Feil ved henting av ansatte:', response.status, response.statusText);
         }
       } catch (error) {
         console.error('Feil ved kommunikasjon med serveren:', error);
@@ -53,7 +53,7 @@ function NavBar() {
         >
           <option value="">Velg ansatt</option>
           {employees.map(employee => (
-            <option key={employee.id} value={employee.navn}>  {/* Legger til key-prop */}
+            <option key={employee._id} value={employee.navn}>  {/* Oppdater key-prop til å bruke _id */}
               {employee.navn}
             </option>
           ))}
