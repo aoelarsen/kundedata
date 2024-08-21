@@ -12,8 +12,9 @@ function NavBar() {
         const response = await fetch('http://localhost:5000/employees');
         if (response.ok) {
           const data = await response.json();
+          console.log('Hentet ansatte:', data); // Logge dataene for å se hva som kommer fra API-et
           setEmployees(data);
-
+  
           // Hent valgt employee fra cookies hvis det er satt
           const savedEmployee = Cookies.get('selectedEmployee');
           if (savedEmployee) {
@@ -26,9 +27,10 @@ function NavBar() {
         console.error('Feil ved kommunikasjon med serveren:', error);
       }
     };
-
+  
     fetchEmployees();
   }, []);
+  
 
   const handleEmployeeChange = (e) => {
     const employee = e.target.value;
