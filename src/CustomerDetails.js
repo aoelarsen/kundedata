@@ -39,7 +39,9 @@ function CustomerDetails() {
   useEffect(() => {
     fetchCustomer();
     fetchOrders(); // Hent ordrer når komponenten lastes
-  }, [id]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [id]); // Inkluder 'id' som avhengighet
+
 
   const formatDate = (dateString) => {
     if (!dateString) return "Ukjent dato";
