@@ -38,7 +38,7 @@ function OrderDetails() {
     };
 
     fetchOrder();
-  }, [id]);
+  }, [id]); // Kjører på nytt når `id` endrer seg
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -58,7 +58,7 @@ function OrderDetails() {
 
     try {
       const response = await fetch(`http://localhost:5000/orders/${id}`, {
-        method: 'PUT',
+        method: 'PATCH', // Endret fra PUT til PATCH
         headers: {
           'Content-Type': 'application/json',
         },

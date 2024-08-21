@@ -53,15 +53,8 @@ function CustomerForm({ addCustomer, customers, phoneNumber, setSearchQuery }) {
       return;
     }
 
-    // Finn den høyeste eksisterende ID
-    const highestId = customers.length > 0 ? Math.max(...customers.map(c => parseInt(c.id, 10))) : 0;
-
-    // Sett ID til én høyere enn den høyeste eksisterende ID og konverter til streng
-    const newId = (highestId + 1).toString();
-
     const newCustomer = {
       ...formData,
-      id: newId,
       registrationDate: new Date().toLocaleString(),
       lastModified: new Date().toLocaleString()
     };
@@ -69,7 +62,7 @@ function CustomerForm({ addCustomer, customers, phoneNumber, setSearchQuery }) {
     try {
       console.log('Sender data til server:', newCustomer);
       
-      // Send en POST-forespørsel til JSON-serveren
+      // Send en POST-forespørsel til MongoDB Atlas
       const response = await fetch('http://localhost:5000/customers', {
         method: 'POST',
         headers: {
@@ -82,7 +75,7 @@ function CustomerForm({ addCustomer, customers, phoneNumber, setSearchQuery }) {
         const addedCustomer = await response.json();
         console.log('Suksess! Kunde lagt til:', addedCustomer);
         addCustomer(addedCustomer);
-        navigate(`/customer-details/${addedCustomer.id}`);
+        navigate(`/customer-details/${addedCustomer._id}`); // Bruker MongoDBs genererte _id
       } else {
         console.error('Feil ved registrering av kunde:', response.statusText);
       }

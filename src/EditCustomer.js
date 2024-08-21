@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-function EditCustomer({ customers }) {
+function EditCustomer() {
   const { id } = useParams(); // Fanger opp id fra URL-en
   const navigate = useNavigate(); // Brukes til å navigere programmatisk
   const [formData, setFormData] = useState({
@@ -11,20 +11,29 @@ function EditCustomer({ customers }) {
     email: '',
   });
 
-  // Dette vil kjøres når komponenten laster, og når `customers` endres
+  // Dette vil kjøres når komponenten laster
   useEffect(() => {
-    const customer = customers.find((cust) => cust.id.toString() === id); // Sammenligner som streng
-    console.log("Fetching customer with ID:", id, "Type of ID:", typeof id);
-    console.log("Customer found:", customer); // Debugging
-    if (customer) {
-      setFormData({
-        firstName: customer.firstName,
-        lastName: customer.lastName,
-        phoneNumber: customer.phoneNumber,
-        email: customer.email,
-      });
-    }
-  }, [id, customers]);
+    const fetchCustomer = async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/customers/${id}`);
+        if (response.ok) {
+          const customer = await response.json();
+          setFormData({
+            firstName: customer.firstName,
+            lastName: customer.lastName,
+            phoneNumber: customer.phoneNumber,
+            email: customer.email,
+          });
+        } else {
+          console.error('Kunde ble ikke funnet');
+        }
+      } catch (error) {
+        console.error('Feil ved henting av kunden:', error);
+      }
+    };
+
+    fetchCustomer();
+  }, [id]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -39,7 +48,7 @@ function EditCustomer({ customers }) {
 
     const updatedCustomer = {
       ...formData,
-      lastModified: new Date().toLocaleString(),
+      lastModified: new Date().toISOString(), // Bruk ISO-strengformat for dato
     };
 
     console.log("Oppdaterer kunde med ID:", id);
@@ -47,7 +56,7 @@ function EditCustomer({ customers }) {
 
     try {
       const response = await fetch(`http://localhost:5000/customers/${id}`, {
-        method: 'PUT',
+        method: 'PATCH', // Endret fra PUT til PATCH
         headers: {
           'Content-Type': 'application/json',
         },

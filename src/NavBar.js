@@ -40,7 +40,7 @@ function NavBar() {
     <nav className="bg-gray-800 p-4 flex justify-between items-center">
       <div className="flex items-center space-x-4">
         <Link to="/" className="text-white hover:text-gray-300">Registrer/søk</Link>
-        <Link to="/customer-list" className="text-white hover:text-gray-300">Kundeliste</Link>
+        <Link to="/customer-list" className="text-white hover:text-gray-300">Kunder</Link>
         <Link to="/ordre" className="text-white hover:text-gray-300">Ordre</Link>
         <Link to="/service" className="text-white hover:text-gray-300">Service</Link>
         <Link to="/hjelpemidler" className="text-white hover:text-gray-300">Hjelpemidler</Link>
