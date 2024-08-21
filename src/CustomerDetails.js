@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import OrderListCustomer from './OrderListCustomer';
 
 function CustomerDetails() {
-  const { id } = useParams();
+  const { id } = useParams(); // Dette vil nå referere til _id fra MongoDB
   const [customer, setCustomer] = useState(null);
 
   const fetchCustomer = async () => {
@@ -63,29 +62,25 @@ function CustomerDetails() {
       <div className="flex justify-between mt-8">
         <div>
           <Link 
-            to={`/create-order/${customer.id}`} 
+            to={`/create-order/${customer._id}`} // Endret til _id
             className="inline-block bg-green-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-600 mr-2"
           >
             Opprett Ordre
           </Link>
           <Link 
-            to={`/create-service/${customer.id}`} 
+            to={`/create-service/${customer._id}`} // Endret til _id
             className="inline-block bg-yellow-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-yellow-600"
           >
             Opprett Service
           </Link>
         </div>
         <Link 
-          to={`/edit-customer/${customer.id}`} 
+          to={`/edit-customer/${customer._id}`} // Endret til _id
           className="inline-block bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-600"
         >
           Endre Kunde
         </Link>
       </div>
-
-      <hr className="my-8" />
-
-      <OrderListCustomer customerId={customer.id} />
     </div>
   );
 }

@@ -414,6 +414,21 @@
       "Ansatt": "Henrik Olsen"
     },
     {
+      "id": "19",
+      "kundeid": "9",
+      "KundeTelefon": "98000009",
+      "Varemerke": "Nike",
+      "Produkt": "Jakke",
+      "Størrelse": "L",
+      "Farge": "Rød",
+      "RegistrertDato": "2024-08-11T12:00:00",
+      "Endretdato": "2024-08-12T14:00:00",
+      "meldingDato": "2024-08-13T15:30:00",
+      "Status": "Levering pågår",
+      "Kommentar": "Ingen kommentarer",
+      "Ansatt": "Henrik Olsen"
+    },
+    {
       "id": "20",
       "kundeid": "10",
       "KundeTelefon": "98000010",

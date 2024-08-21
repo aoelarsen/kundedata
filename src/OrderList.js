@@ -1,73 +1,43 @@
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import React from 'react';
+import { Link, useNavigate } from 'react-router-dom'; // Sørg for at begge disse er importert
 
-function OrderList() {
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
+function OrderList({ orders }) {
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const response = await fetch('http://localhost:5000/orders');
-        if (response.ok) {
-          const data = await response.json();
-          setOrders(data);
-        } else {
-          console.error('Failed to fetch orders');
-        }
-      } catch (error) {
-        console.error('Error fetching orders:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchOrders();
-  }, []);
-
-  if (loading) {
-    return <p>Laster ordrer...</p>;
-  }
-
-  if (orders.length === 0) {
-    return <p className="text-center text-lg text-gray-600">Ingen ordrer funnet.</p>;
-  }
-
-  const formatDate = (dateString) => {
-    const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString('no-NO', options);
+  const handleSelectOrder = (order) => {
+    navigate(`/order-details/${order._id}`); // Ruter til OrderDetails-siden med MongoDB ObjectId
   };
 
   return (
     <div className="mt-8">
-      <h3 className="text-2xl font-semibold mb-4 text-gray-800">Ordre</h3>
+      <h3 className="text-2xl font-semibold mb-4 text-gray-800">Ordrer</h3>
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white border border-gray-300 rounded-lg">
           <thead>
             <tr className="bg-gray-100">
-              <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Ordre ID</th>
-              <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Produkt</th>
               <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Varemerke</th>
+              <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Produkt</th>
               <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Størrelse</th>
               <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Farge</th>
-              <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Registrert Dato</th>
               <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Status</th>
               <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Handlinger</th>
             </tr>
           </thead>
           <tbody>
             {orders.map((order) => (
-              <tr key={order.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.id}</td>
-                <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.Produkt}</td>
+              <tr 
+                key={order._id} // Sørg for at du bruker _id som nøkkel
+                className="hover:bg-gray-50 cursor-pointer"
+                onClick={() => handleSelectOrder(order)}
+              >
                 <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.Varemerke}</td>
+                <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.Produkt}</td>
                 <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.Størrelse}</td>
                 <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.Farge}</td>
-                <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{formatDate(order.RegistrertDato)}</td>
                 <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.Status}</td>
                 <td className="px-6 py-4 border-b border-gray-200 text-sm">
                   <Link
-                    to={`/order-details/${order.id}`}
+                    to={`/order-details/${order._id}`} // Sørg for at du bruker _id her også
                     className="text-blue-500 hover:underline"
                   >
                     Se detaljer
@@ -82,4 +52,4 @@ function OrderList() {
   );
 }
 
-export default OrderList;
+export default OrderList; // Sørg for at OrderList eksporteres korrekt

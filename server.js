@@ -1,0 +1,254 @@
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+
+const app = express();
+const port = 5000;
+
+// Middleware
+app.use(cors());
+app.use(express.json());
+
+// MongoDB Atlas URI
+const uri = "mongodb+srv://sp1348:uzETy8kW83sXiHy4@cluster0.wtpcbrd.mongodb.net/rsData?retryWrites=true&w=majority&appName=Cluster0";
+
+// Connect to MongoDB Atlas
+mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('Connected to MongoDB Atlas'))
+  .catch(err => console.error('Error connecting to MongoDB Atlas:', err));
+
+// Schema and Model for Customers
+const customerSchema = new mongoose.Schema({
+  firstName: String,
+  lastName: String,
+  phoneNumber: String,
+  email: String,
+  registrationDate: String,
+  lastModified: String,
+});
+
+const Customer = mongoose.model('Customer', customerSchema);
+
+// Schema and Model for Orders
+const orderSchema = new mongoose.Schema({
+  Varemerke: String,
+  Produkt: String,
+  Størrelse: String,
+  Farge: String,
+  Status: String,
+  Kommentar: String,
+  Ansatt: String,
+  Endretdato: String,
+  RegistrertDato: String,
+  kundeid: String,
+  KundeTelefon: String,
+});
+
+const Order = mongoose.model('Order', orderSchema);
+
+// Endpoint to get all customers
+app.get('/customers', async (req, res) => {
+  try {
+    const customers = await Customer.find();
+    res.json(customers);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Endpoint to get a single customer by ID
+app.get('/customers/:id', async (req, res) => {
+  try {
+    const customer = await Customer.findById(req.params.id);
+    if (customer == null) {
+      return res.status(404).json({ message: 'Kunde ikke funnet' });
+    }
+    res.json(customer);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Endpoint to create a new customer
+app.post('/customers', async (req, res) => {
+  const customer = new Customer({
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
+    phoneNumber: req.body.phoneNumber,
+    email: req.body.email,
+    registrationDate: req.body.registrationDate,
+    lastModified: req.body.lastModified,
+  });
+
+  try {
+    const newCustomer = await customer.save();
+    res.status(201).json(newCustomer);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+// Endpoint to update a customer
+app.patch('/customers/:id', async (req, res) => {
+  try {
+    const customer = await Customer.findById(req.params.id);
+    if (customer == null) {
+      return res.status(404).json({ message: 'Kunde ikke funnet' });
+    }
+
+    if (req.body.firstName != null) {
+      customer.firstName = req.body.firstName;
+    }
+    if (req.body.lastName != null) {
+      customer.lastName = req.body.lastName;
+    }
+    if (req.body.phoneNumber != null) {
+      customer.phoneNumber = req.body.phoneNumber;
+    }
+    if (req.body.email != null) {
+      customer.email = req.body.email;
+    }
+    if (req.body.registrationDate != null) {
+      customer.registrationDate = req.body.registrationDate;
+    }
+    if (req.body.lastModified != null) {
+      customer.lastModified = req.body.lastModified;
+    }
+
+    const updatedCustomer = await customer.save();
+    res.json(updatedCustomer);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+// Endpoint to delete a customer
+app.delete('/customers/:id', async (req, res) => {
+  try {
+    const customer = await Customer.findById(req.params.id);
+    if (customer == null) {
+      return res.status(404).json({ message: 'Kunde ikke funnet' });
+    }
+
+    await customer.remove();
+    res.json({ message: 'Kunde slettet' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Endpoint to get all orders
+app.get('/orders', async (req, res) => {
+  try {
+    const orders = await Order.find();
+    res.json(orders);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Endpoint to get a single order by ID
+app.get('/orders/:id', async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+    if (order == null) {
+      return res.status(404).json({ message: 'Ordre ikke funnet' });
+    }
+    res.json(order);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Endpoint to create a new order
+app.post('/orders', async (req, res) => {
+  const order = new Order({
+    Varemerke: req.body.Varemerke,
+    Produkt: req.body.Produkt,
+    Størrelse: req.body.Størrelse,
+    Farge: req.body.Farge,
+    Status: req.body.Status,
+    Kommentar: req.body.Kommentar,
+    Ansatt: req.body.Ansatt,
+    Endretdato: req.body.Endretdato,
+    RegistrertDato: req.body.RegistrertDato,
+    kundeid: req.body.kundeid,
+    KundeTelefon: req.body.KundeTelefon,
+  });
+
+  try {
+    const newOrder = await order.save();
+    res.status(201).json(newOrder);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+// Endpoint to update an order
+app.patch('/orders/:id', async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+    if (order == null) {
+      return res.status(404).json({ message: 'Ordre ikke funnet' });
+    }
+
+    if (req.body.Varemerke != null) {
+      order.Varemerke = req.body.Varemerke;
+    }
+    if (req.body.Produkt != null) {
+      order.Produkt = req.body.Produkt;
+    }
+    if (req.body.Størrelse != null) {
+      order.Størrelse = req.body.Størrelse;
+    }
+    if (req.body.Farge != null) {
+      order.Farge = req.body.Farge;
+    }
+    if (req.body.Status != null) {
+      order.Status = req.body.Status;
+    }
+    if (req.body.Kommentar != null) {
+      order.Kommentar = req.body.Kommentar;
+    }
+    if (req.body.Ansatt != null) {
+      order.Ansatt = req.body.Ansatt;
+    }
+    if (req.body.Endretdato != null) {
+      order.Endretdato = req.body.Endretdato;
+    }
+    if (req.body.RegistrertDato != null) {
+      order.RegistrertDato = req.body.RegistrertDato;
+    }
+    if (req.body.kundeid != null) {
+      order.kundeid = req.body.kundeid;
+    }
+    if (req.body.KundeTelefon != null) {
+      order.KundeTelefon = req.body.KundeTelefon;
+    }
+
+    const updatedOrder = await order.save();
+    res.json(updatedOrder);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+// Endpoint to delete an order
+app.delete('/orders/:id', async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+    if (order == null) {
+      return res.status(404).json({ message: 'Ordre ikke funnet' });
+    }
+
+    await order.remove();
+    res.json({ message: 'Ordre slettet' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Start the server
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});

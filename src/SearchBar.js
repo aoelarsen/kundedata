@@ -6,7 +6,7 @@ function SearchBar({ searchQuery, setSearchQuery, filteredCustomers, setPhoneNum
 
   const handleSelectCustomer = (customer) => {
     setSearchQuery(''); // Tøm søkefeltet
-    navigate(`/customer-details/${customer.id}`); // Ruter til CustomerDetails-siden
+    navigate(`/customer-details/${customer._id}`); // Ruter til CustomerDetails-siden med MongoDB ObjectId
   };
 
   return (
@@ -22,7 +22,7 @@ function SearchBar({ searchQuery, setSearchQuery, filteredCustomers, setPhoneNum
         <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-2 shadow-lg">
           {filteredCustomers.map((customer) => (
             <li
-              key={customer.id}
+              key={customer._id}  // Endret til _id
               onClick={() => handleSelectCustomer(customer)}
               className="p-2 cursor-pointer hover:bg-gray-100"
             >

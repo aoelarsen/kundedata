@@ -1,7 +1,13 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 function CustomerList({ customers }) {
+  const navigate = useNavigate();
+
+  const handleSelectCustomer = (customer) => {
+    navigate(`/customer-details/${customer._id}`); // Ruter til CustomerDetails-siden med MongoDB ObjectId
+  };
+
   return (
     <div className="mt-8">
       <h3 className="text-2xl font-semibold mb-4 text-gray-800">Kunder</h3>
@@ -18,14 +24,18 @@ function CustomerList({ customers }) {
           </thead>
           <tbody>
             {customers.map((customer) => (
-              <tr key={customer.id} className="hover:bg-gray-50">
+              <tr 
+                key={customer._id} // Endret til _id
+                className="hover:bg-gray-50 cursor-pointer"
+                onClick={() => handleSelectCustomer(customer)}
+              >
                 <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{customer.firstName}</td>
                 <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{customer.lastName}</td>
                 <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{customer.phoneNumber}</td>
                 <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{customer.email}</td>
                 <td className="px-6 py-4 border-b border-gray-200 text-sm">
                   <Link
-                    to={`/customer-details/${customer.id}`}
+                    to={`/customer-details/${customer._id}`} // Endret til _id
                     className="text-blue-500 hover:underline"
                   >
                     Se detaljer

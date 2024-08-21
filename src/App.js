@@ -13,10 +13,11 @@ import OrderList from './OrderList';
 
 function App() {
   const [customers, setCustomers] = useState([]);
+  const [orders, setOrders] = useState([]); // Legger til state for orders
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredCustomers, setFilteredCustomers] = useState([]);
   const [phoneNumber, setPhoneNumber] = useState('');
-
+  
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
@@ -31,8 +32,26 @@ function App() {
         console.error('Feil ved kommunikasjon med serveren:', error);
       }
     };
-
+  
     fetchCustomers();
+  }, []);
+  
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/orders');
+        if (response.ok) {
+          const ordersData = await response.json();
+          setOrders(ordersData);
+        } else {
+          console.error('Feil ved henting av ordrer');
+        }
+      } catch (error) {
+        console.error('Feil ved kommunikasjon med serveren:', error);
+      }
+    };
+
+    fetchOrders();
   }, []);
 
   useEffect(() => {
@@ -80,13 +99,13 @@ function App() {
                     searchQuery={searchQuery}
                     setSearchQuery={setSearchQuery}
                     filteredCustomers={filteredCustomers}
-                    setPhoneNumber={setPhoneNumber} // Passer setPhoneNumber til SearchBar
+                    setPhoneNumber={setPhoneNumber}
                   />
                   <CustomerForm 
                     addCustomer={(newCustomer) => setCustomers([...customers, newCustomer])} 
                     customers={customers} 
-                    phoneNumber={phoneNumber} // Passer phoneNumber til CustomerForm
-                    setSearchQuery={setSearchQuery} // Passer setSearchQuery til CustomerForm
+                    phoneNumber={phoneNumber}
+                    setSearchQuery={setSearchQuery}
                   />
                 </>
               }
@@ -108,10 +127,22 @@ function App() {
               path="/edit-customer/:id"
               element={<EditCustomer customers={customers} updateCustomer={updateCustomer} />}
             />
-            <Route path="/order-details/:id" element={<OrderDetails />} /> {/* Legg til denne ruten */}
-            <Route path="/ordre" element={<OrderList />} />
-            <Route path="/service" element={<Service />} />
-            <Route path="/hjelpemidler" element={<Calculator />} />
+            <Route 
+              path="/order-details/:id" 
+              element={<OrderDetails />} 
+            />
+            <Route 
+              path="/ordre" 
+              element={<OrderList orders={orders} />} // Passer orders til OrderList
+            />
+            <Route 
+              path="/service" 
+              element={<Service />} 
+            />
+            <Route 
+              path="/hjelpemidler" 
+              element={<Calculator />} 
+            />
           </Routes>
         </div>
       </div>

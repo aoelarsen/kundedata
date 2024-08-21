@@ -53,7 +53,7 @@ function NavBar() {
         >
           <option value="">Velg ansatt</option>
           {employees.map(employee => (
-            <option key={employee.id} value={employee.navn}>
+            <option key={employee.id} value={employee.navn}>  {/* Legger til key-prop */}
               {employee.navn}
             </option>
           ))}
