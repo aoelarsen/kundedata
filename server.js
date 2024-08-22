@@ -8,7 +8,11 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors());
+const corsOptions = {
+  origin: 'https://rssport.netlify.app', // Erstatt med ditt faktiske Netlify-domene
+  optionsSuccessStatus: 200
+}
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Bruk miljøvariabel for MongoDB Atlas URI
