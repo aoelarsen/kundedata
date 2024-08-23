@@ -17,11 +17,14 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredCustomers, setFilteredCustomers] = useState([]);
   const [phoneNumber, setPhoneNumber] = useState('');
-  
+
+  // Heroku base URL
+  const API_BASE_URL = 'https://kundesamhandling-acdc6a9165f8.herokuapp.com/';
+
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
-        const response = await fetch('http://localhost:5000/customers');
+        const response = await fetch(`${API_BASE_URL}/customers`);
         if (response.ok) {
           const customersData = await response.json();
           setCustomers(customersData);
@@ -32,14 +35,14 @@ function App() {
         console.error('Feil ved kommunikasjon med serveren:', error);
       }
     };
-  
+
     fetchCustomers();
-  }, []);
-  
+  }, [API_BASE_URL]);
+
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await fetch('http://localhost:5000/orders');
+        const response = await fetch(`${API_BASE_URL}/orders`);
         if (response.ok) {
           const ordersData = await response.json();
           setOrders(ordersData);
@@ -52,7 +55,7 @@ function App() {
     };
 
     fetchOrders();
-  }, []);
+  }, [API_BASE_URL]);
 
   useEffect(() => {
     const results = customers.filter((customer) =>
