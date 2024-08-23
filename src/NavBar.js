@@ -1,43 +1,26 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 
 function NavBar() {
-  const [employees, setEmployees] = useState([]);
-
-  // Heroku base URL
-  const API_BASE_URL = 'https://kundesamhandling-acdc6a9165f8.herokuapp.com';
-
-  useEffect(() => {
-    const fetchEmployees = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/employees`);
-        if (response.ok) {
-          const employeesData = await response.json();
-          setEmployees(employeesData);
-        } else {
-          console.error('Feil ved henting av ansatte');
-        }
-      } catch (error) {
-        console.error('Feil ved kommunikasjon med serveren:', error);
-      }
-    };
-
-    fetchEmployees();
-  }, [API_BASE_URL]);
-
   return (
     <nav>
       <ul>
+        {/* Legg til linker til CustomerList og OrderList */}
         <li>
           <Link to="/customer-list">Customer List</Link>
         </li>
         <li>
           <Link to="/ordre">Order List</Link>
         </li>
-        {/* Her viser vi ansatte fra API-kallet */}
-        {employees.map((employee) => (
-          <li key={employee._id}>{employee.navn}</li>
-        ))}
+        <li>
+          <Link to="/">Home</Link>
+        </li>
+        <li>
+          <Link to="/service">Service</Link>
+        </li>
+        <li>
+          <Link to="/hjelpemidler">Calculator</Link>
+        </li>
       </ul>
     </nav>
   );
