@@ -13,7 +13,7 @@ function NavBar() {
         const response = await fetch(`${API_BASE_URL}/employees`);
         if (response.ok) {
           const employeesData = await response.json();
-          // Fjern kommentering hvis du trenger å bruke setEmployees senere
+          // Hvis du ikke trenger å bruke employeesData, kommenter ut denne linjen:
           // setEmployees(employeesData);
         } else {
           console.error('Feil ved henting av ansatte');
