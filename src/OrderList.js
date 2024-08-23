@@ -10,7 +10,7 @@ function OrderList({ orders }) {
 
   return (
     <div className="mt-8">
-      <h3 className="text-2xl font-semibold mb-4 text-gray-800">Ordrer</h3>
+      <h3 className="text-2xl font-semibold mb-4 text-gray-800">Ordrer 1</h3>
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white border border-gray-300 rounded-lg">
           <thead>
