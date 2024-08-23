@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 function NavBar() {
   const [employees, setEmployees] = useState([]);
@@ -26,7 +27,18 @@ function NavBar() {
 
   return (
     <nav>
-      {/* Din NavBar kode */}
+      <ul>
+        <li>
+          <Link to="/customer-list">Customer List</Link>
+        </li>
+        <li>
+          <Link to="/ordre">Order List</Link>
+        </li>
+        {/* Her viser vi ansatte fra API-kallet */}
+        {employees.map((employee) => (
+          <li key={employee._id}>{employee.navn}</li>
+        ))}
+      </ul>
     </nav>
   );
 }
