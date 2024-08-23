@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 
 function NavBar() {
-  // const [employees, setEmployees] = useState([]); Fjernet for å unngå feil i deploy
+  // Fjern kommentering hvis du trenger å bruke employees senere
+  // const [employees, setEmployees] = useState([]);
 
   // Heroku base URL
   const API_BASE_URL = 'https://kundesamhandling-acdc6a9165f8.herokuapp.com';
@@ -12,7 +13,8 @@ function NavBar() {
         const response = await fetch(`${API_BASE_URL}/employees`);
         if (response.ok) {
           const employeesData = await response.json();
-          setEmployees(employeesData);
+          // Fjern kommentering hvis du trenger å bruke setEmployees senere
+          // setEmployees(employeesData);
         } else {
           console.error('Feil ved henting av ansatte');
         }
