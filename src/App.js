@@ -8,18 +8,18 @@ import NavBar from './NavBar';
 import Service from './Service';
 import Calculator from './Calculator';
 import CustomerList from './CustomerList';
-import OrderDetails from './OrderDetails'; // Importer OrderDetails
+import OrderDetails from './OrderDetails';
 import OrderList from './OrderList';
 
 function App() {
   const [customers, setCustomers] = useState([]);
-  const [orders, setOrders] = useState([]); // Legger til state for orders
+  const [orders, setOrders] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredCustomers, setFilteredCustomers] = useState([]);
   const [phoneNumber, setPhoneNumber] = useState('');
 
-  // Heroku base URL
-  const API_BASE_URL = 'https://kundesamhandling-acdc6a9165f8.herokuapp.com/';
+  // Bruk miljøvariabelen direkte
+  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -66,7 +66,6 @@ function App() {
     );
     setFilteredCustomers(results);
 
-    // Sjekk for 8-sifret telefonnummer som ikke finnes i kundelisten
     if (searchQuery.length === 8 && /^\d{8}$/.test(searchQuery)) {
       const phoneExists = customers.some(c => c.phoneNumber === searchQuery);
       if (!phoneExists) {
@@ -77,7 +76,6 @@ function App() {
     } else {
       setPhoneNumber('');
     }
-
   }, [searchQuery, customers]);
 
   const updateCustomer = (updatedCustomer) => {
@@ -136,7 +134,7 @@ function App() {
             />
             <Route 
               path="/ordre" 
-              element={<OrderList orders={orders} />} // Passer orders til OrderList
+              element={<OrderList orders={orders} />} 
             />
             <Route 
               path="/service" 

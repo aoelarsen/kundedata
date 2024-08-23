@@ -9,9 +9,9 @@ const port = process.env.PORT || 5000;
 
 // Middleware
 const corsOptions = {
-  origin: 'https://rssport.netlify.app', // Erstatt med ditt faktiske Netlify-domene
+  origin: ['https://rssport.netlify.app', 'http://localhost:3000'], // Tillater både produksjons- og lokal utviklingsopprinnelse
   optionsSuccessStatus: 200
-}
+};
 app.use(cors(corsOptions));
 app.use(express.json());
 
