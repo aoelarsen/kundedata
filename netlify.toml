@@ -1,3 +1,7 @@
 [build]
   command = "npm run build"
   publish = "build"  # Endre dette hvis ditt prosjekt bygger til en annen mappe
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
