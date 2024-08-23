@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { Link } from 'react-router-dom'; // Importer Link fra react-router-dom
 
 function NavBar() {
   // Heroku base URL
@@ -26,7 +27,15 @@ function NavBar() {
 
   return (
     <nav>
-      {/* Din NavBar kode */}
+      <ul>
+        {/* Legg til linker til CustomerList og OrderList */}
+        <li>
+          <Link to="/customer-list">Customer List</Link>
+        </li>
+        <li>
+          <Link to="/ordre">Order List</Link>
+        </li>
+      </ul>
     </nav>
   );
 }
