@@ -1,13 +1,13 @@
 {
   "name": "kundesamhandling",
   "version": "1.0.0",
-  "description": "This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).",
+  "description": "This project was bootstrapped with Create React App.",
   "main": "Customer.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
     "eject": "react-scripts eject",
-    "build": "next build"
+    "build": "react-scripts build"
   },
   "keywords": [],
   "author": "",
