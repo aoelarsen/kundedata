@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 function NavBar() {
-  const [employees, setEmployees] = useState([]);
+  // const [employees, setEmployees] = useState([]); Fjernet for å unngå feil i deploy
 
   // Heroku base URL
   const API_BASE_URL = 'https://kundesamhandling-acdc6a9165f8.herokuapp.com';
