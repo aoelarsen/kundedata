@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 function CustomerList({ customers }) {
   const navigate = useNavigate();
@@ -18,8 +18,10 @@ function CustomerList({ customers }) {
               <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Fornavn</th>
               <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Etternavn</th>
               <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Telefonnummer</th>
-              <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">E-post</th>
-              <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Handlinger</th>
+              {/* Denne kolonnen vises kun på større skjermer */}
+              <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600 hidden md:table-cell">E-post</th>
+              {/* Denne kolonnen vises kun på større skjermer */}
+              <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600 hidden md:table-cell">Handlinger</th>
             </tr>
           </thead>
           <tbody>
@@ -32,8 +34,10 @@ function CustomerList({ customers }) {
                 <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{customer.firstName}</td>
                 <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{customer.lastName}</td>
                 <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{customer.phoneNumber}</td>
-                <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{customer.email}</td>
-                <td className="px-6 py-4 border-b border-gray-200 text-sm">
+                {/* Denne kolonnen vises kun på større skjermer */}
+                <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{customer.email}</td>
+                {/* Denne kolonnen vises kun på større skjermer */}
+                <td className="px-6 py-4 border-b border-gray-200 text-sm hidden md:table-cell">
                   <Link
                     to={`/customer-details/${customer._id}`} // Endret til _id
                     className="text-blue-500 hover:underline"
