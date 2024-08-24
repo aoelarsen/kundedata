@@ -35,13 +35,10 @@ function CustomerDetails() {
     }
   };
   
-
   useEffect(() => {
     fetchCustomer();
     fetchOrders(); // Hent ordrer når komponenten lastes
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [id]); // Inkluder 'id' som avhengighet
-
+  }, [id]);
 
   const formatDate = (dateString) => {
     if (!dateString) return "Ukjent dato";
@@ -117,11 +114,11 @@ function CustomerDetails() {
               <tr className="bg-gray-100">
                 <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Varemerke</th>
                 <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Produkt</th>
-                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Størrelse</th>
                 <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Farge</th>
-                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Status</th>
-                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Registrert dato</th>
-                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Handlinger</th>
+                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600 hidden md:table-cell">Størrelse</th>
+                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600 hidden md:table-cell">Status</th>
+                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600 hidden md:table-cell">Registrert dato</th>
+                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600 hidden md:table-cell">Handlinger</th>
               </tr>
             </thead>
             <tbody>
@@ -129,11 +126,11 @@ function CustomerDetails() {
                 <tr key={order._id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.Varemerke}</td>
                   <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.Produkt}</td>
-                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.Størrelse}</td>
                   <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.Farge}</td>
-                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.Status}</td>
-                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{formatDate(order.RegistrertDato)}</td>
-                  <td className="px-6 py-4 border-b border-gray-200 text-sm">
+                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{order.Størrelse}</td>
+                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{order.Status}</td>
+                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{formatDate(order.RegistrertDato)}</td>
+                  <td className="px-6 py-4 border-b border-gray-200 text-sm hidden md:table-cell">
                     <Link to={`/order-details/${order._id}`} className="text-blue-500 hover:underline">Se detaljer</Link>
                   </td>
                 </tr>
