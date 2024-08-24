@@ -22,7 +22,7 @@ function CustomerDetails() {
 
   const fetchOrders = async () => {
     try {
-      const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders?customerId=${id}`);
+      const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders?kundeid=${id}`);
       if (response.ok) {
         const ordersData = await response.json();
         console.log(ordersData); // Legg til denne linjen for å inspisere dataene

@@ -17,7 +17,7 @@ function OrderDetails() {
   useEffect(() => {
     const fetchOrder = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/orders/${id}`);
+        const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders/${id}`);
         if (response.ok) {
           const order = await response.json();
           setFormData({
