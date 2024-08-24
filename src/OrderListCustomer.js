@@ -8,7 +8,7 @@ function OrderList({ customerId }) {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/orders?kundeid=${customerId}`);
+        const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders?kundeid=${customerId}`);
         if (response.ok) {
           const data = await response.json();
           setOrders(data);

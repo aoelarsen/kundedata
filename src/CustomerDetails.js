@@ -8,7 +8,7 @@ function CustomerDetails() {
 
   const fetchCustomer = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/customers/${id}`);
+      const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customers/${id}`);
       if (response.ok) {
         const customerData = await response.json();
         setCustomer(customerData);
@@ -22,7 +22,7 @@ function CustomerDetails() {
 
   const fetchOrders = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/orders?customerId=${id}`);
+      const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customers?customerId=${id}`);
       if (response.ok) {
         const ordersData = await response.json();
         console.log(ordersData); // Legg til denne linjen for å inspisere dataene

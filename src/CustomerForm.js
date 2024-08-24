@@ -63,7 +63,7 @@ function CustomerForm({ addCustomer, customers, phoneNumber, setSearchQuery }) {
       console.log('Sender data til server:', newCustomer);
       
       // Send en POST-forespørsel til MongoDB Atlas
-      const response = await fetch('http://localhost:5000/customers', {
+      const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/customers', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -15,7 +15,7 @@ function EditCustomer() {
   useEffect(() => {
     const fetchCustomer = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/customers/${id}`);
+        const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customers/${id}`);
         if (response.ok) {
           const customer = await response.json();
           setFormData({
@@ -55,7 +55,7 @@ function EditCustomer() {
     console.log("Oppdaterer kunde med data:", updatedCustomer);
 
     try {
-      const response = await fetch(`http://localhost:5000/customers/${id}`, {
+      const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customers/${id}`, {
         method: 'PATCH', // Endret fra PUT til PATCH
         headers: {
           'Content-Type': 'application/json',
