@@ -86,15 +86,15 @@ function CustomerDetails() {
         <div>
           <Link 
             to={`/create-order/${customer._id}`} // Endret til _id
-            className="inline-block bg-green-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-600 mr-2"
+            className="inline-block bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-600 mr-2"
           >
-            Opprett Ordre
+            Ny Ordre
           </Link>
           <Link 
             to={`/create-service/${customer._id}`} // Endret til _id
-            className="inline-block bg-yellow-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-yellow-600"
+            className="inline-block bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-bluew-600"
           >
-            Opprett Service
+            Ny Service
           </Link>
         </div>
         <Link 
