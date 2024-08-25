@@ -27,6 +27,7 @@ function CustomerForm({ addCustomer, customers, phoneNumber, setSearchQuery }) {
       ...prevData,
       customerNumber: nextCustomerNumber // Sett kundenummer
     }));
+    console.log('Neste tilgjengelige kundenummer:', nextCustomerNumber); // Logging for feilsøking
   }, [customers]);
 
   const handleChange = (e) => {
@@ -70,7 +71,7 @@ function CustomerForm({ addCustomer, customers, phoneNumber, setSearchQuery }) {
     };
 
     try {
-      console.log('Sender data til server:', newCustomer);
+      console.log('Sender data til server:', newCustomer); // Logging for å se data før sending
       
       // Send en POST-forespørsel til MongoDB Atlas
       const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/customers', {

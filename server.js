@@ -176,6 +176,8 @@ app.post('/customers', async (req, res) => {
     const lastCustomer = await Customer.findOne().sort('-customerNumber');
     const nextCustomerNumber = lastCustomer ? lastCustomer.customerNumber + 1 : 1;
 
+    console.log(`Genererer nytt kundenummer: ${nextCustomerNumber}`); // Logging
+
     const customer = new Customer({
       firstName: req.body.firstName,
       lastName: req.body.lastName,
@@ -192,6 +194,7 @@ app.post('/customers', async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 });
+
 
 // Endpoint to update a customer
 app.patch('/customers/:id', async (req, res) => {
