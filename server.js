@@ -31,6 +31,7 @@ const customerSchema = new mongoose.Schema({
   email: String,
   registrationDate: String,
   lastModified: String,
+  customerNumber: Number // Legger til customerNumber felt
 });
 
 const Customer = mongoose.model('Customer', customerSchema);
@@ -170,16 +171,21 @@ app.get('/customers/:id', async (req, res) => {
 
 // Endpoint to create a new customer
 app.post('/customers', async (req, res) => {
-  const customer = new Customer({
-    firstName: req.body.firstName,
-    lastName: req.body.lastName,
-    phoneNumber: req.body.phoneNumber,
-    email: req.body.email,
-    registrationDate: req.body.registrationDate,
-    lastModified: req.body.lastModified,
-  });
-
   try {
+    // Finn høyeste eksisterende customerNumber og øk med 1
+    const lastCustomer = await Customer.findOne().sort('-customerNumber');
+    const nextCustomerNumber = lastCustomer ? lastCustomer.customerNumber + 1 : 1;
+
+    const customer = new Customer({
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      phoneNumber: req.body.phoneNumber,
+      email: req.body.email,
+      registrationDate: req.body.registrationDate,
+      lastModified: req.body.lastModified,
+      customerNumber: nextCustomerNumber // Setter customerNumber
+    });
+
     const newCustomer = await customer.save();
     res.status(201).json(newCustomer);
   } catch (err) {

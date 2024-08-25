@@ -6,7 +6,8 @@ function CustomerForm({ addCustomer, customers, phoneNumber, setSearchQuery }) {
     firstName: '',
     lastName: '',
     phoneNumber: '',
-    email: ''
+    email: '',
+    customerNumber: '' // Nytt felt for kundenummer
   });
   
   const [errorMessage, setErrorMessage] = useState(''); // For feilmelding
@@ -18,6 +19,15 @@ function CustomerForm({ addCustomer, customers, phoneNumber, setSearchQuery }) {
       phoneNumber: phoneNumber // Setter telefonnummer hvis det er satt
     }));
   }, [phoneNumber]);
+
+  useEffect(() => {
+    // Beregn neste tilgjengelige kundenummer
+    const nextCustomerNumber = customers.length > 0 ? Math.max(...customers.map(c => c.customerNumber)) + 1 : 1;
+    setFormData((prevData) => ({
+      ...prevData,
+      customerNumber: nextCustomerNumber // Sett kundenummer
+    }));
+  }, [customers]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
