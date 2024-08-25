@@ -17,7 +17,7 @@ function CustomerList({ customers }) {
             <tr className="bg-gray-100">
               <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Fornavn</th>
               <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Etternavn</th>
-              <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Telefonnummer</th>
+              <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Telefon</th>
               <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600 hidden md:table-cell">E-post</th>
               <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600 hidden md:table-cell">Handlinger</th>
             </tr>

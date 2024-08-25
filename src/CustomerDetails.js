@@ -64,7 +64,7 @@ function CustomerDetails() {
             <td className="py-2 px-4 border-b">{customer.lastName}</td>
           </tr>
           <tr>
-            <th className="py-2 px-4 border-b">Telefonnummer</th>
+            <th className="py-2 px-4 border-b">Telefon</th>
             <td className="py-2 px-4 border-b">{customer.phoneNumber}</td>
           </tr>
           <tr>
@@ -72,7 +72,7 @@ function CustomerDetails() {
             <td className="py-2 px-4 border-b">{customer.email}</td>
           </tr>
           <tr>
-            <th className="py-2 px-4 border-b">Registrert dato</th>
+            <th className="py-2 px-4 border-b">Registrert</th>
             <td className="py-2 px-4 border-b">{formatDate(customer.registrationDate)}</td>
           </tr>
           <tr>
