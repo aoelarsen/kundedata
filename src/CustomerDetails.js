@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 function CustomerDetails() {
   const { id } = useParams(); // Dette vil nå referere til _id fra MongoDB
   const [customer, setCustomer] = useState(null);
   const [orders, setOrders] = useState([]); // Legg til state for ordrer
+  const navigate = useNavigate(); // Brukes til å navigere programmatisk
 
   useEffect(() => {
     const fetchCustomer = async () => {
@@ -26,7 +27,6 @@ function CustomerDetails() {
         const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders?kundeid=${id}`);
         if (response.ok) {
           const ordersData = await response.json();
-          console.log(ordersData); // Legg til denne linjen for å inspisere dataene
           setOrders(ordersData);
         } else {
           console.error('Ordre ble ikke funnet');
@@ -38,7 +38,7 @@ function CustomerDetails() {
 
     fetchCustomer();
     fetchOrders(); // Hent ordrer når komponenten lastes
-  }, [id]); // Inkluder 'id' som avhengighet
+  }, [id]);
 
   const formatDate = (dateString) => {
     if (!dateString) return "Ukjent dato";
@@ -114,25 +114,25 @@ function CustomerDetails() {
               <tr className="bg-gray-100">
                 <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Varemerke</th>
                 <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Produkt</th>
-                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Farge</th>
-                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600 hidden md:table-cell">Størrelse</th>
+                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Størrelse</th>
+                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600 hidden md:table-cell">Farge</th>
                 <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600 hidden md:table-cell">Status</th>
                 <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600 hidden md:table-cell">Registrert dato</th>
-                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600 hidden md:table-cell">Handlinger</th>
               </tr>
             </thead>
             <tbody>
               {orders.map((order) => (
-                <tr key={order._id} className="hover:bg-gray-50">
+                <tr 
+                  key={order._id} 
+                  className="hover:bg-gray-50 cursor-pointer"
+                  onClick={() => navigate(`/order-details/${order._id}`)} // Ruter til OrderDetails-siden
+                >
                   <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.Varemerke}</td>
                   <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.Produkt}</td>
-                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.Farge}</td>
-                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{order.Størrelse}</td>
+                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.Størrelse}</td>
+                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{order.Farge}</td>
                   <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{order.Status}</td>
                   <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{formatDate(order.RegistrertDato)}</td>
-                  <td className="px-6 py-4 border-b border-gray-200 text-sm hidden md:table-cell">
-                    <Link to={`/order-details/${order._id}`} className="text-blue-500 hover:underline">Se detaljer</Link>
-                  </td>
                 </tr>
               ))}
             </tbody>
