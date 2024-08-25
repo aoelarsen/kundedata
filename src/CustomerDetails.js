@@ -6,39 +6,39 @@ function CustomerDetails() {
   const [customer, setCustomer] = useState(null);
   const [orders, setOrders] = useState([]); // Legg til state for ordrer
 
-  const fetchCustomer = async () => {
-    try {
-      const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customers/${id}`);
-      if (response.ok) {
-        const customerData = await response.json();
-        setCustomer(customerData);
-      } else {
-        console.error('Kunde ble ikke funnet');
-      }
-    } catch (error) {
-      console.error('Feil ved henting av kunden:', error);
-    }
-  };
-
-  const fetchOrders = async () => {
-    try {
-      const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders?kundeid=${id}`);
-      if (response.ok) {
-        const ordersData = await response.json();
-        console.log(ordersData); // Legg til denne linjen for å inspisere dataene
-        setOrders(ordersData);
-      } else {
-        console.error('Ordre ble ikke funnet');
-      }
-    } catch (error) {
-      console.error('Feil ved henting av ordrer:', error);
-    }
-  };
-  
   useEffect(() => {
+    const fetchCustomer = async () => {
+      try {
+        const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customers/${id}`);
+        if (response.ok) {
+          const customerData = await response.json();
+          setCustomer(customerData);
+        } else {
+          console.error('Kunde ble ikke funnet');
+        }
+      } catch (error) {
+        console.error('Feil ved henting av kunden:', error);
+      }
+    };
+
+    const fetchOrders = async () => {
+      try {
+        const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders?kundeid=${id}`);
+        if (response.ok) {
+          const ordersData = await response.json();
+          console.log(ordersData); // Legg til denne linjen for å inspisere dataene
+          setOrders(ordersData);
+        } else {
+          console.error('Ordre ble ikke funnet');
+        }
+      } catch (error) {
+        console.error('Feil ved henting av ordrer:', error);
+      }
+    };
+
     fetchCustomer();
     fetchOrders(); // Hent ordrer når komponenten lastes
-  }, [id]);
+  }, [id]); // Inkluder 'id' som avhengighet
 
   const formatDate = (dateString) => {
     if (!dateString) return "Ukjent dato";
