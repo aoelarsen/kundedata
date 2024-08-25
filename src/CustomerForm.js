@@ -9,7 +9,7 @@ function CustomerForm({ addCustomer, customers, phoneNumber, setSearchQuery }) {
     email: '',
     customerNumber: '' // Nytt felt for kundenummer
   });
-  
+
   const [errorMessage, setErrorMessage] = useState(''); // For feilmelding
   const navigate = useNavigate();
 
@@ -21,12 +21,15 @@ function CustomerForm({ addCustomer, customers, phoneNumber, setSearchQuery }) {
   }, [phoneNumber]);
 
   useEffect(() => {
-    // Beregn neste tilgjengelige kundenummer
-    const nextCustomerNumber = customers.length > 0 ? Math.max(...customers.map(c => c.customerNumber)) + 1 : 1;
+    // Filtrer ut kunder uten et gyldig customerNumber og beregn neste tilgjengelige kundenummer
+    const validCustomers = customers.filter(c => typeof c.customerNumber === 'number' && !isNaN(c.customerNumber));
+    const nextCustomerNumber = validCustomers.length > 0 ? Math.max(...validCustomers.map(c => c.customerNumber)) + 1 : 1;
+
     setFormData((prevData) => ({
       ...prevData,
       customerNumber: nextCustomerNumber // Sett kundenummer
     }));
+
     console.log('Neste tilgjengelige kundenummer:', nextCustomerNumber); // Logging for feilsøking
   }, [customers]);
 
@@ -72,7 +75,7 @@ function CustomerForm({ addCustomer, customers, phoneNumber, setSearchQuery }) {
 
     try {
       console.log('Sender data til server:', newCustomer); // Logging for å se data før sending
-      
+
       // Send en POST-forespørsel til MongoDB Atlas
       const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/customers', {
         method: 'POST',
