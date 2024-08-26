@@ -7,7 +7,8 @@ function CustomerForm({ addCustomer, customers, phoneNumber, setSearchQuery }) {
     lastName: '',
     phoneNumber: '',
     email: '',
-    customerNumber: '' // Nytt felt for kundenummer
+    customerNumber: '', // Nytt felt for kundenummer
+    status: 'aktiv' // Nytt felt for status, satt til 'aktiv' som standard
   });
 
   const [errorMessage, setErrorMessage] = useState(''); // For feilmelding
@@ -140,6 +141,16 @@ function CustomerForm({ addCustomer, customers, phoneNumber, setSearchQuery }) {
           type="email"
           name="email"
           value={formData.email}
+          onChange={handleChange}
+          className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Status</label>
+        <input
+          type="text"
+          name="status"
+          value={formData.status}
           onChange={handleChange}
           className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
         />
