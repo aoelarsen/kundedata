@@ -31,11 +31,9 @@ const customerSchema = new mongoose.Schema({
   email: String,
   registrationDate: String,
   lastModified: String,
-  customerNumber: Number,
+  customerNumber: Number, // Sørg for at dette feltet er riktig definert som Number
   status: { type: String, default: 'aktiv' } // Nytt felt for status
 });
-
-
 
 const Customer = mongoose.model('Customer', customerSchema);
 
@@ -187,13 +185,12 @@ app.post('/customers', async (req, res) => {
       registrationDate: req.body.registrationDate,
       lastModified: req.body.lastModified,
       customerNumber: nextCustomerNumber, // Setter customerNumber
-      status: 'aktiv' // Setter status til 'aktiv'
+      status: req.body.status // Setter status fra request body
     });
 
     console.log('Lagrer kunde med følgende data:', customer); // Logging for å inspisere data før lagring
-
+    
     const newCustomer = await customer.save();
-    console.log('Kunde lagt til:', newCustomer); // Logging etter lagring
     res.status(201).json(newCustomer);
   } catch (err) {
     console.error('Feil ved opprettelse av kunde:', err);
