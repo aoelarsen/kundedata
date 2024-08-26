@@ -31,8 +31,9 @@ const customerSchema = new mongoose.Schema({
   email: String,
   registrationDate: String,
   lastModified: String,
-  customerNumber: Number // Legger til customerNumber felt
+  customerNumber: Number // Sørg for at dette feltet er riktig definert som Number
 });
+
 
 const Customer = mongoose.model('Customer', customerSchema);
 
@@ -169,8 +170,33 @@ app.get('/customers/:id', async (req, res) => {
   }
 });
 
+// Endpoint to create a new customer
 app.post('/customers', async (req, res) => {
-    
+  try {
+    // Finn høyeste eksisterende customerNumber og øk med 1
+    const lastCustomer = await Customer.findOne().sort('-customerNumber');
+    const nextCustomerNumber = lastCustomer ? lastCustomer.customerNumber + 1 : 1;
+
+    const customer = new Customer({
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      phoneNumber: req.body.phoneNumber,
+      email: req.body.email,
+      registrationDate: req.body.registrationDate,
+      lastModified: req.body.lastModified,
+      customerNumber: nextCustomerNumber // Setter customerNumber
+    });
+
+    console.log('Lagrer kunde med følgende data:', customer); // Logging for å inspisere data før lagring
+
+    const newCustomer = await customer.save();
+    console.log('Kunde lagt til:', newCustomer); // Logging etter lagring
+    res.status(201).json(newCustomer);
+  } catch (err) {
+    console.error('Feil ved opprettelse av kunde:', err);
+    res.status(400).json({ message: err.message });
+  }
+});    
 
 
 // Endpoint to update a customer
