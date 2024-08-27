@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom'; // Importer Link og useNavigate
+import { useParams, useNavigate, Link } from 'react-router-dom';
 
 function CustomerDetails() {
   const { id } = useParams(); // Dette vil nå referere til _id fra MongoDB
@@ -14,6 +14,7 @@ function CustomerDetails() {
         if (response.ok) {
           const customerData = await response.json();
           setCustomer(customerData);
+          fetchOrders(customerData.customerNumber); // Hent ordrer ved hjelp av customerNumber
         } else {
           console.error('Kunde ble ikke funnet');
         }
@@ -22,9 +23,10 @@ function CustomerDetails() {
       }
     };
 
-    const fetchOrders = async () => {
+    const fetchOrders = async (customerNumber) => {
       try {
-        const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders?kundeid=${id}`);
+        // Bruk customerNumber til å filtrere ordrer
+        const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders?kundeid=${customerNumber}`);
         if (response.ok) {
           const ordersData = await response.json();
           setOrders(ordersData);
@@ -36,8 +38,7 @@ function CustomerDetails() {
       }
     };
 
-    fetchCustomer();
-    fetchOrders(); // Hent ordrer når komponenten lastes
+    fetchCustomer(); // Kall fetchCustomer for å få kunde og tilhørende ordrer
   }, [id]);
 
   const formatDate = (dateString) => {
