@@ -47,6 +47,7 @@ function CustomerDetails() {
     return new Date(dateString).toLocaleDateString('no-NO', options);
   };
 
+  // Flyttet return utenfor if-blokk
   if (!customer) {
     return <p className="text-red-500 text-center mt-4">Kunde ikke funnet</p>;
   }
