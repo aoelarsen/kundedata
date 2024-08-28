@@ -39,6 +39,7 @@ function CustomerDetails() {
         console.error('Feil ved henting av ordrer:', error);
       }
     };
+    
 
     fetchCustomer(); // Kall fetchCustomer for å få kunde og tilhørende ordrer
   }, [id]);
