@@ -2,44 +2,48 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 
 function CustomerDetails() {
-  const { id } = useParams(); // Dette vil nå referere til _id fra MongoDB
-  const [customer, setCustomer] = useState(null);
-  const [orders, setOrders] = useState([]); // Legg til state for ordrer
-  const navigate = useNavigate(); // Brukes til å navigere programmatisk
+    const { id } = useParams(); // Dette vil nå referere til _id fra MongoDB
+    const [customer, setCustomer] = useState(null);
+    const [orders, setOrders] = useState([]); // Legg til state for ordrer
+    const navigate = useNavigate(); // Brukes til å navigere programmatisk
 
-  useEffect(() => {
-    const fetchCustomer = async () => {
-      try {
-        const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customers/${id}`);
-        if (response.ok) {
-          const customerData = await response.json();
-          setCustomer(customerData);
-          fetchOrders(customerData.customerNumber); // Hent ordrer ved hjelp av customerNumber
-        } else {
-          console.error('Kunde ble ikke funnet');
-        }
-      } catch (error) {
-        console.error('Feil ved henting av kunden:', error);
-      }
-    };
+    useEffect(() => {
+        const fetchCustomer = async () => {
+            try {
+                const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customers/${id}`);
+                if (response.ok) {
+                    const customerData = await response.json();
+                    setCustomer(customerData);
+                    fetchOrders(customerData.customerNumber); // Hent ordrer ved hjelp av customerNumber
+                } else {
+                    console.error('Kunde ble ikke funnet');
+                }
+            } catch (error) {
+                console.error('Feil ved henting av kunden:', error);
+            }
+        };
 
-    const fetchOrders = async (customerNumber) => {
-      try {
-        // Bruk customerNumber til å filtrere ordrer
-        const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders?kundeid=${customerNumber}`);
-        if (response.ok) {
-          const ordersData = await response.json();
-          setOrders(ordersData);
-        } else {
-          console.error('Ordre ble ikke funnet');
-        }
-      } catch (error) {
-        console.error('Feil ved henting av ordrer:', error);
-      }
-    };
+        const fetchOrders = async (customerNumber) => {
+            try {
+                // Bruk customerNumber til å filtrere ordrer
+                const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders?kundeid=${customerNumber}`);
+                if (response.ok) {
+                    const ordersData = await response.json();
+                    setOrders(ordersData);
+                } else {
+                    console.error('Ordre ble ikke funnet');
+                }
+            } catch (error) {
+                console.error('Feil ved henting av ordrer:', error);
+            }
+        };
 
-    fetchCustomer(); // Kall fetchCustomer for å få kunde og tilhørende ordrer
-  }, [id]);
+        fetchCustomer(); // Kall fetchCustomer for å få kunde og tilhørende ordrer
+    }, [id]);
+
+    // Resten av komponenten forblir som den er...
+}
+
 
   const formatDate = (dateString) => {
     if (!dateString) return "Ukjent dato";
