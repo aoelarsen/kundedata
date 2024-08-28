@@ -13,6 +13,7 @@ function CustomerDetails() {
         const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customers/${id}`);
         if (response.ok) {
           const customerData = await response.json();
+          console.log('Kunde hentet:', customerData); // Logging for å se kundedata
           setCustomer(customerData);
           fetchOrders(customerData.customerNumber); // Hent ordrer ved hjelp av customerNumber
         } else {
@@ -25,10 +26,11 @@ function CustomerDetails() {
 
     const fetchOrders = async (customerNumber) => {
       try {
-        // Bruk customerNumber til å filtrere ordrer
+        console.log('Henter ordrer for kundeid:', customerNumber); // Logging
         const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders?kundeid=${customerNumber}`);
         if (response.ok) {
           const ordersData = await response.json();
+          console.log('Ordrer hentet fra API:', ordersData); // Logging for å se ordrer
           setOrders(ordersData);
         } else {
           console.error('Ordre ble ikke funnet');
@@ -47,7 +49,6 @@ function CustomerDetails() {
     return new Date(dateString).toLocaleDateString('no-NO', options);
   };
 
-  // Flyttet return utenfor if-blokk
   if (!customer) {
     return <p className="text-red-500 text-center mt-4">Kunde ikke funnet</p>;
   }
@@ -87,26 +88,27 @@ function CustomerDetails() {
       <div className="flex justify-between mt-8">
         <div>
           <Link 
-            to={`/create-order/${customer._id}`}
+            to={`/create-order/${customer._id}`} // Bruker _id til å opprette ny ordre
             className="inline-block bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-600 mr-2"
           >
             Ny Ordre
           </Link>
           <Link 
-            to={`/create-service/${customer._id}`}
-            className="inline-block bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-600"
+            to={`/create-service/${customer._id}`} // Bruker _id til å opprette ny service
+            className="inline-block bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-bluew-600"
           >
             Ny Service
           </Link>
         </div>
         <Link 
-          to={`/edit-customer/${customer._id}`}
+          to={`/edit-customer/${customer._id}`} // Bruker _id til å redigere kunde
           className="inline-block bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-600"
         >
           Endre Kunde
         </Link>
       </div>
 
+      {/* Seksjon for å vise kundens ordrer */}
       <div className="mt-8">
         <h3 className="text-xl font-semibold mb-4">Kundens Ordrer</h3>
         {orders.length > 0 ? (
@@ -126,7 +128,7 @@ function CustomerDetails() {
                 <tr 
                   key={order._id} 
                   className="hover:bg-gray-50 cursor-pointer"
-                  onClick={() => navigate(`/order-details/${order._id}`)}
+                  onClick={() => navigate(`/order-details/${order._id}`)} // Ruter til OrderDetails-siden
                 >
                   <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.Varemerke}</td>
                   <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.Produkt}</td>
