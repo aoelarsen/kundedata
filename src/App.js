@@ -144,6 +144,8 @@ function App() {
               path="/hjelpemidler" 
               element={<Calculator />} 
             />
+              <Route path="/create-order/:id" element={<CreateOrder />} />
+
           </Routes>
         </div>
       </div>
