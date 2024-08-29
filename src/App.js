@@ -10,6 +10,9 @@ import Calculator from './Calculator';
 import CustomerList from './CustomerList';
 import OrderDetails from './OrderDetails';
 import OrderList from './OrderList';
+import CreateOrder from './CreateOrder'; // Legg til denne linjen
+
+
 
 function App() {
   const [customers, setCustomers] = useState([]);
