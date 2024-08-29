@@ -251,13 +251,19 @@ app.delete('/customers/:id', async (req, res) => {
 
 // Endpoint to get all orders
 app.get('/orders', async (req, res) => {
+  const { kundeid } = req.query;
   try {
-    const orders = await Order.find();
+    console.log('Henter ordrer med kundeid:', kundeid); // Legg til logging her
+    const orders = await Order.find({ kundeid });
+    console.log('Ordrer funnet:', orders); // Log ordrer etter spørring
     res.json(orders);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error('Feil ved henting av ordrer:', err);
+    res.status(500).json({ message: 'Feil ved henting av ordrer' });
   }
 });
+
+
 
 // Endpoint to get a single order by ID
 app.get('/orders/:id', async (req, res) => {

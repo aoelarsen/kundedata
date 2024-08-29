@@ -40,6 +40,7 @@ function CustomerDetails() {
       }
     };
     
+    
 
     fetchCustomer(); // Kall fetchCustomer for å få kunde og tilhørende ordrer
   }, [id]);
