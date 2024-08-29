@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
 function CreateOrder() {
@@ -11,9 +11,28 @@ function CreateOrder() {
         Farge: '',
         Kommentar: '',
         Ansatt: '',
-        KundeTelefon: '',
         kundeid: customerNumber // Bruk customerNumber som kundeid
     });
+
+    useEffect(() => {
+        // Når komponenten lastes inn, sett en ny ordre-ID
+        const generateOrderNumber = async () => {
+            try {
+                const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders');
+                const orders = await response.json();
+                const nextOrderNumber = orders.length > 0 ? Math.max(...orders.map(order => order.orderNumber || 0)) + 1 : 1;
+
+                setFormData(prevData => ({
+                    ...prevData,
+                    orderNumber: nextOrderNumber
+                }));
+            } catch (error) {
+                console.error('Feil ved henting av ordrer:', error);
+            }
+        };
+
+        generateOrderNumber();
+    }, []);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -38,7 +57,7 @@ function CreateOrder() {
             if (response.ok) {
                 const addedOrder = await response.json();
                 console.log('Ny ordre registrert:', addedOrder);
-                navigate(`/customer-details/${customerNumber}`);
+                navigate(`/order-list`); // Naviger til OrderList.js etter vellykket registrering
             } else {
                 console.error('Feil ved registrering av ordre:', response.statusText);
             }
@@ -111,17 +130,6 @@ function CreateOrder() {
                         type="text"
                         name="Ansatt"
                         value={formData.Ansatt}
-                        onChange={handleChange}
-                        required
-                        className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-                    />
-                </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">Kunde Telefon</label>
-                    <input
-                        type="text"
-                        name="KundeTelefon"
-                        value={formData.KundeTelefon}
                         onChange={handleChange}
                         required
                         className="mt-1 block w-full p-2 border border-gray-300 rounded-md"

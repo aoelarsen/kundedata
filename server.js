@@ -49,6 +49,7 @@ const orderSchema = new mongoose.Schema({
   Endretdato: String,
   RegistrertDato: String,
   kundeid: String,
+  orderNumber: String,
   KundeTelefon: String,
 });
 
