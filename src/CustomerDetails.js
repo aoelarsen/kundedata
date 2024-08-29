@@ -90,10 +90,10 @@ function CustomerDetails() {
       <div className="flex justify-between mt-8">
         <div>
         <Link 
-  to={`/create-order/${customer._id}`} // Bruker _id til å opprette ny ordre
-  className="inline-block bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-600 mr-2"
+    to={`/create-order/${customer.customerNumber}`} // Bruker customerNumber som parameter
+    className="inline-block bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-600 mr-2"
 >
-  Ny Ordre
+    Ny Ordre
 </Link>
           <Link 
             to={`/create-service/${customer._id}`} // Bruker _id til å opprette ny service
