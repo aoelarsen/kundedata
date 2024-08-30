@@ -15,6 +15,7 @@ function OrderList({ orders }) {
         <table className="min-w-full bg-white border border-gray-300 rounded-lg">
           <thead>
             <tr className="bg-gray-100">
+              <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Ordre Nr.</th>
               <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Merke</th>
               <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Produkt</th>
               <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Str.</th>
@@ -30,6 +31,7 @@ function OrderList({ orders }) {
                 className="hover:bg-gray-50 cursor-pointer"
                 onClick={() => handleSelectOrder(order)}
               >
+                <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.orderNumber}</td> {/* Viser orderNumber */}
                 <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.Varemerke}</td>
                 <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.Produkt}</td>
                 <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.Størrelse}</td>
