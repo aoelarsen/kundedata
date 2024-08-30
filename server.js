@@ -9,12 +9,13 @@ const port = process.env.PORT || 5001;
 
 // Middleware for CORS-konfigurasjon
 const corsOptions = {
-  origin: ['https://rssport.netlify.app', 'http://localhost:3000'], // Tillater både produksjons- og lokal utviklingsopprinnelse
+  origin: ['https://rssport.netlify.app', 'http://localhost:3000', 'http://localhost:3001'], // Legg til localhost:3001 her
   optionsSuccessStatus: 200,
-  methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'], // Legg til tillatte HTTP-metoder
-  allowedHeaders: ['Content-Type', 'Authorization'] // Spesifiser hvilke overskrifter som er tillatt
+  methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'], // Tillater nødvendige HTTP-metoder
+  allowedHeaders: ['Content-Type', 'Authorization'] // Spesifiser tillatte overskrifter
 };
 app.use(cors(corsOptions));
+
 app.use(express.json());
 
 
