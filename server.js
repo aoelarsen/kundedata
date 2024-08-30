@@ -63,36 +63,37 @@ const Order = mongoose.model('Order', orderSchema);
 // Endpoint to create a new order
 app.post('/orders', async (req, res) => {
   try {
-    // Finn høyeste eksisterende orderNumber og øk med 1
-    const lastOrder = await Order.findOne().sort('-orderNumber');
-    const nextOrderNumber = lastOrder ? (parseInt(lastOrder.orderNumber) + 1).toString() : '1';
+      // Finn høyeste eksisterende orderNumber og øk med 1, konverter til streng
+      const lastOrder = await Order.findOne().sort('-orderNumber');
+      const nextOrderNumber = lastOrder ? (parseInt(lastOrder.orderNumber, 10) + 1).toString() : '1';
 
-    // Opprett order data med orderNumber som en streng
-    const orderData = {
-      Varemerke: req.body.Varemerke,
-      Produkt: req.body.Produkt,
-      Størrelse: req.body.Størrelse,
-      Farge: req.body.Farge,
-      Status: req.body.Status || 'Aktiv',
-      Kommentar: req.body.Kommentar,
-      Ansatt: req.body.Ansatt,
-      Endretdato: req.body.Endretdato || '',
-      RegistrertDato: req.body.registrertDato || new Date().toLocaleString(),
-      kundeid: req.body.kundeid,
-      KundeTelefon: req.body.KundeTelefon,
-      orderNumber: nextOrderNumber // Bruker nå en streng
-    };
+      // Opprett order data med orderNumber som en streng
+      const orderData = {
+          Varemerke: req.body.Varemerke,
+          Produkt: req.body.Produkt,
+          Størrelse: req.body.Størrelse,
+          Farge: req.body.Farge,
+          Status: req.body.Status || 'Aktiv',
+          Kommentar: req.body.Kommentar,
+          Ansatt: req.body.Ansatt,
+          Endretdato: req.body.Endretdato || '',
+          RegistrertDato: req.body.RegistrertDato || new Date().toLocaleString(),
+          kundeid: req.body.kundeid,
+          KundeTelefon: req.body.KundeTelefon,
+          orderNumber: nextOrderNumber // Bruker nå en streng
+      };
 
-    // Logg orderData for å bekrefte verdier før lagring
-    console.log('Order data før lagring:', orderData);
+      // Logg orderData for å bekrefte verdier før lagring
+      console.log('Order data før lagring:', orderData);
 
-    const order = new Order(orderData);
-    const newOrder = await order.save();
-    res.status(201).json(newOrder);
+      const order = new Order(orderData);
+      const newOrder = await order.save();
+      res.status(201).json(newOrder);
   } catch (err) {
-    res.status(400).json({ message: err.message });
+      res.status(400).json({ message: err.message });
   }
 });
+
 
 
 

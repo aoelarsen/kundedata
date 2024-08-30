@@ -17,23 +17,24 @@ function CreateOrder() {
   useEffect(() => {
     // Når komponenten lastes inn, generer en ny ordre-ID
     const generateOrderNumber = async () => {
-      try {
-        const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders');
-        const orders = await response.json();
-        const nextOrderNumber = orders.length > 0 ? (Math.max(...orders.map(order => parseInt(order.orderNumber) || 0)) + 1).toString() : '1';
+        try {
+            const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders');
+            const orders = await response.json();
+            const nextOrderNumber = orders.length > 0 ? (Math.max(...orders.map(order => parseInt(order.orderNumber, 10) || 0)) + 1).toString() : '1';
 
-        console.log('Neste ordre nummer generert:', nextOrderNumber); // Logg for å bekrefte generering
-        setFormData(prevData => ({
-          ...prevData,
-          orderNumber: nextOrderNumber
-        }));
-      } catch (error) {
-        console.error('Feil ved henting av ordrer:', error);
-      }
+            console.log('Neste ordre nummer generert:', nextOrderNumber); // Logg for å bekrefte generering
+            setFormData(prevData => ({
+                ...prevData,
+                orderNumber: nextOrderNumber
+            }));
+        } catch (error) {
+            console.error('Feil ved henting av ordrer:', error);
+        }
     };
 
     generateOrderNumber();
-  }, []);
+}, []);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
