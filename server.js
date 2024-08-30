@@ -54,7 +54,7 @@ const orderSchema = new mongoose.Schema({
   RegistrertDato: String,
   kundeid: String,
   KundeTelefon: String,
-  orderNumber: Number // Legger til orderNumber i schemaet
+  orderNumber: { type: Number, required: true } // Sørg for at type er satt til Number og det er påkrevd
 });
 
 const Order = mongoose.model('Order', orderSchema);
@@ -66,18 +66,28 @@ app.post('/orders', async (req, res) => {
     const lastOrder = await Order.findOne().sort('-orderNumber');
     const nextOrderNumber = lastOrder ? lastOrder.orderNumber + 1 : 1;
 
-    const order = new Order({
-      ...req.body,
-      orderNumber: nextOrderNumber // Generer orderNumber her
-    });
+    const orderData = {
+      Varemerke: req.body.Varemerke,
+      Produkt: req.body.Produkt,
+      Størrelse: req.body.Størrelse,
+      Farge: req.body.Farge,
+      Status: 'Aktiv', // Setter status til Aktiv som standard
+      Kommentar: req.body.Kommentar,
+      Ansatt: req.body.Ansatt,
+      Endretdato: req.body.Endretdato || '', // Sett som tom string hvis ikke angitt
+      RegistrertDato: new Date().toLocaleString(),
+      kundeid: req.body.kundeid,
+      KundeTelefon: req.body.KundeTelefon,
+      orderNumber: nextOrderNumber // Generer orderNumber
+    };
 
+    const order = new Order(orderData);
     const newOrder = await order.save();
     res.status(201).json(newOrder);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
 });
-
 
 
 // Schema and Model for Employees
