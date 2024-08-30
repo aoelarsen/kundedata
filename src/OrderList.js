@@ -1,8 +1,27 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom'; // Sørg for at begge disse er importert
 
-function OrderList({ orders }) {
+function OrderList() {
+  const [orders, setOrders] = useState([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders');
+        if (response.ok) {
+          const data = await response.json();
+          setOrders(data); // Setter state med alle ordrene
+        } else {
+          console.error('Feil ved henting av ordrer:', response.statusText);
+        }
+      } catch (error) {
+        console.error('Feil ved kommunikasjon med serveren:', error);
+      }
+    };
+
+    fetchOrders(); // Kall funksjonen når komponenten laster
+  }, []); // Tom avhengighetsliste for å kjøre denne koden kun én gang
 
   const handleSelectOrder = (order) => {
     navigate(`/order-details/${order._id}`); // Ruter til OrderDetails-siden med MongoDB ObjectId
