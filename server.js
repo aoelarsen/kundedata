@@ -5,7 +5,7 @@ const cors = require('cors');
 const app = express();
 
 // Bruk Heroku's dynamisk tildelte port, eller 5000 som fallback lokalt
-const port = process.env.PORT || 5001;
+const port = process.env.PORT || 5000;
 
 // Middleware
 const corsOptions = {
@@ -72,7 +72,7 @@ app.post('/orders', async (req, res) => {
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
-});
+});h
 
 // Schema and Model for Employees
 const employeeSchema = new mongoose.Schema({
