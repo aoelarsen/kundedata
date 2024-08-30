@@ -5,7 +5,7 @@ const cors = require('cors');
 const app = express();
 
 // Bruk Heroku's dynamisk tildelte port, eller 5000 som fallback lokalt
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 5001;
 
 // Middleware for CORS-konfigurasjon
 const corsOptions = {
