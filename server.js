@@ -7,13 +7,16 @@ const app = express();
 // Bruk Heroku's dynamisk tildelte port, eller 5000 som fallback lokalt
 const port = process.env.PORT || 5000;
 
-// Middleware
+// Middleware for CORS-konfigurasjon
 const corsOptions = {
   origin: ['https://rssport.netlify.app', 'http://localhost:3000'], // Tillater både produksjons- og lokal utviklingsopprinnelse
-  optionsSuccessStatus: 200
+  optionsSuccessStatus: 200,
+  methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'], // Legg til tillatte HTTP-metoder
+  allowedHeaders: ['Content-Type', 'Authorization'] // Spesifiser hvilke overskrifter som er tillatt
 };
 app.use(cors(corsOptions));
 app.use(express.json());
+
 
 // Bruk miljøvariabel for MongoDB Atlas URI
 const uri = process.env.MONGO_URI || "mongodb+srv://sp1348:uzETy8kW83sXiHy4@cluster0.wtpcbrd.mongodb.net/rsData?retryWrites=true&w=majority&appName=Cluster0";
@@ -64,7 +67,7 @@ app.post('/orders', async (req, res) => {
 
     const order = new Order({
       ...req.body,
-      orderNumber: nextOrderNumber // Setter orderNumber
+      orderNumber: nextOrderNumber // Sørg for å generere orderNumber her
     });
 
     const newOrder = await order.save();
@@ -72,7 +75,8 @@ app.post('/orders', async (req, res) => {
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
-});h
+});
+
 
 // Schema and Model for Employees
 const employeeSchema = new mongoose.Schema({
@@ -273,15 +277,19 @@ app.delete('/customers/:id', async (req, res) => {
 app.get('/orders', async (req, res) => {
   const { kundeid } = req.query;
   try {
-    console.log('Henter ordrer med kundeid:', kundeid); // Legg til logging her
-    const orders = await Order.find({ kundeid });
-    console.log('Ordrer funnet:', orders); // Log ordrer etter spørring
+    let orders;
+    if (kundeid) {
+      orders = await Order.find({ kundeid }); // Finn ordre med gitt kundeid
+    } else {
+      orders = await Order.find(); // Hent alle ordrer hvis ingen kundeid er spesifisert
+    }
     res.json(orders);
   } catch (err) {
     console.error('Feil ved henting av ordrer:', err);
     res.status(500).json({ message: 'Feil ved henting av ordrer' });
   }
 });
+
 
 
 
