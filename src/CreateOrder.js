@@ -15,13 +15,14 @@ function CreateOrder() {
     });
 
     useEffect(() => {
-        // Når komponenten lastes inn, sett en ny ordre-ID
+        // Når komponenten lastes inn, generer en ny ordre-ID
         const generateOrderNumber = async () => {
             try {
                 const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders');
                 const orders = await response.json();
                 const nextOrderNumber = orders.length > 0 ? Math.max(...orders.map(order => order.orderNumber || 0)) + 1 : 1;
 
+                console.log('Neste ordre nummer generert:', nextOrderNumber); // Logg for å bekrefte generering
                 setFormData(prevData => ({
                     ...prevData,
                     orderNumber: nextOrderNumber
@@ -45,6 +46,9 @@ function CreateOrder() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        // Logg formData for feilsøking
+        console.log('Ordredata som blir sendt til serveren:', formData);
+
         try {
             const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders', {
                 method: 'POST',
@@ -57,9 +61,10 @@ function CreateOrder() {
             if (response.ok) {
                 const addedOrder = await response.json();
                 console.log('Ny ordre registrert:', addedOrder);
-                navigate(`/order-list`); // Naviger til OrderList.js etter vellykket registrering
+                navigate('/order-list'); // Naviger til OrderList.js etter vellykket registrering
             } else {
-                console.error('Feil ved registrering av ordre:', response.statusText);
+                const responseText = await response.text(); // Gir mer detaljert feilinfo
+                console.error('Feil ved registrering av ordre:', response.statusText, responseText);
             }
         } catch (error) {
             console.error('Feil ved kommunikasjon med serveren:', error);
