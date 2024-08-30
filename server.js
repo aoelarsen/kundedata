@@ -5,7 +5,7 @@ const cors = require('cors');
 const app = express();
 
 // Bruk Heroku's dynamisk tildelte port, eller 5000 som fallback lokalt
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 5001;
 
 // Middleware
 const corsOptions = {
@@ -49,11 +49,30 @@ const orderSchema = new mongoose.Schema({
   Endretdato: String,
   RegistrertDato: String,
   kundeid: String,
-  orderNumber: String,
   KundeTelefon: String,
+  orderNumber: Number // Legger til orderNumber i schemaet
 });
 
 const Order = mongoose.model('Order', orderSchema);
+
+// Endpoint to create a new order
+app.post('/orders', async (req, res) => {
+  try {
+    // Finn høyeste eksisterende orderNumber og øk med 1
+    const lastOrder = await Order.findOne().sort('-orderNumber');
+    const nextOrderNumber = lastOrder ? lastOrder.orderNumber + 1 : 1;
+
+    const order = new Order({
+      ...req.body,
+      orderNumber: nextOrderNumber // Setter orderNumber
+    });
+
+    const newOrder = await order.save();
+    res.status(201).json(newOrder);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
 
 // Schema and Model for Employees
 const employeeSchema = new mongoose.Schema({
