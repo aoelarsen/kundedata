@@ -67,7 +67,7 @@ app.post('/orders', async (req, res) => {
 
     const order = new Order({
       ...req.body,
-      orderNumber: nextOrderNumber // Sørg for å generere orderNumber her
+      orderNumber: nextOrderNumber // Generer orderNumber her
     });
 
     const newOrder = await order.save();
@@ -76,6 +76,7 @@ app.post('/orders', async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 });
+
 
 
 // Schema and Model for Employees

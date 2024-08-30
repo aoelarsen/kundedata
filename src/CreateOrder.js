@@ -21,7 +21,7 @@ function CreateOrder() {
                 const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders');
                 const orders = await response.json();
                 const nextOrderNumber = orders.length > 0 ? Math.max(...orders.map(order => order.orderNumber || 0)) + 1 : 1;
-
+    
                 console.log('Neste ordre nummer generert:', nextOrderNumber); // Logg for å bekrefte generering
                 setFormData(prevData => ({
                     ...prevData,
@@ -31,9 +31,10 @@ function CreateOrder() {
                 console.error('Feil ved henting av ordrer:', error);
             }
         };
-
+    
         generateOrderNumber();
     }, []);
+    
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -45,10 +46,10 @@ function CreateOrder() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+    
         // Logg formData for feilsøking
         console.log('Ordredata som blir sendt til serveren:', formData);
-
+    
         try {
             const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders', {
                 method: 'POST',
@@ -57,7 +58,7 @@ function CreateOrder() {
                 },
                 body: JSON.stringify(formData),
             });
-
+    
             if (response.ok) {
                 const addedOrder = await response.json();
                 console.log('Ny ordre registrert:', addedOrder);
@@ -70,6 +71,7 @@ function CreateOrder() {
             console.error('Feil ved kommunikasjon med serveren:', error);
         }
     };
+    
 
     return (
         <div className="p-4">
