@@ -54,8 +54,9 @@ const orderSchema = new mongoose.Schema({
   RegistrertDato: String,
   kundeid: String,
   KundeTelefon: String,
-  orderNumber: { type: Number, required: true } // Sørg for at type er satt til Number og det er påkrevd
+  orderNumber: { type: String, required: true } // Endret fra Number til String
 });
+
 
 const Order = mongoose.model('Order', orderSchema);
 
@@ -64,22 +65,26 @@ app.post('/orders', async (req, res) => {
   try {
     // Finn høyeste eksisterende orderNumber og øk med 1
     const lastOrder = await Order.findOne().sort('-orderNumber');
-    const nextOrderNumber = lastOrder ? lastOrder.orderNumber + 1 : 1;
+    const nextOrderNumber = lastOrder ? (parseInt(lastOrder.orderNumber) + 1).toString() : '1';
 
+    // Opprett order data med orderNumber som en streng
     const orderData = {
       Varemerke: req.body.Varemerke,
       Produkt: req.body.Produkt,
       Størrelse: req.body.Størrelse,
       Farge: req.body.Farge,
-      Status: 'Aktiv', // Setter status til Aktiv som standard
+      Status: req.body.Status || 'Aktiv',
       Kommentar: req.body.Kommentar,
       Ansatt: req.body.Ansatt,
-      Endretdato: req.body.Endretdato || '', // Sett som tom string hvis ikke angitt
-      RegistrertDato: new Date().toLocaleString(),
+      Endretdato: req.body.Endretdato || '',
+      RegistrertDato: req.body.registrertDato || new Date().toLocaleString(),
       kundeid: req.body.kundeid,
       KundeTelefon: req.body.KundeTelefon,
-      orderNumber: nextOrderNumber // Generer orderNumber
+      orderNumber: nextOrderNumber // Bruker nå en streng
     };
+
+    // Logg orderData for å bekrefte verdier før lagring
+    console.log('Order data før lagring:', orderData);
 
     const order = new Order(orderData);
     const newOrder = await order.save();
@@ -88,6 +93,7 @@ app.post('/orders', async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 });
+
 
 
 // Schema and Model for Employees

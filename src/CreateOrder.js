@@ -4,7 +4,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 function CreateOrder() {
   const { customerNumber } = useParams(); // Hent customerNumber fra URL
   const navigate = useNavigate();
-  
   const [formData, setFormData] = useState({
     Varemerke: '',
     Produkt: '',
@@ -12,11 +11,7 @@ function CreateOrder() {
     Farge: '',
     Kommentar: '',
     Ansatt: '',
-    registrertDato: '',
-    endretdato: '',
-    orderNumber: '',
-    status: 'Aktiv',
-    kundeid: customerNumber
+    kundeid: customerNumber // Bruk customerNumber som kundeid
   });
 
   useEffect(() => {
@@ -25,8 +20,9 @@ function CreateOrder() {
       try {
         const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders');
         const orders = await response.json();
-        const nextOrderNumber = orders.length > 0 ? Math.max(...orders.map(order => order.orderNumber || 0)) + 1 : 1;
+        const nextOrderNumber = orders.length > 0 ? (Math.max(...orders.map(order => parseInt(order.orderNumber) || 0)) + 1).toString() : '1';
 
+        console.log('Neste ordre nummer generert:', nextOrderNumber); // Logg for å bekrefte generering
         setFormData(prevData => ({
           ...prevData,
           orderNumber: nextOrderNumber
@@ -53,11 +49,13 @@ function CreateOrder() {
     const newOrder = {
       ...formData,
       registrertDato: new Date().toLocaleString(), // Sett registrertDato til nåværende tidspunkt
+      status: 'Aktiv', // Sett standard status
+      endretdato: '' // Sett endretdato som tom
     };
 
-    try {
-      console.log('Sender ordredata til server:', newOrder);
+    console.log('Sender ordredata til server:', newOrder); // Logg dataen
 
+    try {
       const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders', {
         method: 'POST',
         headers: {
