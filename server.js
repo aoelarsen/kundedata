@@ -54,7 +54,7 @@ const orderSchema = new mongoose.Schema({
   RegistrertDato: String,
   kundeid: String,
   KundeTelefon: String,
-  ordreid: String, // Ordre ID
+  ordreid: Number, // Ordre ID
   orderNumber: String,
   test: String // Legg til dette feltet
 });
@@ -72,7 +72,8 @@ app.post('/orders', async (req, res) => {
   try {
       // Finn høyeste eksisterende ordreid og øk med 1
       const lastOrder = await Order.findOne().sort('-ordreid');
-      const nextOrderId = lastOrder ? lastOrder.ordreid + 1 : 1;
+      const nextOrderId = lastOrder ? parseInt(lastOrder.ordreid, 10) + 1 : 1;
+      
 
       const orderData = {
           Varemerke: req.body.Varemerke,
