@@ -12,8 +12,7 @@ function CreateOrder() {
     Kommentar: '',
     Ansatt: '',
     kundeid: customerNumber, // Bruk customerNumber som kundeid
-    ordreid: '', // Nytt felt for ordre ID
-    test: 'test' // Nytt felt ferdig utfylt med "test"
+    ordreid: '' // Nytt felt for ordre ID
   });
 
   useEffect(() => {

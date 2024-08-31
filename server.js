@@ -55,8 +55,7 @@ const orderSchema = new mongoose.Schema({
   kundeid: String,
   KundeTelefon: String,
   ordreid: Number, // Definer som Number for riktig inkrementering
-  orderNumber: String,
-  test: String // Legg til dette feltet
+  orderNumber: String
 });
 
 
@@ -98,8 +97,7 @@ app.post('/orders', async (req, res) => {
       RegistrertDato: req.body.RegistrertDato || new Date().toLocaleString(),
       kundeid: req.body.kundeid,
       KundeTelefon: req.body.KundeTelefon,
-      ordreid: nextOrderId, // Bruker inkrementert ordreid
-      test: req.body.test || 'test' // Setter test til 'test' hvis ikke gitt
+      ordreid: nextOrderId // Bruker inkrementert ordreid
     };
 
     console.log('Order data før lagring:', orderData);
