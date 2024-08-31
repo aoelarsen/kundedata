@@ -117,6 +117,7 @@ function CustomerDetails() {
           <table className="min-w-full bg-white border border-gray-300 rounded-lg">
             <thead>
               <tr className="bg-gray-100">
+              <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">ID</th>
                 <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Merke</th>
                 <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Produkt</th>
                 <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Str.</th>
@@ -132,6 +133,7 @@ function CustomerDetails() {
                   className="hover:bg-gray-50 cursor-pointer"
                   onClick={() => navigate(`/order-details/${order._id}`)} // Ruter til OrderDetails-siden
                 >
+                                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.ordreid}</td> {/* Viser orderNumber */}
                   <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.Varemerke}</td>
                   <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.Produkt}</td>
                   <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.Størrelse}</td>

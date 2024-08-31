@@ -11,28 +11,28 @@ function CreateOrder() {
     Farge: '',
     Kommentar: '',
     Ansatt: '',
-    kundeid: customerNumber, // Bruk customerNumber som kundeid
+    kundeid: parseInt(customerNumber, 10), // Konverter customerNumber til et tall
     ordreid: '' // Nytt felt for ordre ID
   });
 
   useEffect(() => {
     // Når komponenten lastes inn, hent den siste ordre-ID-en fra serveren
     const fetchLastOrderId = async () => {
-        try {
-          const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders/last-order-id');
-          const data = await response.json();
-          const lastOrderId = parseInt(data.lastOrderId, 10); // Parse the last order ID as an integer
-          const nextOrderId = isNaN(lastOrderId) ? 1 : lastOrderId + 1; // If NaN, start at 1
-     
-          console.log('Neste ordre nummer generert:', nextOrderId); // Log for verification
-          setFormData(prevData => ({
-            ...prevData,
-            ordreid: nextOrderId // Store the next order number in ordreid
-          }));
-        } catch (error) {
-          console.error('Feil ved henting av siste ordre-ID:', error);
-        }
-      };
+      try {
+        const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders/last-order-id');
+        const data = await response.json();
+        const lastOrderId = parseInt(data.lastOrderId, 10); // Parse the last order ID as an integer
+        const nextOrderId = isNaN(lastOrderId) ? 1 : lastOrderId + 1; // If NaN, start at 1
+
+        console.log('Neste ordre nummer generert:', nextOrderId); // Log for verification
+        setFormData(prevData => ({
+          ...prevData,
+          ordreid: nextOrderId // Store the next order number in ordreid
+        }));
+      } catch (error) {
+        console.error('Feil ved henting av siste ordre-ID:', error);
+      }
+    };
 
     fetchLastOrderId();
   }, []);
@@ -54,7 +54,7 @@ function CreateOrder() {
       registrertDato: new Date().toLocaleString(), // Sett registrertDato til nåværende tidspunkt
       status: 'Aktiv', // Sett standard status
       endretdato: '', // Sett endretdato som tom
-      test: formData.test // Inkluder test-feltet
+      test: 'test' // Inkluder test-feltet
     };
 
     console.log('Sender ordredata til server:', newOrder); // Logg dataen før sending
