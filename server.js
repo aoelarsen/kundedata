@@ -64,6 +64,17 @@ const orderSchema = new mongoose.Schema({
 
 const Order = mongoose.model('Order', orderSchema);
 
+app.get('/orders/last-order-id', async (req, res) => {
+  try {
+    const lastOrder = await Order.findOne().sort('-ordreid');
+    const lastOrderId = lastOrder ? lastOrder.ordreid : 0; // Return 0 if no orders found
+    console.log('Last order ID fetched:', lastOrderId); // Debug log
+    res.json({ lastOrderId });
+  } catch (err) {
+    console.error('Feil ved henting av siste ordreid:', err);
+    res.status(500).json({ message: 'Feil ved henting av siste ordreid' });
+  }
+});
 
 // Endpoint to create a new order
 app.post('/orders', async (req, res) => {
