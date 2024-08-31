@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
 function CreateOrder() {
-  const { customerNumber } = useParams();
+  const { customerNumber } = useParams(); // Hent customerNumber fra URL
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     Varemerke: '',
@@ -11,29 +11,30 @@ function CreateOrder() {
     Farge: '',
     Kommentar: '',
     Ansatt: '',
-    kundeid: customerNumber,
-    ordreid: '',  // Nytt felt for ordre ID
-    test: 'test'  // Nytt felt ferdig utfylt med "test"
+    kundeid: customerNumber, // Bruk customerNumber som kundeid
+    ordreid: '', // Nytt felt for ordre ID
+    test: 'test' // Nytt felt ferdig utfylt med "test"
   });
 
   useEffect(() => {
-    // Hent siste ordreid fra serveren og inkrementer med 1
-    const fetchNextOrderId = async () => {
+    // Når komponenten lastes inn, hent den siste ordre-ID-en fra serveren
+    const fetchLastOrderId = async () => {
       try {
         const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders/last-order-id');
         const data = await response.json();
-        const nextOrderId = data.lastOrderId + 1;
+        const nextOrderId = data.ordreid + 1;
 
+        console.log('Neste ordre nummer generert:', nextOrderId); // Logg for å bekrefte generering
         setFormData(prevData => ({
           ...prevData,
-          ordreid: nextOrderId  // Sett det inkrementerte ordreid
+          ordreid: nextOrderId // Lagre neste ordrenummer i ordreid
         }));
       } catch (error) {
-        console.error('Feil ved henting av siste ordre ID:', error);
+        console.error('Feil ved henting av siste ordre-ID:', error);
       }
     };
 
-    fetchNextOrderId();
+    fetchLastOrderId();
   }, []);
 
   const handleChange = (e) => {
@@ -49,14 +50,14 @@ function CreateOrder() {
 
     const newOrder = {
       ...formData,
-      ordreid: formData.ordreid,
-      registrertDato: new Date().toLocaleString(),
-      status: 'Aktiv',
-      endretdato: '',
-      test: formData.test
+      ordreid: formData.ordreid, // Forsikre at ordreid er inkludert
+      registrertDato: new Date().toLocaleString(), // Sett registrertDato til nåværende tidspunkt
+      status: 'Aktiv', // Sett standard status
+      endretdato: '', // Sett endretdato som tom
+      test: formData.test // Inkluder test-feltet
     };
 
-    console.log('Sender ordredata til server:', newOrder);
+    console.log('Sender ordredata til server:', newOrder); // Logg dataen før sending
 
     try {
       const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders', {
@@ -70,9 +71,9 @@ function CreateOrder() {
       if (response.ok) {
         const addedOrder = await response.json();
         console.log('Suksess! Ordre lagt til:', addedOrder);
-        navigate(`/order-details/${addedOrder._id}`);
+        navigate(`/order-details/${addedOrder._id}`); // Naviger til order-details med riktig ID
       } else {
-        const responseText = await response.text();
+        const responseText = await response.text(); // Gir mer detaljert feilinfo
         console.error('Feil ved registrering av ordre:', response.statusText, responseText);
       }
     } catch (error) {
