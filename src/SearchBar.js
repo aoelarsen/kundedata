@@ -26,7 +26,7 @@ function SearchBar({ searchQuery, setSearchQuery, filteredCustomers, setPhoneNum
               onClick={() => handleSelectCustomer(customer)}
               className="p-2 cursor-pointer hover:bg-gray-100"
             >
-              {customer.firstName} {customer.lastName} - {customer.email}
+              {customer.firstName} {customer.lastName} - {customer.phoneNumber}
             </li>
           ))}
         </ul>
