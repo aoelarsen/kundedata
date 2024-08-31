@@ -72,9 +72,8 @@ app.post('/orders', async (req, res) => {
   try {
       // Finn høyeste eksisterende ordreid og øk med 1
       const lastOrder = await Order.findOne().sort('-ordreid');
-      const nextOrderId = lastOrder ? parseInt(lastOrder.ordreid, 10) + 1 : 1;
+      const nextOrderId = lastOrder ? lastOrder.ordreid + 1 : 1;
       
-
       const orderData = {
           Varemerke: req.body.Varemerke,
           Produkt: req.body.Produkt,
@@ -87,8 +86,8 @@ app.post('/orders', async (req, res) => {
           RegistrertDato: req.body.RegistrertDato || new Date().toLocaleString(),
           kundeid: req.body.kundeid,
           KundeTelefon: req.body.KundeTelefon,
-          ordreid: nextOrderId,  // Sett det neste ordrenummeret
-          test: req.body.test || 'test' // Legg til feltet 'test' hvis det ikke finnes
+          ordreid: nextOrderId,  // Bruker inkrementert ordreid
+          test: req.body.test || 'test' // Setter test til 'test' hvis ikke gitt
       };
 
       console.log('Order data før lagring:', orderData);
@@ -103,6 +102,7 @@ app.post('/orders', async (req, res) => {
       res.status(400).json({ message: err.message });
   }
 });
+
 
 
 
