@@ -11,7 +11,9 @@ function CreateOrder() {
     Farge: '',
     Kommentar: '',
     Ansatt: '',
-    kundeid: customerNumber // Bruk customerNumber som kundeid
+    kundeid: customerNumber, // Bruk customerNumber som kundeid
+    ordreid: '', // Nytt felt for ordre ID
+    test: 'test' // Nytt felt ferdig utfylt med "test"
   });
 
   useEffect(() => {
@@ -20,12 +22,12 @@ function CreateOrder() {
         try {
             const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders');
             const orders = await response.json();
-            const nextOrderNumber = orders.length > 0 ? (Math.max(...orders.map(order => parseInt(order.orderNumber, 10) || 0)) + 1).toString() : '1';
+            const nextOrderNumber = orders.length > 0 ? (Math.max(...orders.map(order => parseInt(order.orderNumber, 10) || 0)) + 1) : 1;
 
             console.log('Neste ordre nummer generert:', nextOrderNumber); // Logg for å bekrefte generering
             setFormData(prevData => ({
                 ...prevData,
-                orderNumber: nextOrderNumber
+                ordreid: nextOrderNumber // Lagre ordrenummer i ordreid
             }));
         } catch (error) {
             console.error('Feil ved henting av ordrer:', error);
@@ -34,7 +36,6 @@ function CreateOrder() {
 
     generateOrderNumber();
 }, []);
-
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -46,16 +47,18 @@ function CreateOrder() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     const newOrder = {
       ...formData,
+      ordreid: formData.ordreid, // Forsikre at ordreid er inkludert
       registrertDato: new Date().toLocaleString(), // Sett registrertDato til nåværende tidspunkt
       status: 'Aktiv', // Sett standard status
-      endretdato: '' // Sett endretdato som tom
+      endretdato: '', // Sett endretdato som tom
+      test: formData.test // Inkluder test-feltet
     };
-
-    console.log('Sender ordredata til server:', newOrder); // Logg dataen
-
+  
+    console.log('Sender ordredata til server:', newOrder); // Logg dataen før sending
+  
     try {
       const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders', {
         method: 'POST',
@@ -64,11 +67,11 @@ function CreateOrder() {
         },
         body: JSON.stringify(newOrder),
       });
-
+  
       if (response.ok) {
         const addedOrder = await response.json();
-        console.log('Suksess! Ordre lagt til:', addedOrder);
-        navigate(`/customer-details/${customerNumber}`); // Naviger tilbake til customer details etter vellykket registrering
+        console.log('Suksess! Ordre lagt til:', addedOrder );
+        navigate(`/order-details/${addedOrder._id}`); // Naviger til order-details med riktig ID
       } else {
         const responseText = await response.text(); // Gir mer detaljert feilinfo
         console.error('Feil ved registrering av ordre:', response.statusText, responseText);
@@ -77,7 +80,7 @@ function CreateOrder() {
       console.error('Feil ved kommunikasjon med serveren:', error);
     }
   };
-
+  
   return (
     <div className="p-4">
       <h2 className="text-2xl font-bold mb-4">Registrer Ny Ordre</h2>
@@ -145,6 +148,16 @@ function CreateOrder() {
             onChange={handleChange}
             required
             className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Ordre ID</label>
+          <input
+            type="text"
+            name="ordreid"
+            value={formData.ordreid}
+            readOnly
+            className="mt-1 block w-full p-2 border border-gray-300 rounded-md bg-gray-100"
           />
         </div>
         <div className="text-center">

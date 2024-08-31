@@ -54,43 +54,53 @@ const orderSchema = new mongoose.Schema({
   RegistrertDato: String,
   kundeid: String,
   KundeTelefon: String,
-  orderNumber: { type: String, required: true } // Endret fra Number til String
+  ordreid: String, // Ordre ID
+  orderNumber: String,
+  test: String // Legg til dette feltet
 });
+
 
 
 const Order = mongoose.model('Order', orderSchema);
 
+
 // Endpoint to create a new order
 app.post('/orders', async (req, res) => {
+  console.log('POST request mottatt på /orders');
+  console.log('Request body mottatt:', req.body);
+
   try {
-      // Finn høyeste eksisterende orderNumber og øk med 1, konverter til streng
-      const lastOrder = await Order.findOne().sort('-orderNumber');
-      const nextOrderNumber = lastOrder ? (parseInt(lastOrder.orderNumber, 10) + 1).toString() : '1';
+    if (!req.body.ordreid) {
+      console.error('ordreid mangler eller er tom:', req.body.ordreid);
+      return res.status(400).json({ message: 'ordreid mangler eller er ikke gyldig' });
+    }
 
-      // Opprett order data med orderNumber som en streng
-      const orderData = {
-          Varemerke: req.body.Varemerke,
-          Produkt: req.body.Produkt,
-          Størrelse: req.body.Størrelse,
-          Farge: req.body.Farge,
-          Status: req.body.Status || 'Aktiv',
-          Kommentar: req.body.Kommentar,
-          Ansatt: req.body.Ansatt,
-          Endretdato: req.body.Endretdato || '',
-          RegistrertDato: req.body.RegistrertDato || new Date().toLocaleString(),
-          kundeid: req.body.kundeid,
-          KundeTelefon: req.body.KundeTelefon,
-          orderNumber: nextOrderNumber // Bruker nå en streng
-      };
+    const orderData = {
+      Varemerke: req.body.Varemerke,
+      Produkt: req.body.Produkt,
+      Størrelse: req.body.Størrelse,
+      Farge: req.body.Farge,
+      Status: req.body.Status || 'Aktiv',
+      Kommentar: req.body.Kommentar,
+      Ansatt: req.body.Ansatt,
+      Endretdato: req.body.Endretdato || '',
+      RegistrertDato: req.body.RegistrertDato || new Date().toLocaleString(),
+      kundeid: req.body.kundeid,
+      KundeTelefon: req.body.KundeTelefon,
+      ordreid: req.body.ordreid,
+      test: req.body.test // Legg til feltet 'test'
+    };
 
-      // Logg orderData for å bekrefte verdier før lagring
-      console.log('Order data før lagring:', orderData);
+    console.log('Order data før lagring:', orderData);
 
-      const order = new Order(orderData);
-      const newOrder = await order.save();
-      res.status(201).json(newOrder);
+    const order = new Order(orderData);
+    const newOrder = await order.save();
+
+    console.log('Ny ordre lagret:', newOrder);
+    res.status(201).json(newOrder);
   } catch (err) {
-      res.status(400).json({ message: err.message });
+    console.error('Feil ved lagring av ordre:', err);
+    res.status(400).json({ message: err.message });
   }
 });
 
@@ -339,6 +349,7 @@ app.post('/orders', async (req, res) => {
     RegistrertDato: req.body.RegistrertDato,
     kundeid: req.body.kundeid,
     KundeTelefon: req.body.KundeTelefon,
+    ordreid: req.body.ordreid,
   });
 
   try {
