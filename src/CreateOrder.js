@@ -26,38 +26,43 @@ function CreateOrder() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const newOrder = {
+    // Hent siste ordre ID fra serveren og inkrementer
+    try {
+      const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders/last-order-id');
+      const data = await response.json();
+      const nextOrderId = data.lastOrderId + 1;
+
+      const newOrder = {
         ...formData,
+        ordreid: nextOrderId, // Sett den inkrementerte ordreid
         registrertDato: new Date().toLocaleString(), // Sett registrertDato til nåværende tidspunkt
         status: 'Aktiv', // Sett standard status
         endretdato: '', // Sett endretdato som tom
         test: formData.test // Inkluder test-feltet
-    };
+      };
 
-    console.log('Sender ordredata til server:', newOrder); // Logg dataen før sending
+      console.log('Sender ordredata til server:', newOrder); // Logg dataen før sending
 
-    try {
-        const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(newOrder),
-        });
+      const response2 = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newOrder),
+      });
 
-        if (response.ok) {
-            const addedOrder = await response.json();
-            console.log('Suksess! Ordre lagt til:', addedOrder);
-            navigate(`/order-details/${addedOrder._id}`); // Naviger til order-details med riktig ID
-        } else {
-            const responseText = await response.text(); // Gir mer detaljert feilinfo
-            console.error('Feil ved registrering av ordre:', response.statusText, responseText);
-        }
+      if (response2.ok) {
+        const addedOrder = await response2.json();
+        console.log('Suksess! Ordre lagt til:', addedOrder);
+        navigate(`/order-details/${addedOrder._id}`); // Naviger til order-details med riktig ID
+      } else {
+        const responseText = await response2.text(); // Gir mer detaljert feilinfo
+        console.error('Feil ved registrering av ordre:', response2.statusText, responseText);
+      }
     } catch (error) {
-        console.error('Feil ved kommunikasjon med serveren:', error);
+      console.error('Feil ved kommunikasjon med serveren:', error);
     }
-};
-
+  };
 
   return (
     <div className="p-4">

@@ -335,6 +335,18 @@ app.get('/orders/:id', async (req, res) => {
   }
 });
 
+// Endpoint to get the last order ID
+app.get('/orders/last-order-id', async (req, res) => {
+  try {
+    const lastOrder = await Order.findOne().sort('-ordreid');
+    const lastOrderId = lastOrder ? lastOrder.ordreid : 0; // Returner 0 hvis ingen ordre finnes
+    res.json({ lastOrderId });
+  } catch (err) {
+    console.error('Feil ved henting av siste ordreid:', err);
+    res.status(500).json({ message: 'Feil ved henting av siste ordreid' });
+  }
+});
+
 // Endpoint to create a new order
 app.post('/orders', async (req, res) => {
   const order = new Order({
