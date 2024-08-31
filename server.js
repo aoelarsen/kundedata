@@ -42,43 +42,21 @@ const customerSchema = new mongoose.Schema({
 const Customer = mongoose.model('Customer', customerSchema);
 
 // Schema and Model for Orders
-// Endpoint to create a new order
-app.post('/orders', async (req, res) => {
-  console.log('POST request mottatt på /orders');
-  console.log('Request body mottatt:', req.body);
-
-  try {
-    // Finn høyeste eksisterende ordreid og øk med 1
-    const lastOrder = await Order.findOne().sort('-ordreid');
-    const nextOrderId = lastOrder ? lastOrder.ordreid + 1 : 1;
-
-    const orderData = {
-      Varemerke: req.body.Varemerke,
-      Produkt: req.body.Produkt,
-      Størrelse: req.body.Størrelse,
-      Farge: req.body.Farge,
-      Status: req.body.Status || 'Aktiv',
-      Kommentar: req.body.Kommentar,
-      Ansatt: req.body.Ansatt,
-      Endretdato: req.body.Endretdato || '',
-      RegistrertDato: req.body.RegistrertDato || new Date().toLocaleString(),
-      kundeid: req.body.kundeid,
-      KundeTelefon: req.body.KundeTelefon,
-      ordreid: nextOrderId, // Bruker inkrementert ordreid
-      test: req.body.test || 'test' // Setter test til 'test' hvis ikke gitt
-    };
-
-    console.log('Order data før lagring:', orderData);
-
-    const order = new Order(orderData);
-    const newOrder = await order.save();
-
-    console.log('Ny ordre lagret:', newOrder);
-    res.status(201).json(newOrder);
-  } catch (err) {
-    console.error('Feil ved lagring av ordre:', err);
-    res.status(400).json({ message: err.message });
-  }
+const orderSchema = new mongoose.Schema({
+  Varemerke: String,
+  Produkt: String,
+  Størrelse: String,
+  Farge: String,
+  Status: String,
+  Kommentar: String,
+  Ansatt: String,
+  Endretdato: String,
+  RegistrertDato: String,
+  kundeid: String,
+  KundeTelefon: String,
+  ordreid: Number, // Definer som Number for riktig inkrementering
+  orderNumber: String,
+  test: String // Legg til dette feltet
 });
 
 
@@ -125,6 +103,7 @@ app.post('/orders', async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 });
+
 
 
 
