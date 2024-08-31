@@ -70,37 +70,36 @@ app.post('/orders', async (req, res) => {
   console.log('Request body mottatt:', req.body);
 
   try {
-    if (!req.body.ordreid) {
-      console.error('ordreid mangler eller er tom:', req.body.ordreid);
-      return res.status(400).json({ message: 'ordreid mangler eller er ikke gyldig' });
-    }
+      // Finn høyeste eksisterende ordreid og øk med 1
+      const lastOrder = await Order.findOne().sort('-ordreid');
+      const nextOrderId = lastOrder ? lastOrder.ordreid + 1 : 1;
 
-    const orderData = {
-      Varemerke: req.body.Varemerke,
-      Produkt: req.body.Produkt,
-      Størrelse: req.body.Størrelse,
-      Farge: req.body.Farge,
-      Status: req.body.Status || 'Aktiv',
-      Kommentar: req.body.Kommentar,
-      Ansatt: req.body.Ansatt,
-      Endretdato: req.body.Endretdato || '',
-      RegistrertDato: req.body.RegistrertDato || new Date().toLocaleString(),
-      kundeid: req.body.kundeid,
-      KundeTelefon: req.body.KundeTelefon,
-      ordreid: req.body.ordreid,
-      test: req.body.test // Legg til feltet 'test'
-    };
+      const orderData = {
+          Varemerke: req.body.Varemerke,
+          Produkt: req.body.Produkt,
+          Størrelse: req.body.Størrelse,
+          Farge: req.body.Farge,
+          Status: req.body.Status || 'Aktiv',
+          Kommentar: req.body.Kommentar,
+          Ansatt: req.body.Ansatt,
+          Endretdato: req.body.Endretdato || '',
+          RegistrertDato: req.body.RegistrertDato || new Date().toLocaleString(),
+          kundeid: req.body.kundeid,
+          KundeTelefon: req.body.KundeTelefon,
+          ordreid: nextOrderId,  // Sett det neste ordrenummeret
+          test: req.body.test || 'test' // Legg til feltet 'test' hvis det ikke finnes
+      };
 
-    console.log('Order data før lagring:', orderData);
+      console.log('Order data før lagring:', orderData);
 
-    const order = new Order(orderData);
-    const newOrder = await order.save();
+      const order = new Order(orderData);
+      const newOrder = await order.save();
 
-    console.log('Ny ordre lagret:', newOrder);
-    res.status(201).json(newOrder);
+      console.log('Ny ordre lagret:', newOrder);
+      res.status(201).json(newOrder);
   } catch (err) {
-    console.error('Feil ved lagring av ordre:', err);
-    res.status(400).json({ message: err.message });
+      console.error('Feil ved lagring av ordre:', err);
+      res.status(400).json({ message: err.message });
   }
 });
 
