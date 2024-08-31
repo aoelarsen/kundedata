@@ -27,36 +27,37 @@ function CreateOrder() {
     e.preventDefault();
 
     const newOrder = {
-      ...formData,
-      registrertDato: new Date().toLocaleString(),
-      status: 'Aktiv',
-      endretdato: '',
-      test: formData.test
+        ...formData,
+        registrertDato: new Date().toLocaleString(), // Sett registrertDato til nåværende tidspunkt
+        status: 'Aktiv', // Sett standard status
+        endretdato: '', // Sett endretdato som tom
+        test: formData.test // Inkluder test-feltet
     };
 
-    console.log('Sender ordredata til server:', newOrder);
+    console.log('Sender ordredata til server:', newOrder); // Logg dataen før sending
 
     try {
-      const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newOrder),
-      });
+        const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newOrder),
+        });
 
-      if (response.ok) {
-        const addedOrder = await response.json();
-        console.log('Suksess! Ordre lagt til:', addedOrder);
-        navigate(`/order-details/${addedOrder._id}`);
-      } else {
-        const responseText = await response.text();
-        console.error('Feil ved registrering av ordre:', response.statusText, responseText);
-      }
+        if (response.ok) {
+            const addedOrder = await response.json();
+            console.log('Suksess! Ordre lagt til:', addedOrder);
+            navigate(`/order-details/${addedOrder._id}`); // Naviger til order-details med riktig ID
+        } else {
+            const responseText = await response.text(); // Gir mer detaljert feilinfo
+            console.error('Feil ved registrering av ordre:', response.statusText, responseText);
+        }
     } catch (error) {
-      console.error('Feil ved kommunikasjon med serveren:', error);
+        console.error('Feil ved kommunikasjon med serveren:', error);
     }
-  };
+};
+
 
   return (
     <div className="p-4">
