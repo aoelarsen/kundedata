@@ -1,46 +1,74 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import Cookies from 'js-cookie';
 
 function NavBar() {
-  const [isOpen, setIsOpen] = useState(false); // For å håndtere menyen på små skjermer
-  const [employees, setEmployees] = useState([]); // For å lagre liste over ansatte
-  const [selectedEmployee, setSelectedEmployee] = useState(Cookies.get('selectedEmployee') || ''); // For å lagre valgt ansatt
+  const [isOpen, setIsOpen] = useState(false); // To handle the menu on small screens
+  const [employees, setEmployees] = useState([]); // To store the list of employees
+  const [selectedEmployee, setSelectedEmployee] = useState(Cookies.get('selectedEmployee') || ''); // To store selected employee
+  const inactivityTimeoutRef = useRef(null); // To store the inactivity timeout reference
 
   useEffect(() => {
-    // Hente listen over ansatte fra serveren
+    // Fetch the list of employees from the server
     const fetchEmployees = async () => {
       try {
         const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/employees');
         const data = await response.json();
         setEmployees(data);
       } catch (error) {
-        console.error('Feil ved henting av ansatte:', error);
+        console.error('Error fetching employees:', error);
       }
     };
 
     fetchEmployees();
+
+    // Set up inactivity detection
+    const handleActivity = () => {
+      if (inactivityTimeoutRef.current) {
+        clearTimeout(inactivityTimeoutRef.current);
+      }
+      inactivityTimeoutRef.current = setTimeout(() => {
+        console.log('Brukeren har vært inaktiv i 1 minutt'); // Log meldingen etter 1 minutts inaktivitet
+        setIsOpen(true); // Show the dropdown menu after a period of inactivity
+      }, 60000); // 1 minute of inactivity
+    };
+
+    // Add event listeners for user activity
+    window.addEventListener('mousemove', handleActivity);
+    window.addEventListener('keydown', handleActivity);
+
+    // Initial call to handleActivity to start the timeout
+    handleActivity();
+
+    return () => {
+      // Cleanup on component unmount
+      window.removeEventListener('mousemove', handleActivity);
+      window.removeEventListener('keydown', handleActivity);
+      if (inactivityTimeoutRef.current) {
+        clearTimeout(inactivityTimeoutRef.current);
+      }
+    };
   }, []);
 
   const handleEmployeeChange = (event) => {
     const selected = event.target.value;
     setSelectedEmployee(selected);
-    Cookies.set('selectedEmployee', selected); // Lagre valgt ansatt i en cookie
+    Cookies.set('selectedEmployee', selected); // Save selected employee in a cookie
   };
 
   const toggleMenu = () => {
-    setIsOpen(!isOpen); // Veksle mellom å vise og skjule menyen
+    setIsOpen(!isOpen); // Toggle menu visibility
   };
 
   return (
     <nav style={{ backgroundColor: '#1a202c', padding: '10px', position: 'relative' }}>
       <div className="flex items-center justify-between">
-        {/* Toppmenyen for små skjermer */}
+        {/* Top menu for small screens */}
         <Link to="/" style={{ color: '#fff', textDecoration: 'none', fontSize: '18px' }}>
           Registrer/søk
         </Link>
 
-        {/* Hamburgermeny-ikon for små skjermer */}
+        {/* Hamburger menu icon for small screens */}
         <div className="block md:hidden" onClick={toggleMenu} style={{ cursor: 'pointer' }}>
           <svg
             className="w-6 h-6 text-white"
@@ -53,7 +81,7 @@ function NavBar() {
           </svg>
         </div>
 
-        {/* Vanlig meny for store skjermer */}
+        {/* Regular menu for large screens */}
         <ul className="hidden md:flex list-none margin-0 padding-0" style={{ margin: 0, padding: 0 }}>
           <li style={{ marginRight: '20px' }}>
             <Link to="/customer-list" style={{ color: '#fff', textDecoration: 'none' }}>Kunder</Link>
@@ -69,20 +97,20 @@ function NavBar() {
           </li>
         </ul>
 
-        {/* Nedtrekksmeny for valg av ansatt, midtstilt */}
+        {/* Dropdown for selecting employee, centered */}
         <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
           <select value={selectedEmployee} onChange={handleEmployeeChange} className="bg-white border border-gray-300 rounded p-1">
             <option value="">Velg ansatt</option>
             {employees.map((employee) => (
               <option key={employee._id} value={employee.navn}>
-                {employee.navn.split(' ')[0]} {/* Viser kun fornavn */}
+                {employee.navn.split(' ')[0]} {/* Only shows first name */}
               </option>
             ))}
           </select>
         </div>
       </div>
 
-      {/* Nedtrekksmeny for små skjermer */}
+      {/* Dropdown menu for small screens */}
       {isOpen && (
         <ul className="md:hidden" style={{ listStyleType: 'none', padding: 0, margin: 0 }}>
           <li style={{ marginTop: '10px' }}>
