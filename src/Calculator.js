@@ -46,7 +46,7 @@ function Calculator() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto py-8">
+    <div className="max-w-5xl mx-auto py-8 bg-white shadow-lg rounded-lg p-6 mb-4">
       <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Kalkylekalkulator</h2>
       <p className="text-lg mb-6 text-gray-600">
         Regn ut kalkyle og dekningsbidrag på varer ved å legge inn kostpris og salgspris i

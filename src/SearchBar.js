@@ -10,6 +10,8 @@ function SearchBar({ searchQuery, setSearchQuery, filteredCustomers, setPhoneNum
   };
 
   return (
+    <div className="max-w-5xl mx-auto py-8 bg-white shadow-lg rounded-lg p-6 mb-4">
+
     <div className="mb-6 relative">
       <input
         type="text"
@@ -31,7 +33,7 @@ function SearchBar({ searchQuery, setSearchQuery, filteredCustomers, setPhoneNum
           ))}
         </ul>
       )}
-    </div>
+    </div></div>
   );
 }
 

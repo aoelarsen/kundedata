@@ -9,6 +9,8 @@ function CustomerList({ customers }) {
   };
 
   return (
+    <div className="max-w-5xl mx-auto py-8 bg-white shadow-lg rounded-lg p-6 mb-4">
+
     <div className="mt-8">
       <h3 className="text-2xl font-semibold mb-4 text-gray-800">Kunder</h3>
       <div className="overflow-x-auto">
@@ -46,6 +48,7 @@ function CustomerList({ customers }) {
           </tbody>
         </table>
       </div>
+    </div>
     </div>
   );
 }

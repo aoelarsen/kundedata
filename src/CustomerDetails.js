@@ -56,6 +56,7 @@ function CustomerDetails() {
   }
 
   return (
+    <div className="max-w-5xl mx-auto py-8 bg-white shadow-lg rounded-lg p-6 mb-4">
     <div className="p-4">
       <h2 className="text-2xl font-bold mb-4 text-center">Kundedetaljer</h2>
       <table className="min-w-full bg-white border border-gray-200">
@@ -109,8 +110,10 @@ function CustomerDetails() {
           Endre Kunde
         </Link>
       </div>
+      </div>
 
-      {/* Seksjon for å vise kundens ordrer */}
+    
+
       <div className="mt-8">
         <h3 className="text-xl font-semibold mb-4">Kundens Ordrer</h3>
         {orders.length > 0 ? (

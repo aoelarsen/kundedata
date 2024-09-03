@@ -100,6 +100,8 @@ function CustomerForm({ addCustomer, customers, phoneNumber, setSearchQuery }) {
   };
 
   return (
+    <div className="max-w-5xl mx-auto py-8 bg-white shadow-lg rounded-lg p-6">
+    <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Registrer Ny Kunde</h2>
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <label className="block text-sm font-medium text-gray-700">Fornavn</label>
@@ -164,6 +166,7 @@ function CustomerForm({ addCustomer, customers, phoneNumber, setSearchQuery }) {
         </button>
       </div>
     </form>
+  </div>
   );
 }
 

@@ -76,7 +76,7 @@ function OrderDetails() {
   };
 
   return (
-    <div className="max-w-lg mx-auto py-8 bg-white shadow-lg rounded-lg p-6">
+    <div className="max-w-5xl mx-auto py-8 bg-white shadow-lg rounded-lg p-6 mb-4">
       <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Rediger Ordre</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
