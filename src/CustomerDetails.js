@@ -4,8 +4,8 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 function CustomerDetails() {
   const { id } = useParams(); // Dette vil nå referere til _id fra MongoDB
   const [customer, setCustomer] = useState(null);
-  const [orders, setOrders] = useState([]); // Legg til state for ordrer
-  const navigate = useNavigate(); // Brukes til å navigere programmatisk
+  const [orders, setOrders] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCustomer = async () => {
@@ -13,9 +13,8 @@ function CustomerDetails() {
         const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customers/${id}`);
         if (response.ok) {
           const customerData = await response.json();
-          console.log('Kunde hentet:', customerData); // Logging for å se kundedata
           setCustomer(customerData);
-          fetchOrders(customerData.customerNumber); // Hent ordrer ved hjelp av customerNumber
+          fetchOrders(customerData.customerNumber);
         } else {
           console.error('Kunde ble ikke funnet');
         }
@@ -26,11 +25,9 @@ function CustomerDetails() {
 
     const fetchOrders = async (customerNumber) => {
       try {
-        console.log('Henter ordrer for kundeid:', customerNumber); // Logging
         const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders?kundeid=${customerNumber}`);
         if (response.ok) {
           const ordersData = await response.json();
-          console.log('Ordrer hentet fra API:', ordersData); // Logging for å se ordrer
           setOrders(ordersData);
         } else {
           console.error('Ordre ble ikke funnet');
@@ -40,14 +37,12 @@ function CustomerDetails() {
       }
     };
     
-    
-
-    fetchCustomer(); // Kall fetchCustomer for å få kunde og tilhørende ordrer
+    fetchCustomer();
   }, [id]);
 
   const formatDate = (dateString) => {
     if (!dateString) return "Ukjent dato";
-    const options = { day: '2-digit', month: '2-digit', year: '2-digit' };
+    const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
     return new Date(dateString).toLocaleDateString('no-NO', options);
   };
 
@@ -57,62 +52,48 @@ function CustomerDetails() {
 
   return (
     <div className="max-w-5xl mx-auto py-8 bg-white shadow-lg rounded-lg p-6 mb-4">
-    <div className="p-4">
-      <h2 className="text-2xl font-bold mb-4 text-center">Kundedetaljer</h2>
-      <table className="min-w-full bg-white border border-gray-200">
-        <tbody>
-          <tr>
-            <th className="py-2 px-4 border-b">Fornavn</th>
-            <td className="py-2 px-4 border-b">{customer.firstName}</td>
-          </tr>
-          <tr>
-            <th className="py-2 px-4 border-b">Etternavn</th>
-            <td className="py-2 px-4 border-b">{customer.lastName}</td>
-          </tr>
-          <tr>
-            <th className="py-2 px-4 border-b">Telefon</th>
-            <td className="py-2 px-4 border-b">{customer.phoneNumber}</td>
-          </tr>
-          <tr>
-            <th className="py-2 px-4 border-b">Epost</th>
-            <td className="py-2 px-4 border-b">{customer.email}</td>
-          </tr>
-          <tr>
-            <th className="py-2 px-4 border-b">Registrert</th>
-            <td className="py-2 px-4 border-b">{formatDate(customer.registrationDate)}</td>
-          </tr>
-          <tr>
-            <th className="py-2 px-4 border-b">Sist endret</th>
-            <td className="py-2 px-4 border-b">{formatDate(customer.lastModified)}</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <div className="flex justify-between mt-8">
-        <div>
-        <Link 
-    to={`/create-order/${customer.customerNumber}`} // Bruker customerNumber som parameter
-    className="inline-block bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-600 mr-2"
->
-    Ny Ordre
-</Link>
-          <Link 
-            to={`/create-service/${customer._id}`} // Bruker _id til å opprette ny service
-            className="inline-block bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-bluew-600"
-          >
-            Ny Service
-          </Link>
+      <div className="bg-white p-6 shadow rounded-lg">
+        <h2 className="text-2xl font-bold mb-6 text-center">Kundedetaljer</h2>
+        <div className="space-y-4">
+          <div>
+            <span className="font-semibold">Navn: </span>
+            {customer.firstName} {customer.lastName}
+          </div>
+          <div>
+            <span className="font-semibold">Telefonnummer: </span>
+            {customer.phoneNumber}
+          </div>
+          <div>
+            <span className="font-semibold">Epost: </span>
+            {customer.email}
+          </div>
+          <div>
+            <span className="font-semibold">Registrert dato: </span>
+            {formatDate(customer.registrationDate)} 
+            {customer.lastModified && (
+              <span className="text-gray-600">
+                {' '}({formatDate(customer.lastModified)})
+              </span>
+            )}
+          </div>
+        </div> 
+                <Link 
+    to={`/edit-customer/${customer._id}`}
+    className="text-blue-500 mt-4 block hover:underline "
+  >
+    Endre Kunde
+  </Link>
         </div>
-        <Link 
-          to={`/edit-customer/${customer._id}`} // Bruker _id til å redigere kunde
-          className="inline-block bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-600"
-        >
-          Endre Kunde
-        </Link>
-      </div>
-      </div>
+        <div className="flex justify-between mt-8">
+          <Link 
+            to={`/create-order/${customer.customerNumber}`}
+            className="inline-block bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-600"
+          >
+            Ny Ordre
+          </Link>
 
-    
+       
+      </div>
 
       <div className="mt-8">
         <h3 className="text-xl font-semibold mb-4">Kundens Ordrer</h3>
@@ -120,13 +101,13 @@ function CustomerDetails() {
           <table className="min-w-full bg-white border border-gray-300 rounded-lg">
             <thead>
               <tr className="bg-gray-100">
-              <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">ID</th>
+                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">ID</th>
                 <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Merke</th>
                 <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Produkt</th>
                 <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Str.</th>
-                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600 hidden md:table-cell">Farge</th>
-                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600 hidden md:table-cell">Status</th>
-                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600 hidden md:table-cell">Registrert dato</th>
+                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Farge</th>
+                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Status</th>
+                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Registrert dato</th>
               </tr>
             </thead>
             <tbody>
@@ -134,15 +115,15 @@ function CustomerDetails() {
                 <tr 
                   key={order._id} 
                   className="hover:bg-gray-50 cursor-pointer"
-                  onClick={() => navigate(`/order-details/${order._id}`)} // Ruter til OrderDetails-siden
+                  onClick={() => navigate(`/order-details/${order._id}`)}
                 >
-                                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.ordreid}</td> {/* Viser orderNumber */}
+                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.ordreid}</td>
                   <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.Varemerke}</td>
                   <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.Produkt}</td>
                   <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.Størrelse}</td>
-                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{order.Farge}</td>
-                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{order.Status}</td>
-                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{formatDate(order.RegistrertDato)}</td>
+                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.Farge}</td>
+                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.Status}</td>
+                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{formatDate(order.RegistrertDato)}</td>
                 </tr>
               ))}
             </tbody>
