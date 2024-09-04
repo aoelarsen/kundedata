@@ -12,20 +12,23 @@ function OrderDetails() {
     Kommentar: '',
     Ansatt: '',
   });
+  const [employees, setEmployees] = useState([]); // For å holde ansatte data
   const [updateMessage, setUpdateMessage] = useState(''); // For å vise oppdateringsmelding
 
+  // Hent ordredetaljer
   useEffect(() => {
     const fetchOrder = async () => {
       try {
         const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders/${id}`);
         if (response.ok) {
           const order = await response.json();
+          console.log('Ordre hentet:', order); // Legg til logging for å se ordredata
           setFormData({
             Varemerke: order.Varemerke,
             Produkt: order.Produkt,
             Størrelse: order.Størrelse,
             Farge: order.Farge,
-            Status: order.Status,
+            Status: order.Status || 'Aktiv', // Sett standardverdi til 'Aktiv' hvis ikke finnes
             Kommentar: order.Kommentar,
             Ansatt: order.Ansatt,
           });
@@ -38,7 +41,27 @@ function OrderDetails() {
     };
 
     fetchOrder();
-  }, [id]); // Kjører på nytt når `id` endrer seg
+  }, [id]);
+
+  // Hent ansatte fra databasen
+  useEffect(() => {
+    const fetchEmployees = async () => {
+      try {
+        const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/employees');
+        if (response.ok) {
+          const employeesData = await response.json();
+          console.log('Ansatte hentet:', employeesData); // Legg til logging for å se ansattdata
+          setEmployees(employeesData);
+        } else {
+          console.error('Feil ved henting av ansatte');
+        }
+      } catch (error) {
+        console.error('Feil ved kommunikasjon med serveren:', error);
+      }
+    };
+
+    fetchEmployees();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -58,7 +81,7 @@ function OrderDetails() {
 
     try {
       const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders/${id}`, {
-        method: 'PATCH', // Endret fra PUT til PATCH
+        method: 'PATCH', 
         headers: {
           'Content-Type': 'application/json',
         },
@@ -67,6 +90,7 @@ function OrderDetails() {
 
       if (response.ok) {
         setUpdateMessage('Ordren er oppdatert'); // Viser bekreftelsesmelding
+        console.log('Oppdatert ordre:', updatedOrder); // Logging av oppdateringen
       } else {
         console.error('Feil ved oppdatering av ordre:', response.statusText);
       }
@@ -125,14 +149,15 @@ function OrderDetails() {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">Status:</label>
-          <input
-            type="text"
+          <select
             name="Status"
             value={formData.Status}
             onChange={handleChange}
-            required
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-          />
+          >
+            <option value="Aktiv">Aktiv</option>
+            <option value="Avsluttet">Avsluttet</option>
+          </select>
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">Kommentar:</label>
@@ -145,14 +170,19 @@ function OrderDetails() {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">Ansatt:</label>
-          <input
-            type="text"
+          <select
             name="Ansatt"
             value={formData.Ansatt}
             onChange={handleChange}
-            required
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-          />
+          >
+            <option value="">Velg ansatt</option>
+            {employees.map((employee) => (
+              <option key={employee._id} value={employee.navn}>
+                {employee.navn}
+              </option>
+            ))}
+          </select>
         </div>
         <div className="text-center mt-6">
           <button 
