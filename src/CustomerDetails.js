@@ -96,42 +96,44 @@ function CustomerDetails() {
       </div>
 
       <div className="mt-8">
-        <h3 className="text-xl font-semibold mb-4">Kundens Ordrer</h3>
-        {orders.length > 0 ? (
-          <table className="min-w-full bg-white border border-gray-300 rounded-lg">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">ID</th>
-                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Merke</th>
-                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Produkt</th>
-                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Str.</th>
-                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Farge</th>
-                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Status</th>
-                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Registrert dato</th>
-              </tr>
-            </thead>
-            <tbody>
-              {orders.map((order) => (
-                <tr 
-                  key={order._id} 
-                  className="hover:bg-gray-50 cursor-pointer"
-                  onClick={() => navigate(`/order-details/${order._id}`)}
-                >
-                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.ordreid}</td>
-                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.Varemerke}</td>
-                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.Produkt}</td>
-                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.Størrelse}</td>
-                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.Farge}</td>
-                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.Status}</td>
-                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{formatDate(order.RegistrertDato)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <p className="text-gray-500">Ingen ordrer funnet for denne kunden.</p>
-        )}
-      </div>
+  <h3 className="text-xl font-semibold mb-4">Kundens Ordrer</h3>
+  {orders.length > 0 ? (
+    <table className="min-w-full bg-white border border-gray-300 rounded-lg">
+      <thead>
+        <tr className="bg-gray-100">
+          <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">ID</th>
+          <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Merke</th>
+          <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Produkt</th>
+          {/* Disse kolonnene vises bare på større skjermer */}
+          <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600 hidden md:table-cell">Str.</th>
+          <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600 hidden md:table-cell">Farge</th>
+          <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600 hidden md:table-cell">Status</th>
+          <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600 hidden md:table-cell">Registrert dato</th>
+        </tr>
+      </thead>
+      <tbody>
+        {orders.map((order) => (
+          <tr 
+            key={order._id} 
+            className="hover:bg-gray-50 cursor-pointer"
+            onClick={() => navigate(`/order-details/${order._id}`)}
+          >
+            <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.ordreid}</td>
+            <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.Varemerke}</td>
+            <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.Produkt}</td>
+            {/* Disse feltene vises bare på større skjermer */}
+            <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{order.Størrelse}</td>
+            <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{order.Farge}</td>
+            <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{order.Status}</td>
+            <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{formatDate(order.RegistrertDato)}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  ) : (
+    <p className="text-gray-500">Ingen ordrer funnet for denne kunden.</p>
+  )}
+</div>
     </div>
   );
 }
