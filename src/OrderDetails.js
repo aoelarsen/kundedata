@@ -12,36 +12,63 @@ function OrderDetails() {
     Kommentar: '',
     Ansatt: '',
   });
+  const [customer, setCustomer] = useState(null); // For å holde kundedetaljer
+  const [customerNumber, setCustomerNumber] = useState(null); // Holder customerNumber
   const [employees, setEmployees] = useState([]); // For å holde ansatte data
   const [updateMessage, setUpdateMessage] = useState(''); // For å vise oppdateringsmelding
 
   // Hent ordredetaljer
-  useEffect(() => {
-    const fetchOrder = async () => {
-      try {
-        const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders/${id}`);
-        if (response.ok) {
-          const order = await response.json();
-          console.log('Ordre hentet:', order); // Legg til logging for å se ordredata
-          setFormData({
-            Varemerke: order.Varemerke,
-            Produkt: order.Produkt,
-            Størrelse: order.Størrelse,
-            Farge: order.Farge,
-            Status: order.Status || 'Aktiv', // Sett standardverdi til 'Aktiv' hvis ikke finnes
-            Kommentar: order.Kommentar,
-            Ansatt: order.Ansatt,
-          });
-        } else {
-          console.error('Ordre ble ikke funnet');
-        }
-      } catch (error) {
-        console.error('Feil ved henting av ordren:', error);
-      }
-    };
+useEffect(() => {
+  const fetchOrder = async () => {
+    try {
+      const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders/${id}`);
+      if (response.ok) {
+        const order = await response.json();
+        console.log('Ordre hentet:', order);
+        setFormData({
+          Varemerke: order.Varemerke,
+          Produkt: order.Produkt,
+          Størrelse: order.Størrelse,
+          Farge: order.Farge,
+          Status: order.Status || 'Aktiv',
+          Kommentar: order.Kommentar,
+          Ansatt: order.Ansatt,
+        });
 
-    fetchOrder();
-  }, [id]);
+        // Hent kundedetaljer basert på kundeid fra ordren
+        if (order.kundeid) {
+          fetchCustomer(order.kundeid);
+        }
+      } else {
+        console.error('Ordre ble ikke funnet');
+      }
+    } catch (error) {
+      console.error('Feil ved henting av ordren:', error);
+    }
+  };
+
+  const fetchCustomer = async (kundeid) => {
+    try {
+      const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customers/${kundeid}`);
+      if (response.ok) {
+        const customerData = await response.json();
+        setCustomer(customerData);
+        setCustomerNumber(customerData.customerNumber);
+
+        // Legg til en loggmelding for å vise kundens navn
+        console.log(`Kunde hentet: ${customerData.firstName} ${customerData.lastName}`);
+      } else {
+        console.error('Kunde ble ikke funnet');
+      }
+    } catch (error) {
+      console.error('Feil ved henting av kunden:', error);
+    }
+  };
+
+  fetchOrder();
+}, [id]);
+
+  
 
   // Hent ansatte fra databasen
   useEffect(() => {
@@ -50,7 +77,7 @@ function OrderDetails() {
         const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/employees');
         if (response.ok) {
           const employeesData = await response.json();
-          console.log('Ansatte hentet:', employeesData); // Legg til logging for å se ansattdata
+          console.log('Ansatte hentet:', employeesData); // Logg for å se ansattdata
           setEmployees(employeesData);
         } else {
           console.error('Feil ved henting av ansatte');
@@ -81,7 +108,7 @@ function OrderDetails() {
 
     try {
       const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders/${id}`, {
-        method: 'PATCH', 
+        method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -99,10 +126,44 @@ function OrderDetails() {
     }
   };
 
+  const formatDate = (dateString) => {
+    if (!dateString) return 'Ukjent dato';
+    const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+    return new Date(dateString).toLocaleDateString('no-NO', options);
+  };
+
   return (
     <div className="max-w-5xl mx-auto py-8 bg-white shadow-lg rounded-lg p-6 mb-4">
+      {customer && (
+        <div className="bg-gray-100 p-6 rounded-lg mb-6">
+          <h2 className="text-2xl font-semibold mb-4">Kundedetaljer</h2>
+          <div className="space-y-4">
+            <div>
+              <span className="font-semibold">Navn: </span>
+              {customer.firstName} {customer.lastName}
+            </div>
+            <div>
+              <span className="font-semibold">Telefonnummer: </span>
+              {customer.phoneNumber}
+            </div>
+            <div>
+              <span className="font-semibold">Epost: </span>
+              {customer.email}
+            </div>
+            <div>
+              <span className="font-semibold">Registrert dato: </span>
+              {formatDate(customer.registrationDate)} 
+            </div>
+            <div>
+              <span className="font-semibold">Customer Number: </span>
+              {customerNumber} {/* Viser customerNumber */}
+            </div>
+          </div>
+        </div>
+      )}
       <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Rediger Ordre</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Ordreredigeringsskjema */}
         <div>
           <label className="block text-sm font-medium text-gray-700">Varemerke:</label>
           <input
