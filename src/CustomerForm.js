@@ -147,16 +147,6 @@ function CustomerForm({ addCustomer, customers, phoneNumber, setSearchQuery }) {
           className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
         />
       </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Status</label>
-        <input
-          type="text"
-          name="status"
-          value={formData.status}
-          onChange={handleChange}
-          className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
-        />
-      </div>
       <div className="text-center">
         <button
           type="submit"

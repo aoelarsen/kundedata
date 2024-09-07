@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom'; // Legg til useNavigate
 
 function OrderDetails() {
   const { id } = useParams(); // Henter ordre-id fra URL
+  const navigate = useNavigate(); // For navigering
   const [formData, setFormData] = useState({
     Varemerke: '',
     Produkt: '',
@@ -52,16 +53,14 @@ function OrderDetails() {
         if (response.ok) {
           const customerData = await response.json();  // Forventer en liste av kunder
 
-          // Finn kunden med customerNumber=2 fra listen
           const customer = customerData.find(c => c.customerNumber === kundeid);
 
           if (customer) {
             setCustomer(customer);
 
-            // Logg kundens navn
             console.log(`Kunde hentet: ${kundeid} ${customer.firstName} ${customer.lastName}`);
           } else {
-            console.error('Kunde med customerNumber 2 ble ikke funnet');
+            console.error('Kunde med dette customerNumber ble ikke funnet');
           }
         } else {
           console.error('API-svaret var ikke vellykket');
@@ -74,8 +73,6 @@ function OrderDetails() {
     fetchOrder();
   }, [id]);
 
-
-
   // Hent ansatte fra databasen
   useEffect(() => {
     const fetchEmployees = async () => {
@@ -83,7 +80,7 @@ function OrderDetails() {
         const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/employees');
         if (response.ok) {
           const employeesData = await response.json();
-          console.log('Ansatte hentet:', employeesData); // Logg for å se ansattdata
+          console.log('Ansatte hentet:', employeesData);
           setEmployees(employeesData);
         } else {
           console.error('Feil ved henting av ansatte');
@@ -122,8 +119,13 @@ function OrderDetails() {
       });
 
       if (response.ok) {
-        setUpdateMessage('Ordren er oppdatert'); // Viser bekreftelsesmelding
-        console.log('Oppdatert ordre:', updatedOrder); // Logging av oppdateringen
+        setUpdateMessage('Ordren er oppdatert');
+        console.log('Oppdatert ordre:', updatedOrder);
+
+        // Naviger til kundedetaljer etter oppdatering
+        if (customer) {
+          navigate(`/customer-details/${customer._id}`); // Naviger til kundedetaljer
+        }
       } else {
         console.error('Feil ved oppdatering av ordre:', response.statusText);
       }
