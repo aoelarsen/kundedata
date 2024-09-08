@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom'; // Legg til useNavigate
 
 function OrderDetails() {
-  const { id } = useParams(); // Henter ordre-id fra URL
+  const { id } = useParams(); // Henter _id fra URL (MongoDB ObjectId)
   const navigate = useNavigate(); // For navigering
   const [formData, setFormData] = useState({
     Varemerke: '',
@@ -14,6 +14,7 @@ function OrderDetails() {
     Ansatt: '',
   });
   const [customer, setCustomer] = useState(null); // For å holde kundedetaljer
+  const [orderDetails, setOrderDetails] = useState(null); // For å holde ordredetaljer fra API
   const [employees, setEmployees] = useState([]); // For å holde ansatte data
   const [updateMessage, setUpdateMessage] = useState(''); // For å vise oppdateringsmelding
 
@@ -25,6 +26,7 @@ function OrderDetails() {
         if (response.ok) {
           const order = await response.json();
           console.log('Ordre hentet:', order);
+          setOrderDetails(order); // Setter ordredata til state
           setFormData({
             Varemerke: order.Varemerke,
             Produkt: order.Produkt,
@@ -52,12 +54,10 @@ function OrderDetails() {
         const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customers?customerNumber`);
         if (response.ok) {
           const customerData = await response.json();  // Forventer en liste av kunder
-
           const customer = customerData.find(c => c.customerNumber === kundeid);
 
           if (customer) {
             setCustomer(customer);
-
             console.log(`Kunde hentet: ${kundeid} ${customer.firstName} ${customer.lastName}`);
           } else {
             console.error('Kunde med dette customerNumber ble ikke funnet');
@@ -134,11 +134,51 @@ function OrderDetails() {
     }
   };
 
+  // Funksjon for å skrive ut labelen
+  const handlePrintLabel = () => {
+    if (customer && orderDetails) {
+      const printWindow = window.open('', '', 'width=500,height=300');
+      printWindow.document.write(`
+        <html>
+          <head>
+            <style>
+              body {
+                width: 90mm;
+                height: 29mm;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                font-family: Arial, sans-serif;
+              }
+              .customer-name {
+                font-size: 10px;
+                text-align: center;
+              }
+              .order-id {
+                font-size: 20px;
+                text-align: center;
+                font-weight: bold;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="customer-name">${customer.firstName} ${customer.lastName}</div>
+            <div class="order-id">Ordrenummer: ${orderDetails.ordreid}</div>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+      printWindow.focus();
+      printWindow.print();
+    }
+  };
+
   return (
     <div className="max-w-5xl mx-auto py-8 bg-white shadow-lg rounded-lg p-6 mb-4">
       <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Kundeordre</h2>
       {customer && (
-        <div className="bg-gray-100 p-6 rounded-lg mb-6">
+        <div className="bg-gray-100 p-6 rounded-lg mb-6 relative">
           <h2 className="text-2xl font-semibold mb-4">Kundedetaljer</h2>
           <div className="space-y-4">
             <div>
@@ -153,6 +193,16 @@ function OrderDetails() {
               <span className="font-semibold">Epost: </span>
               {customer.email}
             </div>
+          </div>
+
+          {/* Knapp for utskrift av label, plassert inne i det grå feltet */}
+          <div className="absolute bottom-0 right-0 mb-2 mr-2">
+            <button
+              onClick={handlePrintLabel}
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            >
+              Skriv ut label (Ordrenr: {orderDetails.ordreid})
+            </button>
           </div>
         </div>
       )}
