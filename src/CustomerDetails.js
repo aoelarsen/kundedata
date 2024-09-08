@@ -109,6 +109,11 @@ function CustomerDetails() {
 
       <div className="mt-8">
         <h3 className="text-xl font-semibold mb-4">Kundens Ordrer</h3>
+        
+
+
+
+
         {orders.length > 0 ? (
           <table className="min-w-full bg-white border border-gray-300 rounded-lg relative">
             <thead>

@@ -6,7 +6,9 @@ function NavBar() {
   const [isOpen, setIsOpen] = useState(false); // To handle the menu on small screens
   const [employees, setEmployees] = useState([]); // To store the list of employees
   const [selectedEmployee, setSelectedEmployee] = useState(Cookies.get('selectedEmployee') || ''); // To store selected employee
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false); // For handling settings dropdown
   const inactivityTimeoutRef = useRef(null); // To store the inactivity timeout reference
+  const settingsRef = useRef(null); // To handle click outside for settings menu
 
   useEffect(() => {
     // Fetch the list of employees from the server
@@ -28,7 +30,7 @@ function NavBar() {
         clearTimeout(inactivityTimeoutRef.current);
       }
       inactivityTimeoutRef.current = setTimeout(() => {
-        console.log('Brukeren har vært inaktiv i 1 minutt'); // Log meldingen etter 1 minutts inaktivitet
+        console.log('Brukeren har vært inaktiv i 1 minutt');
         setIsOpen(true); // Show the dropdown menu after a period of inactivity
       }, 60000); // 1 minute of inactivity
     };
@@ -50,6 +52,19 @@ function NavBar() {
     };
   }, []);
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (settingsRef.current && !settingsRef.current.contains(event.target)) {
+        setIsSettingsOpen(false); // Close the settings dropdown if clicked outside
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   const handleEmployeeChange = (event) => {
     const selected = event.target.value;
     setSelectedEmployee(selected);
@@ -60,13 +75,33 @@ function NavBar() {
     setIsOpen(!isOpen); // Toggle menu visibility
   };
 
+  const toggleSettingsMenu = () => {
+    setIsSettingsOpen(!isSettingsOpen); // Toggle settings dropdown
+  };
+
   return (
     <nav style={{ backgroundColor: '#1a202c', padding: '10px', position: 'relative' }}>
       <div className="flex items-center justify-between">
         {/* Top menu for small screens */}
-        <Link to="/" style={{ color: '#fff', textDecoration: 'none', fontSize: '18px' }}>
-          Registrer/søk
-        </Link>
+        <div className="flex items-center">
+          <Link to="/" style={{ color: '#fff', textDecoration: 'none', fontSize: '18px', marginRight: '20px' }}>
+            Registrer/søk
+          </Link>
+
+          {/* Dropdown for selecting employee, placed next to Registrer/søk */}
+          <select
+            value={selectedEmployee}
+            onChange={handleEmployeeChange}
+            className="bg-white border border-gray-300 rounded p-1"
+          >
+            <option value="">Velg ansatt</option>
+            {employees.map((employee) => (
+              <option key={employee._id} value={employee.navn}>
+                {employee.navn.split(' ')[0]} {/* Only shows first name */}
+              </option>
+            ))}
+          </select>
+        </div>
 
         {/* Hamburger menu icon for small screens */}
         <div className="block md:hidden" onClick={toggleMenu} style={{ cursor: 'pointer' }}>
@@ -97,16 +132,31 @@ function NavBar() {
           </li>
         </ul>
 
-        {/* Dropdown for selecting employee, centered */}
-        <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
-          <select value={selectedEmployee} onChange={handleEmployeeChange} className="bg-white border border-gray-300 rounded p-1">
-            <option value="">Velg ansatt</option>
-            {employees.map((employee) => (
-              <option key={employee._id} value={employee.navn}>
-                {employee.navn.split(' ')[0]} {/* Only shows first name */}
-              </option>
-            ))}
-          </select>
+        {/* Settings icon */}
+        <div className="relative" ref={settingsRef}>
+          <button onClick={toggleSettingsMenu} className="text-white focus:outline-none">
+            {/* New settings icon */}
+            <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-settings" width="16" height="16" viewBox="0 0 28 28" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
+  <circle cx="14" cy="14" r="3" />
+  <path d="M22.4 18a1.65 1.65 0 0 0 .33 1.82l.06 .06a2 2 0 1 1 -2.83 2.83l-.06 -.06a1.65 1.65 0 0 0 -1.82 -.33 1.65 1.65 0 0 0 -1 1.51v.17a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2v-.17a1.65 1.65 0 0 0 -1 -1.51 1.65 1.65 0 0 0 -1.82 .33l-.06 .06a2 2 0 1 1 -2.83 -2.83l.06 -.06a1.65 1.65 0 0 0 .33 -1.82 1.65 1.65 0 0 0 -1.51 -1h-.17a2 2 0 0 1 -2 -2v-2a2 2 0 0 1 2 -2h.17a1.65 1.65 0 0 0 1.51 -1 1.65 1.65 0 0 0 -.33 -1.82l-.06 -.06a2 2 0 1 1 2.83 -2.83l.06 .06a1.65 1.65 0 0 0 1.82 .33h.08a1.65 1.65 0 0 0 1.51 -1v-.17a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v.17a1.65 1.65 0 0 0 1 1.51h.08a1.65 1.65 0 0 0 1.82 -.33l.06 -.06a2 2 0 1 1 2.83 2.83l-.06 .06a1.65 1.65 0 0 0 -.33 1.82v.08a1.65 1.65 0 0 0 1 1.51h.17a2 2 0 0 1 2 2v2a2 2 0 0 1 -2 2h-.17a1.65 1.65 0 0 0 -1.51 1z" />
+</svg>
+
+
+          </button>
+
+          {isSettingsOpen && (
+            <ul className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg z-50">
+              <li className="border-b border-gray-200">
+                <Link to="/employees" className="block px-4 py-2 text-gray-700 hover:bg-gray-100" onClick={toggleSettingsMenu}>Ansatte</Link>
+              </li>
+              <li className="border-b border-gray-200">
+                <Link to="/status" className="block px-4 py-2 text-gray-700 hover:bg-gray-100" onClick={toggleSettingsMenu}>Status</Link>
+              </li>
+              <li>
+                <Link to="/sms-templates" className="block px-4 py-2 text-gray-700 hover:bg-gray-100" onClick={toggleSettingsMenu}>SMS-maler</Link>
+              </li>
+            </ul>
+          )}
         </div>
       </div>
 
