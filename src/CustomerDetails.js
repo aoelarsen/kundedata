@@ -5,6 +5,7 @@ function CustomerDetails() {
   const { id } = useParams(); // Dette vil nå referere til _id fra MongoDB
   const [customer, setCustomer] = useState(null);
   const [orders, setOrders] = useState([]);
+  const [hoveredOrderId, setHoveredOrderId] = useState(null); // For å holde styr på hvilken ordre som er hoveret over
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -27,7 +28,11 @@ function CustomerDetails() {
       try {
         const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders?kundeid=${customerNumber}`);
         if (response.ok) {
-          const ordersData = await response.json();
+          let ordersData = await response.json();
+
+          // Sorter ordrene basert på registreringsdato (nyeste først)
+          ordersData = ordersData.sort((a, b) => new Date(b.RegistrertDato) - new Date(a.RegistrertDato));
+
           setOrders(ordersData);
         } else {
           console.error('Ordre ble ikke funnet');
@@ -44,6 +49,14 @@ function CustomerDetails() {
     if (!dateString) return "Ukjent dato";
     const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
     return new Date(dateString).toLocaleDateString('no-NO', options);
+  };
+
+  const handleMouseEnter = (orderId) => {
+    setHoveredOrderId(orderId); // Sett hover til ordren som er hoveret over
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredOrderId(null); // Fjern hover når musen forlater
   };
 
   if (!customer) {
@@ -77,63 +90,69 @@ function CustomerDetails() {
             )}
           </div>
         </div> 
-                <Link 
-    to={`/edit-customer/${customer._id}`}
-    className="text-blue-500 mt-4 block hover:underline "
-  >
-    Endre Kunde
-  </Link>
-        </div>
-        <div className="flex justify-between mt-8">
-          <Link 
-            to={`/create-order/${customer.customerNumber}`}
-            className="inline-block bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-600"
-          >
-            Ny Ordre
-          </Link>
+        <Link 
+          to={`/edit-customer/${customer._id}`}
+          className="text-blue-500 mt-4 block hover:underline"
+        >
+          Endre Kunde
+        </Link>
+      </div>
 
-       
+      <div className="flex justify-between mt-8">
+        <Link 
+          to={`/create-order/${customer.customerNumber}`}
+          className="inline-block bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-600"
+        >
+          Ny Ordre
+        </Link>
       </div>
 
       <div className="mt-8">
-  <h3 className="text-xl font-semibold mb-4">Kundens Ordrer</h3>
-  {orders.length > 0 ? (
-    <table className="min-w-full bg-white border border-gray-300 rounded-lg">
-      <thead>
-        <tr className="bg-gray-100">
-          <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">ID</th>
-          <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Merke</th>
-          <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Produkt</th>
-          {/* Disse kolonnene vises bare på større skjermer */}
-          <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600 hidden md:table-cell">Str.</th>
-          <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600 hidden md:table-cell">Farge</th>
-          <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600 hidden md:table-cell">Status</th>
-          <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600 hidden md:table-cell">Registrert dato</th>
-        </tr>
-      </thead>
-      <tbody>
-        {orders.map((order) => (
-          <tr 
-            key={order._id} 
-            className="hover:bg-gray-50 cursor-pointer"
-            onClick={() => navigate(`/order-details/${order._id}`)}
-          >
-            <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.ordreid}</td>
-            <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.Varemerke}</td>
-            <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.Produkt}</td>
-            {/* Disse feltene vises bare på større skjermer */}
-            <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{order.Størrelse}</td>
-            <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{order.Farge}</td>
-            <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{order.Status}</td>
-            <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{formatDate(order.RegistrertDato)}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  ) : (
-    <p className="text-gray-500">Ingen ordrer funnet for denne kunden.</p>
-  )}
-</div>
+        <h3 className="text-xl font-semibold mb-4">Kundens Ordrer</h3>
+        {orders.length > 0 ? (
+          <table className="min-w-full bg-white border border-gray-300 rounded-lg relative">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">ID</th>
+                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Merke</th>
+                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Produkt</th>
+                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600 hidden md:table-cell">Str.</th>
+                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600 hidden md:table-cell">Farge</th>
+                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600 hidden md:table-cell">Status</th>
+                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600 hidden md:table-cell">Registrert dato</th>
+              </tr>
+            </thead>
+            <tbody>
+              {orders.map((order) => (
+                <tr 
+                  key={order._id} 
+                  className="hover:bg-gray-50 cursor-pointer relative"
+                  onClick={() => navigate(`/order-details/${order._id}`)}
+                  onMouseEnter={() => handleMouseEnter(order._id)} // Når vi hover over en rad
+                  onMouseLeave={handleMouseLeave} // Når vi forlater en rad
+                >
+                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.ordreid}</td>
+                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.Varemerke}</td>
+                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.Produkt}</td>
+                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{order.Størrelse}</td>
+                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{order.Farge}</td>
+                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{order.Status}</td>
+                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{formatDate(order.RegistrertDato)}</td>
+                  
+                  {/* Tooltip for kommentar */}
+                  {hoveredOrderId === order._id && (
+                    <div className="absolute left-0 top-full mt-1 p-2 w-64 bg-gray-200 border border-gray-400 rounded-lg shadow-lg z-10">
+                      <p className="text-sm text-gray-700">{order.Kommentar ? order.Kommentar : 'Ingen kommentar'}</p>
+                    </div>
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <p className="text-gray-500">Ingen ordrer funnet for denne kunden.</p>
+        )}
+      </div>
     </div>
   );
 }
