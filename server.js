@@ -461,11 +461,14 @@ const SmsTemplate = mongoose.model('SmsTemplate', smsTemplateSchema);
 app.get('/smsmaler', async (req, res) => {
   try {
     const smsMaler = await SmsTemplate.find();
+    console.log(smsMaler); // Legg til denne linjen for å sjekke om dataene blir hentet
     res.json(smsMaler);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
+
+
 
 app.post('/smsmaler', async (req, res) => {
   const smsTemplate = new SmsTemplate({
