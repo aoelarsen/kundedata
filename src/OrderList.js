@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 
 function OrderList() {
   const [orders, setOrders] = useState([]);
-  const [hoveredOrderId, setHoveredOrderId] = useState(null); // For å holde styr på hvilken ordre som er hoveret over
-  const [tooltipPosition, setTooltipPosition] = useState('top-full'); // Standard posisjon for tooltip
+  const [hoveredOrder, setHoveredOrder] = useState(null); // For å holde styr på hvilken ordre som er hoveret over
+  const [tooltipStyle, setTooltipStyle] = useState({}); // Style for tooltip plassering
   const navigate = useNavigate();
   const tableRef = useRef(); // Referanse til tabellen for å beregne posisjon
 
@@ -30,22 +30,16 @@ function OrderList() {
     navigate(`/order-details/${order._id}`); // Ruter til OrderDetails-siden med MongoDB ObjectId
   };
 
-  const handleMouseEnter = (orderId, event) => {
-    setHoveredOrderId(orderId); // Sett hover til ordren som er hoveret over
+  const handleMouseEnter = (order, event) => {
+    setHoveredOrder(order); // Sett hover til ordren som er hoveret over
 
-    // Beregn posisjonen for tooltipen
-    const rowRect = event.currentTarget.getBoundingClientRect();
-    const tableRect = tableRef.current.getBoundingClientRect();
-    
-    if (rowRect.bottom > tableRect.bottom - 50) {
-      setTooltipPosition('bottom-full'); // Plasser tooltipen over raden hvis den er nær bunnen
-    } else {
-      setTooltipPosition('top-full'); // Plasser tooltipen under raden hvis det er plass
-    }
+    const tooltipX = event.clientX;
+    const tooltipY = event.clientY + window.scrollY; // Legg til scroll-offset for riktig plassering
+    setTooltipStyle({ left: tooltipX + 'px', top: tooltipY + 'px' });
   };
 
   const handleMouseLeave = () => {
-    setHoveredOrderId(null); // Fjern hover når musen forlater
+    setHoveredOrder(null); // Fjern hover når musen forlater
   };
 
   // Funksjon for å formatere dato til DD.MM.YYYY
@@ -62,7 +56,7 @@ function OrderList() {
       <div className="mt-8">
         <h3 className="text-2xl font-semibold mb-4 text-gray-800">Ordre</h3>
         <div className="overflow-x-auto" ref={tableRef}>
-          <table className="min-w-full bg-white border border-gray-300 rounded-lg relative">
+          <table className="min-w-full bg-white border border-gray-300 rounded-lg">
             <thead>
               <tr className="bg-gray-100">
                 <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">ID</th>
@@ -79,9 +73,9 @@ function OrderList() {
               {orders.map((order) => (
                 <tr
                   key={order._id} // Sørg for at du bruker _id som nøkkel
-                  className="hover:bg-gray-50 cursor-pointer relative"
+                  className="hover:bg-gray-50 cursor-pointer"
                   onClick={() => handleSelectOrder(order)}
-                  onMouseEnter={(event) => handleMouseEnter(order._id, event)} // Når vi hover over en rad
+                  onMouseEnter={(event) => handleMouseEnter(order, event)} // Når vi hover over en rad
                   onMouseLeave={handleMouseLeave} // Når vi forlater en rad
                 >
                   <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.ordreid}</td>
@@ -94,17 +88,20 @@ function OrderList() {
                   <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">
                     {formatDate(order.RegistrertDato)}
                   </td>
-
-                  {/* Tooltip for kommentar */}
-                  {hoveredOrderId === order._id && (
-                    <div className={`absolute left-0 ${tooltipPosition} mt-1 p-2 w-64 bg-gray-200 border border-gray-400 rounded-lg shadow-lg z-10`}>
-                      <p className="text-sm text-gray-700">{order.Kommentar ? order.Kommentar : 'Ingen kommentar'}</p>
-                    </div>
-                  )}
                 </tr>
               ))}
             </tbody>
           </table>
+
+          {/* Tooltip for kommentar */}
+          {hoveredOrder && (
+            <div
+              className="absolute bg-gray-200 border border-gray-400 rounded-lg shadow-lg p-2 text-sm z-10"
+              style={tooltipStyle}
+            >
+              {hoveredOrder.Kommentar ? hoveredOrder.Kommentar : 'Ingen kommentar'}
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -5,7 +5,8 @@ function CustomerDetails() {
   const { id } = useParams(); // Dette vil nå referere til _id fra MongoDB
   const [customer, setCustomer] = useState(null);
   const [orders, setOrders] = useState([]);
-  const [hoveredOrderId, setHoveredOrderId] = useState(null); // For å holde styr på hvilken ordre som er hoveret over
+  const [hoveredOrder, setHoveredOrder] = useState(null); // For å holde styr på hvilken ordre som er hoveret over
+  const [tooltipStyle, setTooltipStyle] = useState({}); // Style for tooltip plassering
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -41,7 +42,7 @@ function CustomerDetails() {
         console.error('Feil ved henting av ordrer:', error);
       }
     };
-    
+
     fetchCustomer();
   }, [id]);
 
@@ -51,12 +52,16 @@ function CustomerDetails() {
     return new Date(dateString).toLocaleDateString('no-NO', options);
   };
 
-  const handleMouseEnter = (orderId) => {
-    setHoveredOrderId(orderId); // Sett hover til ordren som er hoveret over
+  const handleMouseEnter = (order, event) => {
+    setHoveredOrder(order); // Sett hover til ordren som er hoveret over
+
+    const tooltipX = event.clientX;
+    const tooltipY = event.clientY + window.scrollY; // Legg til scroll-offset for riktig plassering
+    setTooltipStyle({ left: tooltipX + 'px', top: tooltipY + 'px' });
   };
 
   const handleMouseLeave = () => {
-    setHoveredOrderId(null); // Fjern hover når musen forlater
+    setHoveredOrder(null); // Fjern hover når musen forlater
   };
 
   if (!customer) {
@@ -82,15 +87,15 @@ function CustomerDetails() {
           </div>
           <div>
             <span className="font-semibold">Registrert dato: </span>
-            {formatDate(customer.registrationDate)} 
+            {formatDate(customer.registrationDate)}
             {customer.lastModified && (
               <span className="text-gray-600">
                 {' '}({formatDate(customer.lastModified)})
               </span>
             )}
           </div>
-        </div> 
-        <Link 
+        </div>
+        <Link
           to={`/edit-customer/${customer._id}`}
           className="text-blue-500 mt-4 block hover:underline"
         >
@@ -99,7 +104,7 @@ function CustomerDetails() {
       </div>
 
       <div className="flex justify-between mt-8">
-        <Link 
+        <Link
           to={`/create-order/${customer.customerNumber}`}
           className="inline-block bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-600"
         >
@@ -109,10 +114,6 @@ function CustomerDetails() {
 
       <div className="mt-8">
         <h3 className="text-xl font-semibold mb-4">Kundens Ordrer</h3>
-        
-
-
-
 
         {orders.length > 0 ? (
           <table className="min-w-full bg-white border border-gray-300 rounded-lg relative">
@@ -129,11 +130,11 @@ function CustomerDetails() {
             </thead>
             <tbody>
               {orders.map((order) => (
-                <tr 
-                  key={order._id} 
-                  className="hover:bg-gray-50 cursor-pointer relative"
+                <tr
+                  key={order._id}
+                  className="hover:bg-gray-50 cursor-pointer"
                   onClick={() => navigate(`/order-details/${order._id}`)}
-                  onMouseEnter={() => handleMouseEnter(order._id)} // Når vi hover over en rad
+                  onMouseEnter={(event) => handleMouseEnter(order, event)} // Når vi hover over en rad
                   onMouseLeave={handleMouseLeave} // Når vi forlater en rad
                 >
                   <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.ordreid}</td>
@@ -143,19 +144,22 @@ function CustomerDetails() {
                   <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{order.Farge}</td>
                   <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{order.Status}</td>
                   <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{formatDate(order.RegistrertDato)}</td>
-                  
-                  {/* Tooltip for kommentar */}
-                  {hoveredOrderId === order._id && (
-                    <div className="absolute left-0 top-full mt-1 p-2 w-64 bg-gray-200 border border-gray-400 rounded-lg shadow-lg z-10">
-                      <p className="text-sm text-gray-700">{order.Kommentar ? order.Kommentar : 'Ingen kommentar'}</p>
-                    </div>
-                  )}
                 </tr>
               ))}
             </tbody>
           </table>
         ) : (
           <p className="text-gray-500">Ingen ordrer funnet for denne kunden.</p>
+        )}
+
+        {/* Tooltip for kommentar */}
+        {hoveredOrder && (
+          <div
+            className="absolute bg-gray-200 border border-gray-400 rounded-lg shadow-lg p-2 text-sm z-10"
+            style={tooltipStyle}
+          >
+            {hoveredOrder.Kommentar ? hoveredOrder.Kommentar : 'Ingen kommentar'}
+          </div>
         )}
       </div>
     </div>

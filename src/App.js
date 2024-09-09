@@ -10,6 +10,9 @@ import Calculator from './Calculator';
 import CustomerList from './CustomerList';
 import OrderDetails from './OrderDetails';
 import OrderList from './OrderList';
+import EmployeeList from './EmployeeList';
+import EmployeeChange from './EmployeeChange';
+import EmployeeForm from './EmployeeForm';
 import CreateOrder from './CreateOrder'; // Legg til denne linjen
 
 
@@ -105,9 +108,9 @@ function App() {
                     filteredCustomers={filteredCustomers}
                     setPhoneNumber={setPhoneNumber}
                   />
-                  <CustomerForm 
-                    addCustomer={(newCustomer) => setCustomers([...customers, newCustomer])} 
-                    customers={customers} 
+                  <CustomerForm
+                    addCustomer={(newCustomer) => setCustomers([...customers, newCustomer])}
+                    customers={customers}
                     phoneNumber={phoneNumber}
                     setSearchQuery={setSearchQuery}
                   />
@@ -117,9 +120,9 @@ function App() {
             <Route
               path="/customer-list"
               element={
-                <CustomerList 
-                  customers={customers} 
-                  deleteCustomer={(id) => setCustomers(customers.filter(customer => customer.id !== id))} 
+                <CustomerList
+                  customers={customers}
+                  deleteCustomer={(id) => setCustomers(customers.filter(customer => customer.id !== id))}
                 />
               }
             />
@@ -131,24 +134,27 @@ function App() {
               path="/edit-customer/:id"
               element={<EditCustomer customers={customers} updateCustomer={updateCustomer} />}
             />
-            <Route 
-              path="/order-details/:id" 
-              element={<OrderDetails />} 
+            <Route
+              path="/order-details/:id"
+              element={<OrderDetails />}
             />
-            <Route 
-              path="/ordre" 
-              element={<OrderList orders={orders} />} 
+            <Route
+              path="/ordre"
+              element={<OrderList orders={orders} />}
             />
-            <Route 
-              path="/service" 
-              element={<Service />} 
+            <Route
+              path="/service"
+              element={<Service />}
             />
-            <Route 
-              path="/hjelpemidler" 
-              element={<Calculator />} 
+            <Route
+              path="/hjelpemidler"
+              element={<Calculator />}
             />
-          
-<Route path="/create-order/:customerNumber" element={<CreateOrder />} />
+            <Route path="/employees" element={<EmployeeList />} />
+            <Route path="/employee-list" element={<EmployeeList />} />
+            <Route path="/employee-change/:id" element={<EmployeeChange />} />
+            <Route path="/employee-form" element={<EmployeeForm />} />
+            <Route path="/create-order/:customerNumber" element={<CreateOrder />} />
           </Routes>
         </div>
       </div>
