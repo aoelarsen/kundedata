@@ -13,8 +13,10 @@ import OrderList from './OrderList';
 import EmployeeList from './EmployeeList';
 import EmployeeChange from './EmployeeChange';
 import EmployeeForm from './EmployeeForm';
-import CreateOrder from './CreateOrder';import 
-SmsTemplateList from './SmsTemplateList';
+import CreateOrder from './CreateOrder';
+import SmsTemplateList from './SmsTemplateList';
+import SmsTemplateForm from './SmsTemplateForm';
+
 
 
 
@@ -151,8 +153,8 @@ function App() {
               path="/hjelpemidler"
               element={<Calculator />}
             />
-                    <Route path="/sms-templates" element={<SmsTemplateList />} /> {/* Ny route for SMS-maler */}
-
+        <Route path="/sms-templates" element={<SmsTemplateList />} />
+        <Route path="/sms-template-form" element={<SmsTemplateForm />} />
             <Route path="/employees" element={<EmployeeList />} />
             <Route path="/employee-list" element={<EmployeeList />} />
             <Route path="/employee-change/:id" element={<EmployeeChange />} />

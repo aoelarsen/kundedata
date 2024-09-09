@@ -461,12 +461,15 @@ const SmsTemplate = mongoose.model('SmsTemplate', smsTemplateSchema);
 app.get('/smsmaler', async (req, res) => {
   try {
     const smsMaler = await SmsTemplate.find();
-    console.log(smsMaler); // Legg til denne linjen for å sjekke om dataene blir hentet
+    console.log('Antall SMS-maler funnet:', smsMaler.length); // Legg til dette for å sjekke antall dokumenter
+    console.log('Innhold av SMS-maler:', smsMaler); // Logg innholdet
     res.json(smsMaler);
   } catch (err) {
+    console.error('Feil ved henting av SMS-maler:', err);
     res.status(500).json({ message: err.message });
   }
 });
+
 
 
 
