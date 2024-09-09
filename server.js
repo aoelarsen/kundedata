@@ -448,6 +448,84 @@ app.delete('/orders/:id', async (req, res) => {
   }
 });
 
+// Schema and Model for SMS Templates (smsmaler)
+const smsTemplateSchema = new mongoose.Schema({
+  tittel: { type: String, required: true },
+  type: { type: String, required: true },
+  tekst: { type: String, required: true },
+  status: { type: String, default: 'aktiv' } // Status kan være aktiv eller inaktiv
+});
+
+const SmsTemplate = mongoose.model('SmsTemplate', smsTemplateSchema);
+
+app.get('/smsmaler', async (req, res) => {
+  try {
+    const smsMaler = await SmsTemplate.find();
+    res.json(smsMaler);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+app.post('/smsmaler', async (req, res) => {
+  const smsTemplate = new SmsTemplate({
+    tittel: req.body.tittel,
+    type: req.body.type,
+    tekst: req.body.tekst,
+    status: req.body.status || 'aktiv'
+  });
+
+  try {
+    const newSmsTemplate = await smsTemplate.save();
+    res.status(201).json(newSmsTemplate);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+app.patch('/smsmaler/:id', async (req, res) => {
+  try {
+    const smsTemplate = await SmsTemplate.findById(req.params.id);
+    if (smsTemplate == null) {
+      return res.status(404).json({ message: 'SMS-mal ikke funnet' });
+    }
+
+    if (req.body.tittel != null) {
+      smsTemplate.tittel = req.body.tittel;
+    }
+    if (req.body.type != null) {
+      smsTemplate.type = req.body.type;
+    }
+    if (req.body.tekst != null) {
+      smsTemplate.tekst = req.body.tekst;
+    }
+    if (req.body.status != null) {
+      smsTemplate.status = req.body.status;
+    }
+
+    const updatedSmsTemplate = await smsTemplate.save();
+    res.json(updatedSmsTemplate);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+app.delete('/smsmaler/:id', async (req, res) => {
+  try {
+    const smsTemplate = await SmsTemplate.findById(req.params.id);
+    if (smsTemplate == null) {
+      return res.status(404).json({ message: 'SMS-mal ikke funnet' });
+    }
+
+    await smsTemplate.remove();
+    res.json({ message: 'SMS-mal slettet' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+
+
 // Start the server
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

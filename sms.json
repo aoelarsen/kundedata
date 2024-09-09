@@ -1,0 +1,27 @@
+[
+    {
+      "tittel": "Bekreftelse",
+      "type": "informasjon",
+      "tekst": "Din ordre er bekreftet og vil bli behandlet snart.",
+      "status": "aktiv"
+    },
+    {
+      "tittel": "Levering",
+      "type": "levering",
+      "tekst": "Din bestilling er sendt og forventes levert innen 3-5 virkedager.",
+      "status": "aktiv"
+    },
+    {
+      "tittel": "Betaling",
+      "type": "påminnelse",
+      "tekst": "Påminnelse: Din faktura er snart forfalt.",
+      "status": "inaktiv"
+    },
+    {
+      "tittel": "Kansellering",
+      "type": "informasjon",
+      "tekst": "Din bestilling er dessverre kansellert. Ta kontakt for mer informasjon.",
+      "status": "aktiv"
+    }
+  ]
+  

@@ -13,7 +13,8 @@ import OrderList from './OrderList';
 import EmployeeList from './EmployeeList';
 import EmployeeChange from './EmployeeChange';
 import EmployeeForm from './EmployeeForm';
-import CreateOrder from './CreateOrder'; // Legg til denne linjen
+import CreateOrder from './CreateOrder';import 
+SmsTemplateList from './SmsTemplateList';
 
 
 
@@ -150,6 +151,8 @@ function App() {
               path="/hjelpemidler"
               element={<Calculator />}
             />
+                    <Route path="/sms-templates" element={<SmsTemplateList />} /> {/* Ny route for SMS-maler */}
+
             <Route path="/employees" element={<EmployeeList />} />
             <Route path="/employee-list" element={<EmployeeList />} />
             <Route path="/employee-change/:id" element={<EmployeeChange />} />
