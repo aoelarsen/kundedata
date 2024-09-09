@@ -21,7 +21,7 @@ function EmployeeForm() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+    
         try {
             const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/employees', {
                 method: 'POST',
@@ -30,9 +30,9 @@ function EmployeeForm() {
                 },
                 body: JSON.stringify(formData),
             });
-
+    
             if (response.ok) {
-                const newEmployee = await response.json();
+                // No need to assign 'newEmployee' if you are not using it
                 navigate('/employee-list'); // Navigerer tilbake til listen over ansatte
             } else {
                 console.error('Feil ved opprettelse av ansatt');
@@ -41,6 +41,7 @@ function EmployeeForm() {
             console.error('Feil ved kommunikasjon med serveren:', error);
         }
     };
+    
 
     return (
         <div className="max-w-5xl mx-auto py-8 bg-white shadow-lg rounded-lg p-6 mb-4">
