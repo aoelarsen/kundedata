@@ -44,7 +44,7 @@ function SmsTemplateChange() {
         e.preventDefault();
 
         try {
-            const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/smsmaler/${id}`, {
+            const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/smstemplates/${id}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
