@@ -460,8 +460,10 @@ const SmsTemplate = mongoose.model('SmsTemplate', smsTemplateSchema);
 
 app.get('/smstemplates', async (req, res) => {
   try {
-    const smsTemplates = await SmsTemplate.find();
-    console.log('Antall SMS-maler funnet:', smsTemplates.length);
+    const smsTemplates = await SmsTemplate.findById(req.params.id);
+    if (smsTemplates == null) {
+      return res.status(404).json({ message: 'SMS-maler ikke funnet' });
+    }
     res.json(smsTemplates);
   } catch (err) {
     console.error('Feil ved henting av SMS-maler:', err);
