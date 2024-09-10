@@ -458,18 +458,17 @@ const smsTemplateSchema = new mongoose.Schema({
 
 const SmsTemplate = mongoose.model('SmsTemplate', smsTemplateSchema);
 
-app.get('/smstemplates/:id', async (req, res) => {
+app.get('/smstemplates', async (req, res) => {
   try {
-    const smsTemplate = await SmsTemplate.findById(req.params.id);
-    if (!smsTemplate) {
-      return res.status(404).json({ message: 'SMS-mal ikke funnet' });
-    }
-    res.json(smsTemplate);
+    const smsTemplates = await SmsTemplate.find();
+    console.log('Antall SMS-maler funnet:', smsTemplates.length);
+    res.json(smsTemplates);
   } catch (err) {
-    console.error('Feil ved henting av SMS-mal med ID:', err);
+    console.error('Feil ved henting av SMS-maler:', err);
     res.status(500).json({ message: err.message });
   }
 });
+
 
 
 app.post('/smstemplates', async (req, res) => {
