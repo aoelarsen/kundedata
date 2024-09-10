@@ -16,7 +16,7 @@ import EmployeeForm from './EmployeeForm';
 import CreateOrder from './CreateOrder';
 import SmsTemplateList from './SmsTemplateList';
 import SmsTemplateForm from './SmsTemplateForm';
-
+import SmsTemplateChange from './SmsTemplateChange';
 
 
 
@@ -153,6 +153,8 @@ function App() {
               path="/hjelpemidler"
               element={<Calculator />}
             />
+            <Route path="/sms-template-change/:id" element={<SmsTemplateChange />} />
+
         <Route path="/sms-templates" element={<SmsTemplateList />} />
         <Route path="/sms-template-form" element={<SmsTemplateForm />} />
             <Route path="/employees" element={<EmployeeList />} />

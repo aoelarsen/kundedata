@@ -1,15 +1,36 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 
-function SmsTemplateForm() {
+function SmsTemplateChange() {
+    const { id } = useParams();
     const [formData, setFormData] = useState({
         tittel: '',
-        type: 'ordre', // Standard type
+        type: '',
         tekst: '',
-        status: 'aktiv', // Standard status
+        status: '',
     });
 
     const navigate = useNavigate();
+
+    useEffect(() => {
+        console.log("ID hentet fra URL:", id); // Logg ID-en som brukes
+        const fetchSmsTemplate = async () => {
+            try {
+                const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/smstemplates/${id}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    setFormData(data);
+                } else {
+                    console.error('Feil ved henting av SMS-mal');
+                }
+            } catch (error) {
+                console.error('Feil ved kommunikasjon med serveren:', error);
+            }
+        };
+    
+        fetchSmsTemplate();
+    }, [id]);
+    
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -23,8 +44,8 @@ function SmsTemplateForm() {
         e.preventDefault();
 
         try {
-            const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/smstemplates', {
-                method: 'POST',
+            const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/smsmaler/${id}`, {
+                method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -34,7 +55,7 @@ function SmsTemplateForm() {
             if (response.ok) {
                 navigate('/sms-templates'); // Navigerer tilbake til listen over SMS-maler
             } else {
-                console.error('Feil ved opprettelse av SMS-mal');
+                console.error('Feil ved oppdatering av SMS-mal');
             }
         } catch (error) {
             console.error('Feil ved kommunikasjon med serveren:', error);
@@ -43,7 +64,7 @@ function SmsTemplateForm() {
 
     return (
         <div className="max-w-5xl mx-auto py-8 bg-white shadow-lg rounded-lg p-6 mb-4">
-            <h2 className="text-3xl font-bold mb-6 text-center">Opprett Ny SMS-mal</h2>
+            <h2 className="text-3xl font-bold mb-6 text-center">Endre SMS-mal</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                     <label className="block text-sm font-medium text-gray-700">Tittel</label>
@@ -93,7 +114,7 @@ function SmsTemplateForm() {
                 </div>
                 <div className="text-center">
                     <button type="submit" className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600">
-                        Opprett SMS-mal
+                        Oppdater SMS-mal
                     </button>
                 </div>
             </form>
@@ -101,4 +122,4 @@ function SmsTemplateForm() {
     );
 }
 
-export default SmsTemplateForm;
+export default SmsTemplateChange;

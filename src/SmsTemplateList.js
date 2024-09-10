@@ -8,7 +8,7 @@ function SmsTemplateList() {
     useEffect(() => {
         const fetchSmsTemplates = async () => {
             try {
-                const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/smsmaler');
+                const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/smstemplates');
                 if (!response.ok) {
                     throw new Error('Feil ved henting av SMS-maler');
                 }
@@ -23,7 +23,8 @@ function SmsTemplateList() {
     }, []);
 
     const handleSelectSmsTemplate = (smsTemplateId) => {
-        navigate(`/sms-template-change/${smsTemplateId}`); // Naviger til SmsTemplateChange for å endre en SMS-mal
+        console.log("Valgt SMS-mal ID:", smsTemplateId); // Logg ID-en som sendes
+        navigate(`/sms-template-change/${smsTemplateId}`);
     };
 
     const handleAddSmsTemplate = () => {

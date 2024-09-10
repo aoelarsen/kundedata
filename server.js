@@ -458,22 +458,19 @@ const smsTemplateSchema = new mongoose.Schema({
 
 const SmsTemplate = mongoose.model('SmsTemplate', smsTemplateSchema);
 
-app.get('/smsmaler', async (req, res) => {
+app.get('/smstemplates', async (req, res) => {
   try {
-    const smsMaler = await SmsTemplate.find();
-    console.log('Antall SMS-maler funnet:', smsMaler.length); // Legg til dette for å sjekke antall dokumenter
-    console.log('Innhold av SMS-maler:', smsMaler); // Logg innholdet
-    res.json(smsMaler);
+    const smsTemplates = await SmsTemplate.find();
+    console.log('Antall SMS-maler funnet:', smsTemplates.length);
+    console.log('Innhold av SMS-maler:', smsTemplates);
+    res.json(smsTemplates);
   } catch (err) {
     console.error('Feil ved henting av SMS-maler:', err);
     res.status(500).json({ message: err.message });
   }
 });
 
-
-
-
-app.post('/smsmaler', async (req, res) => {
+app.post('/smstemplates', async (req, res) => {
   const smsTemplate = new SmsTemplate({
     tittel: req.body.tittel,
     type: req.body.type,
@@ -489,7 +486,7 @@ app.post('/smsmaler', async (req, res) => {
   }
 });
 
-app.patch('/smsmaler/:id', async (req, res) => {
+app.patch('/smstemplates/:id', async (req, res) => {
   try {
     const smsTemplate = await SmsTemplate.findById(req.params.id);
     if (smsTemplate == null) {
@@ -516,7 +513,7 @@ app.patch('/smsmaler/:id', async (req, res) => {
   }
 });
 
-app.delete('/smsmaler/:id', async (req, res) => {
+app.delete('/smstemplates/:id', async (req, res) => {
   try {
     const smsTemplate = await SmsTemplate.findById(req.params.id);
     if (smsTemplate == null) {
@@ -529,6 +526,7 @@ app.delete('/smsmaler/:id', async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+
 
 
 
