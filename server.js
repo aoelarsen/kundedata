@@ -28,39 +28,8 @@ mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('Connected to MongoDB Atlas'))
   .catch(err => console.error('Error connecting to MongoDB Atlas:', err));
 
-  mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => {
-    console.log('Connected to MongoDB Atlas');
 
-    // Funksjon for å opprette butikkene
-    const createButikker = async () => {
-      try {
-        const butikk1 = new Butikk({ butikkid: 1, butikknavn: 'Sport1 Røyken' });
-        const butikk2 = new Butikk({ butikkid: 2, butikknavn: 'Sport1 Slemmestad' });
-
-        // Sjekk om butikkene allerede finnes
-        const existingButikk1 = await Butikk.findOne({ butikkid: 1 });
-        const existingButikk2 = await Butikk.findOne({ butikkid: 2 });
-
-        if (!existingButikk1) {
-          await butikk1.save();
-          console.log('Sport1 Røyken lagret i databasen');
-        }
-        if (!existingButikk2) {
-          await butikk2.save();
-          console.log('Sport1 Slemmestad lagret i databasen');
-        }
-
-      } catch (error) {
-        console.error('Feil ved lagring av butikker:', error);
-      }
-    };
-
-    // Kall funksjonen for å opprette butikkene
-    createButikker();
-  })
-  .catch(err => console.error('Error connecting to MongoDB Atlas:', err));
-
+  
 // Schema and Model for Customers
 const customerSchema = new mongoose.Schema({
   firstName: String,
@@ -577,14 +546,23 @@ app.delete('/smstemplates/:id', async (req, res) => {
 
 
 // Definer schema for butikk
-const butikkSchema = new mongoose.Schema({
+const storeSchema = new mongoose.Schema({
   butikkid: { type: Number, required: true },
   butikknavn: { type: String, required: true },
 });
 
 // Lag modell for butikk
-const Butikk = mongoose.model('Butikk', butikkSchema);
+const Store = mongoose.model('Store', storeSchema);
 
+// Endepunkt for å hente alle butikker
+app.get('/stores', async (req, res) => {
+  try {
+    const stores = await Store.find(); // Hent alle butikker fra databasen
+    res.json(stores); // Returner butikkene som JSON
+  } catch (err) {
+    res.status(500).json({ message: err.message }); // Send en feilmelding hvis noe går galt
+  }
+});
 
 
 

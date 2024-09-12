@@ -6,6 +6,8 @@ function NavBar() {
   const [isOpen, setIsOpen] = useState(false); // To handle the menu on small screens
   const [employees, setEmployees] = useState([]); // To store the list of employees
   const [selectedEmployee, setSelectedEmployee] = useState(Cookies.get('selectedEmployee') || ''); // To store selected employee
+  const [stores, setStores] = useState([]); // Store the list of stores
+  const [selectedStore, setSelectedStore] = useState(Cookies.get('selectedStore') || ''); // Store the selected store
   const [isSettingsOpen, setIsSettingsOpen] = useState(false); // For handling settings dropdown
   const inactivityTimeoutRef = useRef(null); // To store the inactivity timeout reference
   const settingsRef = useRef(null); // To handle click outside for settings menu
@@ -23,6 +25,19 @@ function NavBar() {
     };
 
     fetchEmployees();
+
+    // Fetch the list of stores from the server
+    const fetchStores = async () => {
+      try {
+        const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/stores');
+        const data = await response.json();
+        setStores(data);
+      } catch (error) {
+        console.error('Error fetching stores:', error);
+      }
+    };
+
+    fetchStores();
 
     // Set up inactivity detection
     const handleActivity = () => {
@@ -71,6 +86,12 @@ function NavBar() {
     Cookies.set('selectedEmployee', selected); // Save selected employee in a cookie
   };
 
+  const handleStoreChange = (event) => {
+    const selected = event.target.value;
+    setSelectedStore(selected);
+    Cookies.set('selectedStore', selected); // Save selected store in a cookie
+  };
+
   const toggleMenu = () => {
     setIsOpen(!isOpen); // Toggle menu visibility
   };
@@ -98,6 +119,20 @@ function NavBar() {
             {employees.map((employee) => (
               <option key={employee._id} value={employee.navn}>
                 {employee.navn.split(' ')[0]} {/* Only shows first name */}
+              </option>
+            ))}
+          </select>
+
+          {/* Dropdown for selecting store */}
+          <select
+            value={selectedStore}
+            onChange={handleStoreChange}
+            className="bg-white border border-gray-300 rounded p-1 ml-4"
+          >
+            <option value="">Velg butikk</option>
+            {stores.map((store) => (
+              <option key={store.butikkid} value={store.butikknavn}>
+                {store.butikknavn}
               </option>
             ))}
           </select>
@@ -135,13 +170,11 @@ function NavBar() {
         {/* Settings icon */}
         <div className="relative" ref={settingsRef}>
           <button onClick={toggleSettingsMenu} className="text-white focus:outline-none">
-            {/* New settings icon */}
+            {/* Settings icon */}
             <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-settings" width="16" height="16" viewBox="0 0 28 28" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="14" cy="14" r="3" />
               <path d="M22.4 18a1.65 1.65 0 0 0 .33 1.82l.06 .06a2 2 0 1 1 -2.83 2.83l-.06 -.06a1.65 1.65 0 0 0 -1.82 -.33 1.65 1.65 0 0 0 -1 1.51v.17a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2v-.17a1.65 1.65 0 0 0 -1 -1.51 1.65 1.65 0 0 0 -1.82 .33l-.06 .06a2 2 0 1 1 -2.83 -2.83l.06 -.06a1.65 1.65 0 0 0 .33 -1.82 1.65 1.65 0 0 0 -1.51 -1h-.17a2 2 0 0 1 -2 -2v-2a2 2 0 0 1 2 -2h.17a1.65 1.65 0 0 0 1.51 -1 1.65 1.65 0 0 0 -.33 -1.82l-.06 -.06a2 2 0 1 1 2.83 -2.83l.06 .06a1.65 1.65 0 0 0 1.82 .33h.08a1.65 1.65 0 0 0 1.51 -1v-.17a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v.17a1.65 1.65 0 0 0 1 1.51h.08a1.65 1.65 0 0 0 1.82 -.33l.06 -.06a2 2 0 1 1 2.83 2.83l-.06 .06a1.65 1.65 0 0 0 -.33 1.82v.08a1.65 1.65 0 0 0 1 1.51h.17a2 2 0 0 1 2 2v2a2 2 0 0 1 -2 2h-.17a1.65 1.65 0 0 0 -1.51 1z" />
             </svg>
-
-
           </button>
 
           {isSettingsOpen && (
