@@ -4,6 +4,7 @@ const cors = require('cors');
 
 const app = express();
 
+
 // Bruk Heroku's dynamisk tildelte port, eller 5000 som fallback lokalt
 const port = process.env.PORT || 5001;
 
@@ -26,6 +27,34 @@ const uri = process.env.MONGO_URI || "mongodb+srv://sp1348:uzETy8kW83sXiHy4@clus
 mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('Connected to MongoDB Atlas'))
   .catch(err => console.error('Error connecting to MongoDB Atlas:', err));
+
+// Mongoose Butikk-schema og model
+const butikkSchema = new mongoose.Schema({
+  butikkid: Number,
+  butikknavn: String,
+});
+
+const Butikk = mongoose.model('Butikk', butikkSchema);
+
+// Funksjon for å opprette butikkene
+const createButikker = async () => {
+  try {
+    const butikk1 = new Butikk({ butikkid: 1, butikknavn: 'Sport1 Røyken' });
+    const butikk2 = new Butikk({ butikkid: 2, butikknavn: 'Sport1 Slemmestad' });
+
+    await butikk1.save();
+    await butikk2.save();
+
+    console.log('Butikker lagret i databasen');
+  } catch (error) {
+    console.error('Feil ved lagring av butikker:', error);
+  }
+};
+
+// Kall funksjonen når serveren starter
+createButikker();
+
+
 
 // Schema and Model for Customers
 const customerSchema = new mongoose.Schema({
