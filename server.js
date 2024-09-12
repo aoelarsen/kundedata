@@ -28,6 +28,39 @@ mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('Connected to MongoDB Atlas'))
   .catch(err => console.error('Error connecting to MongoDB Atlas:', err));
 
+  mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => {
+    console.log('Connected to MongoDB Atlas');
+
+    // Funksjon for å opprette butikkene
+    const createButikker = async () => {
+      try {
+        const butikk1 = new Butikk({ butikkid: 1, butikknavn: 'Sport1 Røyken' });
+        const butikk2 = new Butikk({ butikkid: 2, butikknavn: 'Sport1 Slemmestad' });
+
+        // Sjekk om butikkene allerede finnes
+        const existingButikk1 = await Butikk.findOne({ butikkid: 1 });
+        const existingButikk2 = await Butikk.findOne({ butikkid: 2 });
+
+        if (!existingButikk1) {
+          await butikk1.save();
+          console.log('Sport1 Røyken lagret i databasen');
+        }
+        if (!existingButikk2) {
+          await butikk2.save();
+          console.log('Sport1 Slemmestad lagret i databasen');
+        }
+
+      } catch (error) {
+        console.error('Feil ved lagring av butikker:', error);
+      }
+    };
+
+    // Kall funksjonen for å opprette butikkene
+    createButikker();
+  })
+  .catch(err => console.error('Error connecting to MongoDB Atlas:', err));
+
 // Schema and Model for Customers
 const customerSchema = new mongoose.Schema({
   firstName: String,
