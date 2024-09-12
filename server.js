@@ -551,14 +551,6 @@ const butikkSchema = new mongoose.Schema({
 // Lag modell for butikk
 const Butikk = mongoose.model('Butikk', butikkSchema);
 
-app.get('/butikker', async (req, res) => {
-  try {
-    const butikker = await Butikk.find();
-    res.json(butikker);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
 
 
 
