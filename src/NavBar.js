@@ -93,7 +93,6 @@ function NavBar() {
 
         {/* Menu items for large screens */}
         <div className="hidden md:flex space-x-4">
-          {/* Store dropdown */}
           {selectedStore && (
             <span className="text-white">Butikk: {selectedStore}</span>
           )}
@@ -102,45 +101,51 @@ function NavBar() {
           <Link to="/service" className="text-white">Service</Link>
         </div>
 
-        {/* Settings icon */}
-        <div className="relative" ref={settingsRef}>
-          <button onClick={toggleSettingsMenu} className="text-white focus:outline-none">
-            <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-settings" width="16" height="16" viewBox="0 0 28 28" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="14" cy="14" r="3" />
-              <path d="M22.4 18a1.65 1.65 0 0 0 .33 1.82l.06 .06a2 2 0 1 1 -2.83 2.83l-.06 -.06a1.65 1.65 0 0 0 -1.82 -.33 1.65 1.65 0 0 0 -1 1.51v.17a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2v-.17a1.65 1.65 0 0 0 -1 -1.51 1.65 1.65 0 0 0 -1.82 .33l-.06 .06a2 2 0 1 1 -2.83 -2.83l.06 -.06a1.65 1.65 0 0 0 .33 -1.82 1.65 1.65 0 0 0 -1.51 -1h-.17a2 2 0 0 1 -2 -2v-2a2 2 0 0 1 2 -2h.17a1.65 1.65 0 0 0 1.51 -1 1.65 1.65 0 0 0 -.33 -1.82l-.06 -.06a2 2 0 1 1 2.83 -2.83l.06 .06a1.65 1.65 0 0 0 1.82 .33h.08a1.65 1.65 0 0 0 1.51 -1v-.17a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v.17a1.65 1.65 0 0 0 1 1.51h.08a1.65 1.65 0 0 0 1.82 -.33l.06 -.06a2 2 0 1 1 2.83 2.83l-.06 .06a1.65 1.65 0 0 0 -.33 1.82v.08a1.65 1.65 0 0 0 1 1.51h.17a2 2 0 0 1 2 2v2a2 2 0 0 1 -2 2h-.17a1.65 1.65 0 0 0 -1.51 1z" />
-            </svg>
-          </button>
+        {/* Settings icon and Hamburger menu */}
+        <div className="flex items-center space-x-4">
+          {/* Hamburger menu for small screens */}
+          <div className="md:hidden">
+            <button onClick={toggleMenu} className="text-white focus:outline-none">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" />
+              </svg>
+            </button>
+          </div>
 
-          {isSettingsOpen && (
-            <ul className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg z-50">
-              <li className="border-b border-gray-200">
-                <Link to="/employees" className="block px-4 py-2 text-gray-700 hover:bg-gray-100" onClick={toggleSettingsMenu}>Ansatte</Link>
-              </li>
-              <li className="border-b border-gray-200">
-                <Link to="/status" className="block px-4 py-2 text-gray-700 hover:bg-gray-100" onClick={toggleSettingsMenu}>Status</Link>
-              </li>
-              <li className="border-b border-gray-200">
-                <Link to="/sms-templates" className="block px-4 py-2 text-gray-700 hover:bg-gray-100" onClick={toggleSettingsMenu}>SMS-maler</Link>
-              </li>
-              <li>
-                <Link to="/hjelpemidler" className="block px-4 py-2 text-gray-700 hover:bg-gray-100" onClick={toggleSettingsMenu}>Hjelpemidler</Link>
-              </li>
-              <li>
-                <button onClick={openStoreModal} className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">
-                  Bytt butikk
-                </button>
-              </li>
-            </ul>
-          )}
-        </div>
+          {/* Settings icon always visible */}
+          <div className="relative" ref={settingsRef}>
+            <button onClick={toggleSettingsMenu} className="text-white focus:outline-none">
+              <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-settings" width="16" height="16" viewBox="0 0 28 28" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="14" cy="14" r="3" />
+                <path d="M22.4 18a1.65 1.65 0 0 0 .33 1.82l.06 .06a2 2 0 1 1 -2.83 2.83l-.06 -.06a1.65 1.65 0 0 0 -1.82 -.33 1.65 1.65 0 0 0 -1 1.51v.17a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2v-.17a1.65 1.65 0 0 0 -1 -1.51 1.65 1.65 0 0 0 -1.82 .33l-.06 .06a2 2 0 1 1 -2.83 -2.83l.06 -.06a1.65 1.65 0 0 0 .33 -1.82 1.65 1.65 0 0 0 -1.51 -1h-.17a2 2 0 0 1 -2 -2v-2a2 2 0 0 1 2 -2h.17a1.65 1.65 0 0 0 1.51 -1 1.65 1.65 0 0 0 -.33 -1.82l-.06 -.06a2 2 0 1 1 2.83 -2.83l.06 .06a1.65 1.65 0 0 0 1.82 .33h.08a1.65 1.65 0 0 0 1.51 -1v-.17a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v.17a1.65 1.65 0 0 0 1 1.51h.08a1.65 1.65 0 0 0 1.82 -.33l.06 -.06a2 2 0 1 1 2.83 2.83l-.06 .06a1.65 1.65 0 0 0 -.33 1.82v.08a1.65 1.65 0 0 0 1 1.51h.17a2 2 0 0 1 2 2v2a2 2 0 0 1 -2 2h-.17a1.65 1.65 0 0 0 -1.51 1z" />
+              </svg>
+            </button>
 
-        {/* Hamburger menu for small screens */}
-        <div className="md:hidden flex items-center">
-          <button onClick={toggleMenu} className="text-white focus:outline-none">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" />
-            </svg>
-          </button>
+            {isSettingsOpen && (
+              <ul className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg z-50">
+                <li className="border-b border-gray-200">
+                  <Link to="/sendsms" className="block px-4 py-2 text-gray-700 hover:bg-gray-100" onClick={toggleSettingsMenu}>Send SMS</Link>
+                </li>
+                <li className="border-b border-gray-200">
+                  <Link to="/employees" className="block px-4 py-2 text-gray-700 hover:bg-gray-100" onClick={toggleSettingsMenu}>Ansatte</Link>
+                </li>
+                <li className="border-b border-gray-200">
+                  <Link to="/status" className="block px-4 py-2 text-gray-700 hover:bg-gray-100" onClick={toggleSettingsMenu}>Status</Link>
+                </li>
+                <li className="border-b border-gray-200">
+                  <Link to="/sms-templates" className="block px-4 py-2 text-gray-700 hover:bg-gray-100" onClick={toggleSettingsMenu}>SMS-maler</Link>
+                </li>
+                <li>
+                  <Link to="/hjelpemidler" className="block px-4 py-2 text-gray-700 hover:bg-gray-100" onClick={toggleSettingsMenu}>Hjelpemidler</Link>
+                </li>
+                <li>
+                  <button onClick={openStoreModal} className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">
+                    Bytt butikk
+                  </button>
+                </li>
+              </ul>
+            )}
+          </div>
         </div>
       </div>
 
@@ -178,7 +183,6 @@ function NavBar() {
       )}
     </nav>
   );
-
 }
 
 export default NavBar;

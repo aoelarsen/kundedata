@@ -45,7 +45,7 @@ function CustomerDetails() {
 
     const fetchSmsArchive = async (phoneNumber) => {
       try {
-        const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/smsarkiv?telefonnummer=${phoneNumber}`);
+        const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/smsarchives?telefonnummer=${phoneNumber}`);
         if (response.ok) {
           const smsData = await response.json();
           // Sorter SMS-er etter dato, nyeste først
