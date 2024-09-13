@@ -17,6 +17,8 @@ import CreateOrder from './CreateOrder';
 import SmsTemplateList from './SmsTemplateList';
 import SmsTemplateForm from './SmsTemplateForm';
 import SmsTemplateChange from './SmsTemplateChange';
+import OrderDetails from './OrderDetails'; // Import OrderDetails
+import SendSMS from './SendSMS';
 
 
 
@@ -162,6 +164,9 @@ function App() {
             <Route path="/employee-change/:id" element={<EmployeeChange />} />
             <Route path="/employee-form" element={<EmployeeForm />} />
             <Route path="/create-order/:customerNumber" element={<CreateOrder />} />
+            <Route path="/orderdetails/:id" element={<OrderDetails />} />
+
+<Route path="/sendsms" element={<SendSMS />} />
           </Routes>
         </div>
       </div>

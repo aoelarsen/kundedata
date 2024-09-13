@@ -564,6 +564,49 @@ app.get('/stores', async (req, res) => {
   }
 });
 
+// Schema and Model for SMS Archive (smsarkiv)
+const smsArchiveSchema = new mongoose.Schema({
+  telefonnummer: { type: String, required: true },
+  meldingstekst: { type: String, required: true },
+  kundeNavn: { type: String, default: 'Ukjent' }, // Navn på kunde hvis valgt
+  sendtDato: { type: String, required: true }, // Dato i formatet dd.MM.yyyy
+});
+
+const SmsArchive = mongoose.model('SmsArchive', smsArchiveSchema);
+
+// Endpoint to store SMS in the archive
+app.post('/smsarkiv', async (req, res) => {
+  const { telefonnummer, meldingstekst, kundeNavn } = req.body;
+
+  // Formater datoen til dd.MM.yyyy
+  const now = new Date();
+  const sendtDato = `${now.getDate().toString().padStart(2, '0')}.${(now.getMonth() + 1).toString().padStart(2, '0')}.${now.getFullYear()}`;
+
+  const smsEntry = new SmsArchive({
+    telefonnummer,
+    meldingstekst,
+    kundeNavn,
+    sendtDato,
+  });
+
+  try {
+    const savedSms = await smsEntry.save();
+    res.status(201).json(savedSms);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+// Endpoint to get all SMS from the archive
+app.get('/smsarkiv', async (req, res) => {
+  try {
+    const smsList = await SmsArchive.find();
+    res.json(smsList);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 
 
 

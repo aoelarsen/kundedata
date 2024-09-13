@@ -174,6 +174,12 @@ function OrderDetails() {
     }
   };
 
+  // Funksjon for å navigere til SendSMS.js
+  const handleSendSMS = () => {
+    // Naviger til SendSMS.js med ordre- og kundedetaljer
+    navigate('/sendsms', { state: { orderDetails, customer } });
+  };
+
   return (
     <div className="max-w-5xl mx-auto py-8 bg-white shadow-lg rounded-lg p-6 mb-4">
       <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Kundeordre</h2>
@@ -194,18 +200,27 @@ function OrderDetails() {
               {customer.email}
             </div>
           </div>
-
-          {/* Knapp for utskrift av label, plassert inne i det grå feltet */}
-          <div className="absolute bottom-0 right-0 mb-2 mr-2">
-            <button
-              onClick={handlePrintLabel}
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-            >
-              Skriv ut label (Ordrenr: {orderDetails.ordreid})
-            </button>
-          </div>
         </div>
       )}
+
+      {/* Flytt knappene her, rett under det grå feltet */}
+      <div className="flex justify-between mb-6">
+        <button
+          onClick={handlePrintLabel}
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        >
+          Skriv ut label (Ordrenr: {orderDetails?.ordreid})
+        </button>
+
+        <button
+          onClick={handleSendSMS}
+          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+        >
+          Send SMS
+        </button>
+      </div>
+
+      {/* Resten av skjemaet for ordreoppdatering */}
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Ordreredigeringsskjema */}
         <div>

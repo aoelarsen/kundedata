@@ -5,6 +5,7 @@ function CustomerDetails() {
   const { id } = useParams(); // Dette vil nå referere til _id fra MongoDB
   const [customer, setCustomer] = useState(null);
   const [orders, setOrders] = useState([]);
+  const [smsArchive, setSmsArchive] = useState([]); // Lagrer SMS-er sendt til kunden
   const [hoveredOrder, setHoveredOrder] = useState(null); // For å holde styr på hvilken ordre som er hoveret over
   const [tooltipStyle, setTooltipStyle] = useState({}); // Style for tooltip plassering
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ function CustomerDetails() {
           const customerData = await response.json();
           setCustomer(customerData);
           fetchOrders(customerData.customerNumber);
+          fetchSmsArchive(customerData.phoneNumber); // Hent SMS-er for denne kunden
         } else {
           console.error('Kunde ble ikke funnet');
         }
@@ -30,10 +32,8 @@ function CustomerDetails() {
         const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders?kundeid=${customerNumber}`);
         if (response.ok) {
           let ordersData = await response.json();
-
           // Sorter ordrene basert på registreringsdato (nyeste først)
           ordersData = ordersData.sort((a, b) => new Date(b.RegistrertDato) - new Date(a.RegistrertDato));
-
           setOrders(ordersData);
         } else {
           console.error('Ordre ble ikke funnet');
@@ -43,18 +43,35 @@ function CustomerDetails() {
       }
     };
 
+    const fetchSmsArchive = async (phoneNumber) => {
+      try {
+        const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/smsarkiv?telefonnummer=${phoneNumber}`);
+        if (response.ok) {
+          const smsData = await response.json();
+          // Sorter SMS-er etter dato, nyeste først
+          setSmsArchive(smsData.sort((a, b) => new Date(b.sendtDato) - new Date(a.sendtDato)));
+        } else {
+          console.error('Ingen SMS-er funnet for dette telefonnummeret');
+        }
+      } catch (error) {
+        console.error('Feil ved henting av SMS-arkiv:', error);
+      }
+    };
+
     fetchCustomer();
   }, [id]);
 
-  const formatDate = (dateString) => {
+  const formatDateTime = (dateString) => {
     if (!dateString) return "Ukjent dato";
-    const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
-    return new Date(dateString).toLocaleDateString('no-NO', options);
+    const options = { 
+      day: '2-digit', month: '2-digit', year: 'numeric', 
+      hour: '2-digit', minute: '2-digit', second: '2-digit' 
+    };
+    return new Date(dateString).toLocaleString('no-NO', options);
   };
 
   const handleMouseEnter = (order, event) => {
     setHoveredOrder(order); // Sett hover til ordren som er hoveret over
-
     const tooltipX = event.clientX;
     const tooltipY = event.clientY + window.scrollY; // Legg til scroll-offset for riktig plassering
     setTooltipStyle({ left: tooltipX + 'px', top: tooltipY + 'px' });
@@ -87,10 +104,10 @@ function CustomerDetails() {
           </div>
           <div>
             <span className="font-semibold">Registrert dato: </span>
-            {formatDate(customer.registrationDate)}
+            {formatDateTime(customer.registrationDate)}
             {customer.lastModified && (
               <span className="text-gray-600">
-                {' '}({formatDate(customer.lastModified)})
+                {' '}({formatDateTime(customer.lastModified)})
               </span>
             )}
           </div>
@@ -103,15 +120,35 @@ function CustomerDetails() {
         </Link>
       </div>
 
-      <div className="flex justify-between mt-8">
-        <Link
-          to={`/create-order/${customer.customerNumber}`}
-          className="inline-block bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-600"
-        >
-          Ny Ordre
-        </Link>
+      {/* SMS Historikk */}
+      <div className="mt-8">
+        <h3 className="text-xl font-semibold mb-4">Sendte SMS-er</h3>
+
+        {smsArchive.length > 0 ? (
+          <table className="min-w-full bg-white border border-gray-300 rounded-lg relative">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Meldingstekst</th>
+                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Sendt dato</th>
+              </tr>
+            </thead>
+            <tbody>
+              {smsArchive
+                .filter((sms) => sms.telefonnummer === customer.phoneNumber) // Filtrer basert på telefonnummer
+                .map((sms) => (
+                <tr key={sms._id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{sms.meldingstekst}</td>
+                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{formatDateTime(sms.sendtDato)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <p className="text-gray-500">Ingen SMS-er sendt til dette telefonnummeret.</p>
+        )}
       </div>
 
+      {/* Ordrer */}
       <div className="mt-8">
         <h3 className="text-xl font-semibold mb-4">Kundens Ordrer</h3>
 
@@ -143,7 +180,7 @@ function CustomerDetails() {
                   <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{order.Størrelse}</td>
                   <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{order.Farge}</td>
                   <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{order.Status}</td>
-                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{formatDate(order.RegistrertDato)}</td>
+                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{formatDateTime(order.RegistrertDato)}</td>
                 </tr>
               ))}
             </tbody>
@@ -151,17 +188,26 @@ function CustomerDetails() {
         ) : (
           <p className="text-gray-500">Ingen ordrer funnet for denne kunden.</p>
         )}
-
-        {/* Tooltip for kommentar */}
-        {hoveredOrder && (
-          <div
-            className="absolute bg-gray-200 border border-gray-400 rounded-lg shadow-lg p-2 text-sm z-10"
-            style={tooltipStyle}
-          >
-            {hoveredOrder.Kommentar ? hoveredOrder.Kommentar : 'Ingen kommentar'}
-          </div>
-        )}
       </div>
+
+      <div className="flex justify-between mt-8">
+        <Link
+          to={`/create-order/${customer.customerNumber}`}
+          className="inline-block bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-600"
+        >
+          Ny Ordre
+        </Link>
+      </div>
+
+      {/* Tooltip for kommentar */}
+      {hoveredOrder && (
+        <div
+          className="absolute bg-gray-200 border border-gray-400 rounded-lg shadow-lg p-2 text-sm z-10"
+          style={tooltipStyle}
+        >
+          {hoveredOrder.Kommentar ? hoveredOrder.Kommentar : 'Ingen kommentar'}
+        </div>
+      )}
     </div>
   );
 }
