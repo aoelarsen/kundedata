@@ -57,7 +57,8 @@ const orderSchema = new mongoose.Schema({
   RegistrertDato: String,
   kundeid: Number,
   KundeTelefon: String,
-  ordreid: Number // Definer som Number for riktig inkrementering
+  ordreid: Number, // Definer som Number for riktig inkrementering
+  butikkid: Number // Legg til butikkid som Number
 });
 
 
@@ -377,6 +378,7 @@ app.post('/orders', async (req, res) => {
     kundeid: req.body.kundeid,
     KundeTelefon: req.body.KundeTelefon,
     ordreid: req.body.ordreid,
+    butikkid: req.body.butikkid // Inkluder butikkid
   });
 
   try {
@@ -386,6 +388,7 @@ app.post('/orders', async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 });
+
 
 // Endpoint to update an order
 app.patch('/orders/:id', async (req, res) => {

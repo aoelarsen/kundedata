@@ -9,7 +9,7 @@ function CreateOrder() {
   // State for å lagre ansatte
   const [employees, setEmployees] = useState([]);
   
-  // State for å lagre ordredetaljer inkludert valgt ansatt
+  // State for å lagre ordredetaljer inkludert valgt ansatt og butikkid
   const [formData, setFormData] = useState({
     Varemerke: '',
     Produkt: '',
@@ -17,6 +17,7 @@ function CreateOrder() {
     Farge: '',
     Kommentar: '',
     Ansatt: Cookies.get('selectedEmployee') || '', // Sett valgt ansatt fra cookies hvis tilgjengelig
+    butikkid: '', // Nytt felt for butikkid
     kundeid: parseInt(customerNumber, 10), // Konverter customerNumber til et tall
     ordreid: '', // Nytt felt for ordre ID
     test: 'test' // Inkluder test-feltet
@@ -57,10 +58,21 @@ function CreateOrder() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
+
+    // Hent butikkid basert på valgt ansatt
+    if (name === 'Ansatt') {
+      const selectedEmployee = employees.find(emp => emp.navn === value);
+      setFormData({
+        ...formData,
+        [name]: value,
+        butikkid: selectedEmployee ? selectedEmployee.butikkid : '' // Sett butikkid basert på valgt ansatt
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value
+      });
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -69,6 +81,7 @@ function CreateOrder() {
     const newOrder = {
       ...formData,
       ordreid: formData.ordreid, // Forsikre at ordreid er inkludert
+      butikkid: formData.butikkid, // Inkluder butikkid i bestillingen
       registrertDato: new Date().toLocaleString(), // Sett registrertDato til nåværende tidspunkt
       status: 'Aktiv', // Sett standard status
       endretdato: '', // Sett endretdato som tom
