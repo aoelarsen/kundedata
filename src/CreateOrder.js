@@ -62,6 +62,9 @@ function CreateOrder() {
     // Hent butikkid basert på valgt ansatt
     if (name === 'Ansatt') {
       const selectedEmployee = employees.find(emp => emp.navn === value);
+      console.log('Selected Employee:', selectedEmployee); // Logg den valgte ansatte
+    console.log('ButikkID fra valgt ansatt:', selectedEmployee ? selectedEmployee.butikkid : 'Ingen butikkid funnet'); // Logg butikkid
+
       setFormData({
         ...formData,
         [name]: value,

@@ -82,6 +82,8 @@ app.get('/orders/last-order-id', async (req, res) => {
 app.post('/orders', async (req, res) => {
   console.log('POST request mottatt på /orders');
   console.log('Request body mottatt:', req.body);
+  console.log('Promo: Mottatt POST request for ny ordre:', req.body); // Logg hele bodyen
+
 
   try {
     // Finn høyeste eksisterende ordreid og øk med 1
@@ -103,7 +105,7 @@ app.post('/orders', async (req, res) => {
       ordreid: Number(nextOrderId) // Bruker inkrementert ordreid
     };
 
-    console.log('Order data før lagring:', orderData);
+    console.log('Fjert: Order data før lagring:', orderData);
 
     const order = new Order(orderData);
     const newOrder = await order.save();
