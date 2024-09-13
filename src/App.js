@@ -17,7 +17,6 @@ import CreateOrder from './CreateOrder';
 import SmsTemplateList from './SmsTemplateList';
 import SmsTemplateForm from './SmsTemplateForm';
 import SmsTemplateChange from './SmsTemplateChange';
-import OrderDetails from './OrderDetails'; // Import OrderDetails
 import SendSMS from './SendSMS';
 
 
