@@ -575,7 +575,7 @@ const smsArchiveSchema = new mongoose.Schema({
 const SmsArchive = mongoose.model('SmsArchive', smsArchiveSchema);
 
 // Endpoint to store SMS in the archive
-app.post('/smsarkiv', async (req, res) => {
+app.post('/smsarchives', async (req, res) => {
   const { telefonnummer, meldingstekst, kundeNavn } = req.body;
 
   // Formater datoen til dd.MM.yyyy
@@ -598,7 +598,7 @@ app.post('/smsarkiv', async (req, res) => {
 });
 
 // Endpoint to get all SMS from the archive
-app.get('/smsarkiv', async (req, res) => {
+app.get('/smsarchives', async (req, res) => {
   try {
     const smsList = await SmsArchive.find();
     res.json(smsList);
