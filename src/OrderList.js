@@ -6,8 +6,6 @@ function OrderList() {
   const [orders, setOrders] = useState([]);
   const [filteredOrders, setFilteredOrders] = useState([]); // State for filtrerte ordrer
   const [employeeOrders, setEmployeeOrders] = useState([]); // State for ansattes ordrer
-  const [hoveredOrder, setHoveredOrder] = useState(null);
-  const [tooltipStyle, setTooltipStyle] = useState({});
   const [searchQuery, setSearchQuery] = useState(''); // Søkefelt
   const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
   const [statusFilter, setStatusFilter] = useState('Aktiv');
