@@ -102,7 +102,9 @@ app.post('/orders', async (req, res) => {
       RegistrertDato: req.body.RegistrertDato || new Date().toLocaleString(),
       kundeid: req.body.kundeid,
       KundeTelefon: req.body.KundeTelefon,
-      ordreid: Number(nextOrderId) // Bruker inkrementert ordreid
+      ordreid: Number(nextOrderId), // Bruker inkrementert ordreid
+      butikkid: req.body.butikkid // Legg til butikkid her
+
     };
 
     console.log('Fjert: Order data før lagring:', orderData);
