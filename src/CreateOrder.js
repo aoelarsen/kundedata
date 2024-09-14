@@ -9,6 +9,8 @@ function CreateOrder() {
   // State for å lagre ansatte
   const [employees, setEmployees] = useState([]);
   
+  console.log('Butikkid fra cookies:', Cookies.get('butikkid'));
+
   // State for å lagre ordredetaljer inkludert valgt ansatt og butikkid
   const [formData, setFormData] = useState({
     Varemerke: '',
@@ -17,7 +19,7 @@ function CreateOrder() {
     Farge: '',
     Kommentar: '',
     Ansatt: Cookies.get('selectedEmployee') || '', // Sett valgt ansatt fra cookies hvis tilgjengelig
-    butikkid: '', // Nytt felt for butikkid
+    butikkid: Cookies.get('butikkid') || '', // Hent butikkid fra cookies
     kundeid: parseInt(customerNumber, 10), // Konverter customerNumber til et tall
     ordreid: '', // Nytt felt for ordre ID
     test: 'test' // Inkluder test-feltet

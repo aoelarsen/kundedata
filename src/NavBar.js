@@ -45,11 +45,18 @@ function NavBar() {
 
   // Handle store change and store it in cookies
   const handleStoreChange = (event) => {
-    const selected = event.target.value;
-    setSelectedStore(selected);
-    Cookies.set('selectedStore', selected);
-    setIsStoreModalOpen(false); // Close modal after selecting store
+    const selectedStoreName = event.target.value;
+    const selectedStoreObject = stores.find(store => store.butikknavn === selectedStoreName);
+  
+    if (selectedStoreObject) {
+      Cookies.set('selectedStore', selectedStoreObject.butikknavn);
+      Cookies.set('butikkid', selectedStoreObject.butikkid); // Lagre butikkid i cookies
+      setSelectedStore(selectedStoreObject.butikknavn);
+    }
+  
+    setIsStoreModalOpen(false); // Lukk modalen etter valg av butikk
   };
+  
 
   const handleEmployeeChange = (event) => {
     const selected = event.target.value;
@@ -94,7 +101,7 @@ function NavBar() {
         {/* Menu items for large screens */}
         <div className="hidden md:flex space-x-4">
           {selectedStore && (
-            <span className="text-white">Butikk: {selectedStore}</span>
+            <span className="text-white">Butikk: {Cookies.get('butikkid')} {selectedStore}</span>
           )}
           <Link to="/customer-list" className="text-white">Kunder</Link>
           <Link to="/ordre" className="text-white">Ordre</Link>
