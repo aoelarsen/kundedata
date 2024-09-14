@@ -22,16 +22,16 @@ function OrderList() {
         if (response.ok) {
           const data = await response.json();
 
-          // Filtrer ordrer basert på valgt butikkid og status
-          const filteredOrders = butikkid
+          // Filtrer ordrer for alle ordre-tabellen basert på valgt butikkid og statusfilter
+          const filteredAllOrders = butikkid
             ? data.filter(order => order.butikkid === butikkid && order.Status === statusFilter)
             : data.filter(order => order.Status === statusFilter);
 
-          setOrders(filteredOrders);
-          setFilteredOrders(filteredOrders);
+          setOrders(filteredAllOrders);
+          setFilteredOrders(filteredAllOrders);
 
-          // Filtrer ordrer basert på valgt ansatt fra cookie
-          const filteredEmployeeOrders = filteredOrders.filter(
+          // Filtrer ordrer for ansatt-tabellen (kun "Aktiv" status brukes for ansatte)
+          const filteredEmployeeOrders = data.filter(
             order => order.Ansatt === selectedEmployee && order.Status === 'Aktiv'
           );
 
@@ -111,8 +111,10 @@ function OrderList() {
 
   return (
     <div className="max-w-5xl mx-auto py-8 bg-white shadow-lg rounded-lg p-6 mb-4">
-      <h3 className="text-2xl font-semibold mb-4 text-gray-800">Aktive Ordrer for {selectedEmployee}</h3>
-
+      <h3 className="text-2xl font-semibold mb-4 text-gray-800">Dine aktive order ({selectedEmployee})</h3>
+      <p className="text-sm text-gray-700 mb-4">
+        Sørg for å følge opp dine ordre her. Dersom andre skal følge opp, avtal dette med vedkommende som kan flytte denne over på sin bruker.
+      </p>
       {/* Tabell for aktive ordrer basert på ansatt */}
       <div className="overflow-x-auto mb-8">
         <table className="min-w-full bg-white border border-gray-300 rounded-lg">
