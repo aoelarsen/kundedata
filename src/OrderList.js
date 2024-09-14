@@ -67,6 +67,7 @@ function OrderList() {
                 <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600 hidden md:table-cell">Status</th>
                 <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600 hidden md:table-cell">Ansatt</th>
                 <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600 hidden md:table-cell">Registrert Dato</th>
+                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600 hidden md:table-cell">ButikkID</th> {/* Ny kolonne */}
               </tr>
             </thead>
             <tbody>
@@ -88,11 +89,11 @@ function OrderList() {
                   <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">
                     {formatDate(order.RegistrertDato)}
                   </td>
+                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{order.butikkid}</td> {/* Ny celle */}
                 </tr>
               ))}
             </tbody>
           </table>
-
           {/* Tooltip for kommentar */}
           {hoveredOrder && (
             <div
