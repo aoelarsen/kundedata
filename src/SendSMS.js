@@ -127,8 +127,60 @@ function SendSMS() {
     <div className="max-w-5xl mx-auto py-8 bg-white shadow-lg rounded-lg p-6 mb-4">
       <h2 className="text-3xl font-bold mb-6 text-center">Send SMS</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Skjema for sending av SMS */}
-        {/* ... */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Velg Kunde</label>
+          <select value={customer?._id || ''} onChange={handleCustomerChange} className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
+            <option value="">Velg en kunde</option>
+            {customers.map((customer) => (
+              <option key={customer._id} value={customer._id}>
+                {customer.firstName} {customer.lastName} - {customer.phoneNumber}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Telefonnummer</label>
+          <input
+            type="tel"
+            name="telefonnummer"
+            value={formData.telefonnummer}
+            onChange={handleChange}
+            required
+            className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
+            placeholder="Skriv inn telefonnummer"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Velg SMS-mal</label>
+          <select onChange={handleSmsTemplateChange} className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
+            <option value="">Velg en SMS-mal</option>
+            {smsTemplates.map((template) => (
+              <option key={template._id} value={template._id}>
+                {template.tittel}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Meldingstekst</label>
+          <textarea
+            name="meldingstekst"
+            value={formData.meldingstekst}
+            onChange={handleChange}
+            required
+            className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
+            placeholder="Skriv inn meldingsteksten"
+          />
+        </div>
+
+        <div className="text-center">
+          <button type="submit" className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600">
+            Send SMS
+          </button>
+        </div>
       </form>
 
       {/* Tabell for å vise sendte SMS-er */}
