@@ -96,17 +96,6 @@ function OrderList() {
     navigate(`/order-details/${order._id}`);
   };
 
-  const handleMouseEnter = (order, event) => {
-    setHoveredOrder(order);
-    const tooltipX = event.clientX;
-    const tooltipY = event.clientY + window.scrollY;
-    setTooltipStyle({ left: tooltipX + 'px', top: tooltipY + 'px' });
-  };
-
-  const handleMouseLeave = () => {
-    setHoveredOrder(null);
-  };
-
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const day = String(date.getDate()).padStart(2, '0');
@@ -144,8 +133,6 @@ function OrderList() {
                 key={order._id}
                 className="hover:bg-gray-50 cursor-pointer"
                 onClick={() => handleSelectOrder(order)}
-                onMouseEnter={(event) => handleMouseEnter(order, event)}
-                onMouseLeave={handleMouseLeave}
               >
                 <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.ordreid}</td>
                 <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.Varemerke}</td>
@@ -222,8 +209,6 @@ function OrderList() {
                 key={order._id}
                 className="hover:bg-gray-50 cursor-pointer"
                 onClick={() => handleSelectOrder(order)}
-                onMouseEnter={(event) => handleMouseEnter(order, event)}
-                onMouseLeave={handleMouseLeave}
               >
                 <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.ordreid}</td>
                 <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.Varemerke}</td>
