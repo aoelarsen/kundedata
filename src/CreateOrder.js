@@ -118,6 +118,7 @@ function CreateOrder() {
   };
 
   return (
+    <div className="max-w-5xl mx-auto py-8 bg-white shadow-lg rounded-lg p-6 mb-4">
     <div className="p-4">
       <h2 className="text-2xl font-bold mb-4">Registrer ny ordre</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -202,6 +203,8 @@ function CreateOrder() {
         </div>
       </form>
     </div>
+    </div>
+
   );
 }
 

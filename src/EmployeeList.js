@@ -49,7 +49,7 @@ function EmployeeList() {
                         <tr className="bg-gray-100">
                             <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Navn</th>
                             <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Telefon</th>
-                            <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">E-post</th>
+                            <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600 hidden md:table-cell">E-post</th> {/* Skjul på små skjermer */}
                         </tr>
                     </thead>
                     <tbody>
@@ -61,7 +61,7 @@ function EmployeeList() {
                             >
                                 <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{employee.navn}</td>
                                 <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{employee.telefon}</td>
-                                <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{employee.epost}</td>
+                                <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{employee.epost}</td> {/* Skjul på små skjermer */}
                             </tr>
                         ))}
                     </tbody>

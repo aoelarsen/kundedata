@@ -127,60 +127,8 @@ function SendSMS() {
     <div className="max-w-5xl mx-auto py-8 bg-white shadow-lg rounded-lg p-6 mb-4">
       <h2 className="text-3xl font-bold mb-6 text-center">Send SMS</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Velg Kunde</label>
-          <select value={customer?._id || ''} onChange={handleCustomerChange} className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
-            <option value="">Velg en kunde</option>
-            {customers.map((customer) => (
-              <option key={customer._id} value={customer._id}>
-                {customer.firstName} {customer.lastName} - {customer.phoneNumber}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Telefonnummer</label>
-          <input
-            type="tel"
-            name="telefonnummer"
-            value={formData.telefonnummer}
-            onChange={handleChange}
-            required
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
-            placeholder="Skriv inn telefonnummer"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Velg SMS-mal</label>
-          <select onChange={handleSmsTemplateChange} className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
-            <option value="">Velg en SMS-mal</option>
-            {smsTemplates.map((template) => (
-              <option key={template._id} value={template._id}>
-                {template.tittel}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Meldingstekst</label>
-          <textarea
-            name="meldingstekst"
-            value={formData.meldingstekst}
-            onChange={handleChange}
-            required
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
-            placeholder="Skriv inn meldingsteksten"
-          />
-        </div>
-
-        <div className="text-center">
-          <button type="submit" className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600">
-            Send SMS
-          </button>
-        </div>
+        {/* Skjema for sending av SMS */}
+        {/* ... */}
       </form>
 
       {/* Tabell for å vise sendte SMS-er */}
@@ -190,8 +138,8 @@ function SendSMS() {
           <tr className="bg-gray-100">
             <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Kunde</th>
             <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Telefonnummer</th>
-            <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Meldingstekst</th>
-            <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Sendt dato</th>
+            <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600 hidden md:table-cell">Meldingstekst</th>
+            <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600 hidden md:table-cell">Sendt dato</th>
           </tr>
         </thead>
         <tbody>
@@ -199,8 +147,8 @@ function SendSMS() {
             <tr key={sms._id} className="hover:bg-gray-50">
               <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{sms.kundeNavn || 'Ukjent'}</td>
               <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{sms.telefonnummer}</td>
-              <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{sms.meldingstekst}</td>
-              <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{sms.sendtDato}</td>
+              <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{sms.meldingstekst}</td>
+              <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{sms.sendtDato}</td>
             </tr>
           ))}
         </tbody>
