@@ -86,7 +86,7 @@ function CreateOrder() {
     const newOrder = {
       ...formData,
       ordreid: formData.ordreid, // Forsikre at ordreid er inkludert
-      butikkid: formData.butikkid, // Inkluder butikkid i bestillingen
+      butikkid: Cookies.get('butikkid') || formData.butikkid,  // Inkluder butikkid i bestillingen
       registrertDato: new Date().toLocaleString(), // Sett registrertDato til nåværende tidspunkt
       status: 'Aktiv', // Sett standard status
       endretdato: '', // Sett endretdato som tom
