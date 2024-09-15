@@ -134,9 +134,12 @@ function ServiceDetails() {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
+        {serviceDetails && (
+          <div>
+            <p><strong>ID:</strong> {serviceDetails._id}</p>
+          </div>
+        )}
         <div>
-        <p><strong>ID:</strong> {serviceDetails._id}</p>
-
           <label className="block text-sm font-medium text-gray-700">Beskrivelse:</label>
           <input
             type="text"
