@@ -5,7 +5,6 @@ import Cookies from 'js-cookie';
 function ServiceList() {
   const [services, setServices] = useState([]);
   const navigate = useNavigate();
-  const selectedEmployee = Cookies.get('selectedEmployee') || ''; // Hent valgt ansatt fra cookie
   const butikkid = parseInt(Cookies.get('butikkid'), 10) || null;
 
   useEffect(() => {

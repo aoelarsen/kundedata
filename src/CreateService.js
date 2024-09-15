@@ -17,7 +17,7 @@ function CreateService() {
     Produkt: '',
     Størrelse: '',
     Farge: '',
-    Kommentar: '',
+    Beskrivelse: '',
     Ansatt: Cookies.get('selectedEmployee') || '', // Sett valgt ansatt fra cookies hvis tilgjengelig
     butikkid: Cookies.get('butikkid') || '', // Hent butikkid fra cookies
     kundeid: parseInt(customerNumber, 10), // Konverter customerNumber til et tall
@@ -166,11 +166,11 @@ function CreateService() {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">Kommentar</label>
+          <label className="block text-sm font-medium text-gray-700">Beskrivelse</label>
           <input
             type="text"
-            name="Kommentar"
-            value={formData.Kommentar}
+            name="Beskrivelse"
+            value={formData.Beskrivelse}
             onChange={handleChange}
             className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
           />
