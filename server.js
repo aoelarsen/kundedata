@@ -66,6 +66,21 @@ const orderSchema = new mongoose.Schema({
 
 const Order = mongoose.model('Order', orderSchema);
 
+const serviceSchema = new mongoose.Schema({
+  beskrivelse: String,
+  status: { type: String, default: 'Aktiv' },
+  ansatt: String,
+  registrertDato: String,
+  endretdato: String,
+  kundeid: Number,
+  KundeTelefon: String,
+  serviceid: Number,
+  butikkid: Number
+});
+
+const Service = mongoose.model('Service', serviceSchema);
+
+
 app.get('/orders/last-order-id', async (req, res) => {
   try {
     const lastOrder = await Order.findOne().sort('-ordreid');
@@ -609,6 +624,102 @@ app.get('/smsarchives', async (req, res) => {
   try {
     const smsList = await SmsArchive.find();
     res.json(smsList);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Get all services
+app.get('/services', async (req, res) => {
+  const { kundeid } = req.query;
+  try {
+    let services;
+    if (kundeid) {
+      services = await Service.find({ kundeid }); // Finn tjenester med gitt kundeid
+    } else {
+      services = await Service.find(); // Hent alle tjenester hvis ingen kundeid er spesifisert
+    }
+    res.json(services);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Get a single service by ID
+app.get('/services/:id', async (req, res) => {
+  try {
+    const service = await Service.findById(req.params.id);
+    if (service == null) {
+      return res.status(404).json({ message: 'Tjeneste ikke funnet' });
+    }
+    res.json(service);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Create a new service
+app.post('/services', async (req, res) => {
+  try {
+    const lastService = await Service.findOne().sort('-serviceid');
+    const nextServiceId = lastService ? lastService.serviceid + 1 : 1;
+
+    const service = new Service({
+      beskrivelse: req.body.beskrivelse,
+      status: req.body.status || 'Aktiv',
+      ansatt: req.body.ansatt,
+      registrertDato: req.body.registrertDato || new Date().toLocaleString(),
+      kundeid: req.body.kundeid,
+      KundeTelefon: req.body.KundeTelefon,
+      serviceid: nextServiceId,
+      butikkid: req.body.butikkid
+    });
+
+    const newService = await service.save();
+    res.status(201).json(newService);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+// Update a service
+app.patch('/services/:id', async (req, res) => {
+  try {
+    const service = await Service.findById(req.params.id);
+    if (service == null) {
+      return res.status(404).json({ message: 'Tjeneste ikke funnet' });
+    }
+
+    if (req.body.beskrivelse != null) {
+      service.beskrivelse = req.body.beskrivelse;
+    }
+    if (req.body.status != null) {
+      service.status = req.body.status;
+    }
+    if (req.body.ansatt != null) {
+      service.ansatt = req.body.ansatt;
+    }
+    if (req.body.endretdato != null) {
+      service.endretdato = req.body.endretdato;
+    }
+
+    const updatedService = await service.save();
+    res.json(updatedService);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+// Delete a service
+app.delete('/services/:id', async (req, res) => {
+  try {
+    const service = await Service.findById(req.params.id);
+    if (service == null) {
+      return res.status(404).json({ message: 'Tjeneste ikke funnet' });
+    }
+
+    await service.remove();
+    res.json({ message: 'Tjeneste slettet' });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
