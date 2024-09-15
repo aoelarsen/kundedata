@@ -649,6 +649,18 @@ app.get('/services', async (req, res) => {
   }
 });
 
+// Endpoint to get the last service ID
+app.get('/orders/last-service-id', async (req, res) => {
+  try {
+    const lastService = await Service.findOne().sort('-ordreid');
+    const lastServiceId = lastService ? lastService.ordreid : 0; // Returner 0 hvis ingen service finnes
+    res.json({ lastServiceId });
+  } catch (err) {
+    console.error('Feil ved henting av siste serviceid:', err);
+    res.status(500).json({ message: 'Feil ved henting av siste serviceid' });
+  }
+});
+
 // Get a single service by ID
 app.get('/services/:id', async (req, res) => {
   try {
