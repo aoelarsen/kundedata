@@ -650,7 +650,7 @@ app.get('/services', async (req, res) => {
 });
 
 // Endpoint to get the last service ID
-app.get('/orders/last-service-id', async (req, res) => {
+app.get('/services/last-service-id', async (req, res) => {
   try {
     const lastService = await Service.findOne().sort('-ordreid');
     const lastServiceId = lastService ? lastService.ordreid : 0; // Returner 0 hvis ingen service finnes
