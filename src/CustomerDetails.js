@@ -5,6 +5,7 @@ function CustomerDetails() {
   const { id } = useParams(); // Dette vil nå referere til _id fra MongoDB
   const [customer, setCustomer] = useState(null);
   const [orders, setOrders] = useState([]);
+  const [services, setServices] = useState([]); // Ny state for tjenester
   const [smsArchive, setSmsArchive] = useState([]); // Lagrer SMS-er sendt til kunden
   const [hoveredOrder, setHoveredOrder] = useState(null); // For å holde styr på hvilken ordre som er hoveret over
   const [tooltipStyle, setTooltipStyle] = useState({}); // Style for tooltip plassering
@@ -18,6 +19,7 @@ function CustomerDetails() {
           const customerData = await response.json();
           setCustomer(customerData);
           fetchOrders(customerData.customerNumber);
+          fetchServices(customerData.customerNumber); // Hent tjenester for denne kunden
           fetchSmsArchive(customerData.phoneNumber); // Hent SMS-er for denne kunden
         } else {
           console.error('Kunde ble ikke funnet');
@@ -32,7 +34,6 @@ function CustomerDetails() {
         const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders?kundeid=${customerNumber}`);
         if (response.ok) {
           let ordersData = await response.json();
-          // Sorter ordrene basert på registreringsdato (nyeste først)
           ordersData = ordersData.sort((a, b) => new Date(b.RegistrertDato) - new Date(a.RegistrertDato));
           setOrders(ordersData);
         } else {
@@ -43,12 +44,26 @@ function CustomerDetails() {
       }
     };
 
+    const fetchServices = async (customerNumber) => {
+      try {
+        const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/services?kundeid=${customerNumber}`);
+        if (response.ok) {
+          let servicesData = await response.json();
+          servicesData = servicesData.sort((a, b) => new Date(b.RegistrertDato) - new Date(a.RegistrertDato));
+          setServices(servicesData);
+        } else {
+          console.error('Tjenester ble ikke funnet');
+        }
+      } catch (error) {
+        console.error('Feil ved henting av tjenester:', error);
+      }
+    };
+
     const fetchSmsArchive = async (phoneNumber) => {
       try {
         const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/smsarchives?telefonnummer=${phoneNumber}`);
         if (response.ok) {
           const smsData = await response.json();
-          // Sorter SMS-er etter dato, nyeste først
           setSmsArchive(smsData.sort((a, b) => new Date(b.sendtDato) - new Date(a.sendtDato)));
         } else {
           console.error('Ingen SMS-er funnet for dette telefonnummeret');
@@ -123,7 +138,6 @@ function CustomerDetails() {
       {/* SMS Historikk */}
       <div className="mt-8">
         <h3 className="text-xl font-semibold mb-4">Sendte SMS-er</h3>
-
         {smsArchive.length > 0 ? (
           <table className="min-w-full bg-white border border-gray-300 rounded-lg relative">
             <thead>
@@ -134,7 +148,7 @@ function CustomerDetails() {
             </thead>
             <tbody>
               {smsArchive
-                .filter((sms) => sms.telefonnummer === customer.phoneNumber) // Filtrer basert på telefonnummer
+                .filter((sms) => sms.telefonnummer === customer.phoneNumber)
                 .map((sms) => (
                 <tr key={sms._id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{sms.meldingstekst}</td>
@@ -151,7 +165,6 @@ function CustomerDetails() {
       {/* Ordrer */}
       <div className="mt-8">
         <h3 className="text-xl font-semibold mb-4">Kundens Ordrer</h3>
-
         {orders.length > 0 ? (
           <table className="min-w-full bg-white border border-gray-300 rounded-lg relative">
             <thead>
@@ -171,8 +184,8 @@ function CustomerDetails() {
                   key={order._id}
                   className="hover:bg-gray-50 cursor-pointer"
                   onClick={() => navigate(`/order-details/${order._id}`)}
-                  onMouseEnter={(event) => handleMouseEnter(order, event)} // Når vi hover over en rad
-                  onMouseLeave={handleMouseLeave} // Når vi forlater en rad
+                  onMouseEnter={(event) => handleMouseEnter(order, event)}
+                  onMouseLeave={handleMouseLeave}
                 >
                   <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.ordreid}</td>
                   <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.Varemerke}</td>
@@ -196,6 +209,50 @@ function CustomerDetails() {
           className="inline-block bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-600"
         >
           Ny Ordre
+        </Link>
+      </div>
+
+      {/* Tjenester */}
+      <div className="mt-8">
+        <h3 className="text-xl font-semibold mb-4">Kundens Tjenester</h3>
+        {services.length > 0 ? (
+          <table className="min-w-full bg-white border border-gray-300 rounded-lg relative">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">ID</th>
+                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Type</th>
+                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Beskrivelse</th>
+                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600 hidden md:table-cell">Status</th>
+                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600 hidden md:table-cell">Registrert dato</th>
+              </tr>
+            </thead>
+            <tbody>
+              {services.map((service) => (
+                <tr
+                  key={service._id}
+                  className="hover:bg-gray-50 cursor-pointer"
+                  onClick={() => navigate(`/service-details/${service._id}`)}
+                >
+                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{service.serviceId}</td>
+                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{service.type}</td>
+                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{service.description}</td>
+                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{service.status}</td>
+                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{formatDateTime(service.RegistrertDato)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <p className="text-gray-500">Ingen tjenester funnet for denne kunden.</p>
+        )}
+      </div>
+
+      <div className="flex justify-between mt-8">
+        <Link
+          to={`/create-service/${customer.customerNumber}`}
+          className="inline-block bg-green-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-600"
+        >
+          Ny Service
         </Link>
       </div>
 

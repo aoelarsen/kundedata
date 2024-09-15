@@ -67,6 +67,10 @@ const orderSchema = new mongoose.Schema({
 const Order = mongoose.model('Order', orderSchema);
 
 const serviceSchema = new mongoose.Schema({
+  Varemerke: String,
+  Produkt: String,
+  Størrelse: String,
+  Farge: String,
   beskrivelse: String,
   status: { type: String, default: 'Aktiv' },
   ansatt: String,
@@ -665,6 +669,10 @@ app.post('/services', async (req, res) => {
     const nextServiceId = lastService ? lastService.serviceid + 1 : 1;
 
     const service = new Service({
+      Varemerke: req.body.Varemerke,
+      Produkt: req.body.Produkt,
+      Størrelse: req.body.Størrelse,
+      Farge: req.body.Farge,
       beskrivelse: req.body.beskrivelse,
       status: req.body.status || 'Aktiv',
       ansatt: req.body.ansatt,

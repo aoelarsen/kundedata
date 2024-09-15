@@ -5,7 +5,8 @@ import CustomerDetails from './CustomerDetails';
 import EditCustomer from './EditCustomer';
 import SearchBar from './SearchBar';
 import NavBar from './NavBar';
-import Service from './Service';
+import ServiceList from './ServiceList';
+import ServiceDetails from './ServiceDetails';
 import Calculator from './Calculator';
 import CustomerList from './CustomerList';
 import OrderDetails from './OrderDetails';
@@ -14,6 +15,7 @@ import EmployeeList from './EmployeeList';
 import EmployeeChange from './EmployeeChange';
 import EmployeeForm from './EmployeeForm';
 import CreateOrder from './CreateOrder';
+import CreateService from './CreateService';
 import SmsTemplateList from './SmsTemplateList';
 import SmsTemplateForm from './SmsTemplateForm';
 import SmsTemplateChange from './SmsTemplateChange';
@@ -25,6 +27,7 @@ import SendSMS from './SendSMS'; // Import SendSMS
 function App() {
   const [customers, setCustomers] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [services, setServices] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredCustomers, setFilteredCustomers] = useState([]);
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -66,6 +69,24 @@ function App() {
     };
 
     fetchOrders();
+  }, [API_BASE_URL]);
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/Services`);
+        if (response.ok) {
+          const servicesData = await response.json();
+          setServices(servicesData);
+        } else {
+          console.error('Feil ved henting av servicer');
+        }
+      } catch (error) {
+        console.error('Feil ved kommunikasjon med serveren:', error);
+      }
+    };
+
+    fetchServices();
   }, [API_BASE_URL]);
 
   useEffect(() => {
@@ -148,9 +169,11 @@ function App() {
               element={<OrderList orders={orders} />}
             />
             <Route
-              path="/service"
-              element={<Service />}
+              path="/service-details/:id"
+              element={<ServiceDetails />}
             />
+<Route path="/service" element={<ServiceList services={services} />} />
+
             <Route
               path="/hjelpemidler"
               element={<Calculator />}
@@ -164,6 +187,8 @@ function App() {
             <Route path="/employee-change/:id" element={<EmployeeChange />} />
             <Route path="/employee-form" element={<EmployeeForm />} />
             <Route path="/create-order/:customerNumber" element={<CreateOrder />} />
+            <Route path="/create-service/:customerNumber" element={<CreateService />} />
+
             <Route path="/sendsms" element={<SendSMS />} />
           </Routes>
         </div>
