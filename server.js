@@ -71,7 +71,7 @@ const serviceSchema = new mongoose.Schema({
   Produkt: String,
   Størrelse: String,
   Farge: String,
-  beskrivelse: String,
+  Beskrivelse: String,
   status: { type: String, default: 'Aktiv' },
   ansatt: String,
   registrertDato: String,
