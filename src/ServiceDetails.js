@@ -8,6 +8,10 @@ function ServiceDetails() {
     beskrivelse: '',
     status: '',
     ansatt: '',
+    Varemerke: '',
+    Produkt: '',
+    Størrelse: '',
+    Farge: '',
   });
   const [customer, setCustomer] = useState(null); // For å holde kundedetaljer
   const [serviceDetails, setServiceDetails] = useState(null); // For å holde servicedetaljer fra API
@@ -23,9 +27,13 @@ function ServiceDetails() {
           const service = await response.json();
           setServiceDetails(service);
           setFormData({
-            beskrivelse: service.beskrivelse,
+            beskrivelse: service.Beskrivelse,
             status: service.status || 'Aktiv',
             ansatt: service.ansatt,
+            Varemerke: service.Varemerke,
+            Produkt: service.Produkt,
+            Størrelse: service.Størrelse,
+            Farge: service.Farge,
           });
           if (service.kundeid) {
             fetchCustomer(service.kundeid);
@@ -139,6 +147,46 @@ function ServiceDetails() {
             <p><strong>ID:</strong> {serviceDetails._id}</p>
           </div>
         )}
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Varemerke:</label>
+          <input
+            type="text"
+            name="Varemerke"
+            value={formData.Varemerke}
+            onChange={handleChange}
+            className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Produkt:</label>
+          <input
+            type="text"
+            name="Produkt"
+            value={formData.Produkt}
+            onChange={handleChange}
+            className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Størrelse:</label>
+          <input
+            type="text"
+            name="Størrelse"
+            value={formData.Størrelse}
+            onChange={handleChange}
+            className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Farge:</label>
+          <input
+            type="text"
+            name="Farge"
+            value={formData.Farge}
+            onChange={handleChange}
+            className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+          />
+        </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">Beskrivelse:</label>
           <input

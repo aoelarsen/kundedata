@@ -78,9 +78,9 @@ function CustomerDetails() {
 
   const formatDateTime = (dateString) => {
     if (!dateString) return "Ukjent dato";
-    const options = { 
-      day: '2-digit', month: '2-digit', year: 'numeric', 
-      hour: '2-digit', minute: '2-digit', second: '2-digit' 
+    const options = {
+      day: '2-digit', month: '2-digit', year: 'numeric',
+      hour: '2-digit', minute: '2-digit', second: '2-digit'
     };
     return new Date(dateString).toLocaleString('no-NO', options);
   };
@@ -150,11 +150,11 @@ function CustomerDetails() {
               {smsArchive
                 .filter((sms) => sms.telefonnummer === customer.phoneNumber)
                 .map((sms) => (
-                <tr key={sms._id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{sms.meldingstekst}</td>
-                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{formatDateTime(sms.sendtDato)}</td>
-                </tr>
-              ))}
+                  <tr key={sms._id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{sms.meldingstekst}</td>
+                    <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{formatDateTime(sms.sendtDato)}</td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         ) : (
@@ -212,7 +212,7 @@ function CustomerDetails() {
         </Link>
       </div>
 
-      {/* Tjenester */}
+      {/* Kundens Tjenester */}
       <div className="mt-8">
         <h3 className="text-xl font-semibold mb-4">Kundens Tjenester</h3>
         {services.length > 0 ? (
@@ -220,8 +220,10 @@ function CustomerDetails() {
             <thead>
               <tr className="bg-gray-100">
                 <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">ID</th>
-                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Type</th>
-                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Beskrivelse</th>
+                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Merke</th>
+                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Produkt</th>
+                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600 hidden md:table-cell">Str.</th>
+                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600 hidden md:table-cell">Farge</th>
                 <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600 hidden md:table-cell">Status</th>
                 <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600 hidden md:table-cell">Registrert dato</th>
               </tr>
@@ -232,12 +234,16 @@ function CustomerDetails() {
                   key={service._id}
                   className="hover:bg-gray-50 cursor-pointer"
                   onClick={() => navigate(`/service-details/${service._id}`)}
+                  onMouseEnter={(event) => handleMouseEnter(service, event, 'service')}
+                  onMouseLeave={handleMouseLeave}
                 >
-                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{service.serviceId}</td>
-                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{service.type}</td>
-                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{service.description}</td>
+                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{service.serviceid}</td>
+                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{service.Varemerke}</td>
+                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{service.Produkt}</td>
+                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{service.Størrelse}</td>
+                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{service.Farge}</td>
                   <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{service.status}</td>
-                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{formatDateTime(service.RegistrertDato)}</td>
+                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{formatDateTime(service.registrertDato)}</td>
                 </tr>
               ))}
             </tbody>
