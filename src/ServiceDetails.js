@@ -317,7 +317,6 @@ useEffect(() => {
     ))}
   </select>
   {/* Legg til logging for å se valgte ansatt */}
-  <p>Valgt ansatt: {formData.ansatt}</p>
 </div>
 
         <div className="text-center mt-6">
