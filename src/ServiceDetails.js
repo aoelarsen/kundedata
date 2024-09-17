@@ -19,6 +19,14 @@ function ServiceDetails() {
   const [employees, setEmployees] = useState([]); // For å holde ansatte data
   const [updateMessage, setUpdateMessage] = useState(''); // For å vise oppdateringsmelding
 
+  // Funksjon for å formatere datoer med sjekk
+  const formatDateTime = (dateString) => {
+    if (!dateString || isNaN(new Date(dateString).getTime())) {
+      return "Ukjent dato"; // Returner en fallback-verdi hvis datoen er ugyldig
+    }
+    return format(new Date(dateString), 'dd.MM.yy, HH:mm');
+  };
+
   // Hent servicedetaljer
   useEffect(() => {
     const fetchService = async () => {
@@ -119,18 +127,56 @@ function ServiceDetails() {
     }
   };
 
-   // Funksjon for å formatere datoer med sjekk
-   const formatDateTime = (dateString) => {
-    if (!dateString || isNaN(new Date(dateString).getTime())) {
-      return "Ukjent dato"; // Returner en fallback-verdi hvis datoen er ugyldig
+  // Funksjon for å skrive ut labelen
+  const handlePrintLabel = () => {
+    if (customer && serviceDetails) {
+      const printWindow = window.open('', '', 'width=500,height=300');
+      printWindow.document.write(`
+        <html>
+          <head>
+            <style>
+              body {
+                width: 90mm;
+                height: 29mm;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                font-family: Arial, sans-serif;
+              }
+              .customer-name {
+                font-size: 10px;
+                text-align: center;
+              }
+              .service-id {
+                font-size: 20px;
+                text-align: center;
+                font-weight: bold;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="customer-name">${customer.firstName} ${customer.lastName}</div>
+            <div class="service-id">Servicenummer: ${serviceDetails.serviceid}</div>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+      printWindow.focus();
+      printWindow.print();
     }
-    return format(new Date(dateString), 'dd.MM.yy, HH:mm');
   };
+
+  // Funksjon for å navigere til SendSMS.js
+  const handleSendSMS = () => {
+    navigate('/sendsms', { state: { serviceDetails, customer } });
+  };
+  
 
   return (
     <div className="max-w-5xl mx-auto py-8 bg-white shadow-lg rounded-lg p-6 mb-4">
       <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Tjenestedetaljer</h2>
-      
+
       {/* Vis registrert dato og endret dato øverst */}
       {serviceDetails && (
         <div className="mb-4">
@@ -161,12 +207,25 @@ function ServiceDetails() {
         </div>
       )}
 
+      {/* Legg til knapper for utskrift og SMS */}
+      <div className="flex justify-between mb-6">
+        <button
+          onClick={handlePrintLabel}
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        >
+          Skriv ut label (Servicenr: {serviceDetails?.serviceid})
+        </button>
+
+        <button
+          onClick={handleSendSMS}
+          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+        >
+          Send SMS
+        </button>
+      </div>
+
+      {/* Resten av skjemaet for tjenesteoppdatering */}
       <form onSubmit={handleSubmit} className="space-y-4">
-        {serviceDetails && (
-          <div>
-            <p><strong>ID:</strong> {serviceDetails._id}</p>
-          </div>
-        )}
         <div>
           <label className="block text-sm font-medium text-gray-700">Varemerke:</label>
           <input

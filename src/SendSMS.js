@@ -4,10 +4,11 @@ import { format } from 'date-fns'; // Importer date-fns for datoformatering
 
 function SendSMS() {
   const location = useLocation();
-  const { orderDetails, customer } = location.state || {};
+  const { orderDetails, serviceDetails, customer } = location.state || {};
   const [customers, setCustomers] = useState([]);
   const [smsTemplates, setSmsTemplates] = useState([]);
   const [smsArchive, setSmsArchive] = useState([]);
+  const [searchTerm, setSearchTerm] = useState(""); // Legg til state for søkefelt
   const [formData, setFormData] = useState({
     telefonnummer: customer?.phoneNumber || '',
     meldingstekst: '',
@@ -73,11 +74,15 @@ function SendSMS() {
     const selectedTemplate = smsTemplates.find(template => template._id === e.target.value);
     if (selectedTemplate) {
       let updatedMessage = selectedTemplate.tekst;
-
+  
       if (updatedMessage.includes('%ordreid%') && orderDetails) {
         updatedMessage = updatedMessage.replace('%ordreid%', orderDetails.ordreid);
       }
-
+  
+      if (updatedMessage.includes('%serviceid%') && serviceDetails) {
+        updatedMessage = updatedMessage.replace('%serviceid%', serviceDetails.serviceid);
+      }
+  
       setFormData((prevData) => ({
         ...prevData,
         meldingstekst: updatedMessage,
@@ -120,6 +125,22 @@ function SendSMS() {
       console.error('Feil ved kommunikasjon med serveren:', error);
     }
   };
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  // Filtrer meldinger basert på søketerm
+  const filteredSmsArchive = smsArchive.filter((sms) => {
+    return (
+      sms.kundeNavn.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      sms.telefonnummer.includes(searchTerm) ||
+      sms.meldingstekst.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  });
+
+  // Vis bare de 5 siste
+  const lastTenSms = filteredSmsArchive.slice(0, 5);
 
   // Funksjon for å formatere datoen riktig
   const formatDateTime = (dateString) => {
@@ -190,7 +211,18 @@ function SendSMS() {
         </div>
       </form>
 
-      <h3 className="text-2xl font-bold mt-8 mb-4">Siste sendte SMS-er</h3>
+      {/* Søkefelt */}
+      <div className="mt-8 mb-4">
+        <input
+          type="text"
+          placeholder="Søk etter SMS (kunde, telefonnummer, melding)"
+          value={searchTerm}
+          onChange={handleSearchChange}
+          className="w-full p-2 border border-gray-300 rounded-md shadow-sm"
+        />
+      </div>
+
+      <h3 className="text-2xl font-bold mb-4">Siste sendte SMS-er</h3>
       <table className="min-w-full bg-white border border-gray-300 rounded-lg">
         <thead>
           <tr className="bg-gray-100">
@@ -201,7 +233,7 @@ function SendSMS() {
           </tr>
         </thead>
         <tbody>
-          {smsArchive.map((sms) => (
+          {lastTenSms.map((sms) => (
             <tr key={sms._id} className="hover:bg-gray-50">
               <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{sms.kundeNavn || 'Ukjent'}</td>
               <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{sms.telefonnummer}</td>
