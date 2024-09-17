@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { format } from 'date-fns'; // Importer format-funksjonen fra date-fns
 
 function CustomerForm({ addCustomer, customers, phoneNumber, setSearchQuery }) {
   const [formData, setFormData] = useState({

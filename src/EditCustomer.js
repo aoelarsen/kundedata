@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { format } from 'date-fns'; // Importer date-fns for formatering
 
 function EditCustomer() {
   const { id } = useParams(); // Fanger opp id fra URL-en

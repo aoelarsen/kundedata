@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie'; // For å håndtere cookies
-import { format } from 'date-fns'; // Importer date-fns for formatering
 
 function CreateService() {
   const { customerNumber } = useParams(); // Hent customerNumber fra URL

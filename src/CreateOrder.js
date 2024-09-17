@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie'; 
-import { format } from 'date-fns'; // Importer format fra date-fns
 
 function CreateOrder() {
   const { customerNumber } = useParams(); 
