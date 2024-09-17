@@ -595,7 +595,7 @@ const smsArchiveSchema = new mongoose.Schema({
   telefonnummer: { type: String, required: true },
   meldingstekst: { type: String, required: true },
   kundeNavn: { type: String, default: 'Ukjent' }, // Navn på kunde hvis valgt
-  sendtDato: { type: String, required: true }, // Dato i formatet dd.MM.yyyy
+  sendtDato: { type: Date, required: true }, // Endret til Date type for å lagre i ISO-format
 });
 
 const SmsArchive = mongoose.model('SmsArchive', smsArchiveSchema);
@@ -604,15 +604,14 @@ const SmsArchive = mongoose.model('SmsArchive', smsArchiveSchema);
 app.post('/smsarchives', async (req, res) => {
   const { telefonnummer, meldingstekst, kundeNavn } = req.body;
 
-  // Formater datoen til dd.MM.yyyy
-  const now = new Date();
-  const sendtDato = `${now.getDate().toString().padStart(2, '0')}.${(now.getMonth() + 1).toString().padStart(2, '0')}.${now.getFullYear()}`;
+  // Bruker Date-objekt for å lagre nåværende dato i ISO-format
+  const sendtDato = new Date(); // Lagres i ISO-format i MongoDB
 
   const smsEntry = new SmsArchive({
     telefonnummer,
     meldingstekst,
     kundeNavn,
-    sendtDato,
+    sendtDato, // ISO-formatet brukes direkte
   });
 
   try {
@@ -632,6 +631,7 @@ app.get('/smsarchives', async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+
 
 // Get all services
 app.get('/services', async (req, res) => {

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { format } from 'date-fns'; // Importer date-fns for formatering
 
 function EditCustomer() {
   const { id } = useParams(); // Fanger opp id fra URL-en
@@ -48,7 +49,7 @@ function EditCustomer() {
 
     const updatedCustomer = {
       ...formData,
-      lastModified: new Date().toISOString(), // Bruk ISO-strengformat for dato
+      lastModified: new Date().toISOString(), // Bruker ISO-strengformat for dato når vi lagrer
     };
 
     console.log("Oppdaterer kunde med ID:", id);
@@ -56,7 +57,7 @@ function EditCustomer() {
 
     try {
       const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customers/${id}`, {
-        method: 'PATCH', // Endret fra PUT til PATCH
+        method: 'PATCH', // Endret fra PUT til PATCH for delvis oppdatering
         headers: {
           'Content-Type': 'application/json',
         },

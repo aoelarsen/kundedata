@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom'; // Importer useLocation for å hente state fra navigering
+import { useLocation } from 'react-router-dom';
+import { format } from 'date-fns'; // Importer date-fns for datoformatering
 
 function SendSMS() {
-  const location = useLocation(); // Henter state fra navigering
-  const { orderDetails, customer } = location.state || {}; // Hent ordre- og kundedetaljer
+  const location = useLocation();
+  const { orderDetails, customer } = location.state || {};
   const [customers, setCustomers] = useState([]);
   const [smsTemplates, setSmsTemplates] = useState([]);
-  const [smsArchive, setSmsArchive] = useState([]); // Lagrer arkiv over sendte meldinger
+  const [smsArchive, setSmsArchive] = useState([]);
   const [formData, setFormData] = useState({
-    telefonnummer: customer?.phoneNumber || '', // Sett telefonnummer fra kunden
+    telefonnummer: customer?.phoneNumber || '',
     meldingstekst: '',
-    kundeNavn: `${customer?.firstName || ''} ${customer?.lastName || ''}`, // Sett kundenavn
+    kundeNavn: `${customer?.firstName || ''} ${customer?.lastName || ''}`,
   });
 
-  // Hent kunder, SMS-maler og sendte SMS-er fra databasen ved oppstart
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
@@ -47,10 +47,9 @@ function SendSMS() {
 
     fetchCustomers();
     fetchSmsTemplates();
-    fetchSmsArchive(); // Hent SMS-arkiv
+    fetchSmsArchive();
   }, []);
 
-  // Håndterer endringer i inputfeltene
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -59,25 +58,22 @@ function SendSMS() {
     }));
   };
 
-  // Oppdater telefonnummer når en kunde velges
   const handleCustomerChange = (e) => {
     const selectedCustomer = customers.find(customer => customer._id === e.target.value);
     if (selectedCustomer) {
       setFormData((prevData) => ({
         ...prevData,
         telefonnummer: selectedCustomer.phoneNumber,
-        kundeNavn: `${selectedCustomer.firstName} ${selectedCustomer.lastName}`, // Legger til kundenavn
+        kundeNavn: `${selectedCustomer.firstName} ${selectedCustomer.lastName}`,
       }));
     }
   };
 
-  // Oppdater meldingstekst når en SMS-mal velges, og erstatt %ordreid% med det faktiske ordrenummeret
   const handleSmsTemplateChange = (e) => {
     const selectedTemplate = smsTemplates.find(template => template._id === e.target.value);
     if (selectedTemplate) {
       let updatedMessage = selectedTemplate.tekst;
 
-      // Sjekk om %ordreid% er i SMS-malen, og erstatt den med det faktiske ordrenummeret
       if (updatedMessage.includes('%ordreid%') && orderDetails) {
         updatedMessage = updatedMessage.replace('%ordreid%', orderDetails.ordreid);
       }
@@ -89,9 +85,13 @@ function SendSMS() {
     }
   };
 
-  // Håndterer innsending av skjema
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const smsData = {
+      ...formData,
+      sendtDato: new Date().toISOString(), // Sett sendtDato til nåværende tidspunkt i ISO-format
+    };
 
     try {
       const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/smsarchives', {
@@ -99,16 +99,14 @@ function SendSMS() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData), // Sender telefonnummer, meldingstekst og kundeNavn
+        body: JSON.stringify(smsData),
       });
 
       if (response.ok) {
         alert('SMS sendt og lagret i arkivet!');
-
-        // Oppdater SMS-arkivet ved å hente de siste meldingene på nytt
         const updatedArchive = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/smsarchives');
         const updatedArchiveData = await updatedArchive.json();
-        setSmsArchive(updatedArchiveData.reverse()); // Oppdaterer tabellen med siste meldinger øverst
+        setSmsArchive(updatedArchiveData.reverse());
 
         setFormData({
           telefonnummer: '',
@@ -120,6 +118,15 @@ function SendSMS() {
       }
     } catch (error) {
       console.error('Feil ved kommunikasjon med serveren:', error);
+    }
+  };
+
+  // Funksjon for å formatere datoen riktig
+  const formatDateTime = (dateString) => {
+    try {
+      return format(new Date(dateString), 'dd.MM.yyyy HH:mm');
+    } catch (error) {
+      return 'Ukjent dato';
     }
   };
 
@@ -183,7 +190,6 @@ function SendSMS() {
         </div>
       </form>
 
-      {/* Tabell for å vise sendte SMS-er */}
       <h3 className="text-2xl font-bold mt-8 mb-4">Siste sendte SMS-er</h3>
       <table className="min-w-full bg-white border border-gray-300 rounded-lg">
         <thead>
@@ -200,7 +206,7 @@ function SendSMS() {
               <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{sms.kundeNavn || 'Ukjent'}</td>
               <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{sms.telefonnummer}</td>
               <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{sms.meldingstekst}</td>
-              <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{sms.sendtDato}</td>
+              <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{formatDateTime(sms.sendtDato)}</td>
             </tr>
           ))}
         </tbody>

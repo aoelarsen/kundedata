@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { format } from 'date-fns'; // Importer date-fns for formatering
 
 function CustomerDetails() {
   const { id } = useParams(); // Dette vil nå referere til _id fra MongoDB
@@ -76,14 +77,19 @@ function CustomerDetails() {
     fetchCustomer();
   }, [id]);
 
+  // Formaterer dato til "dd.MM.yy, HH:mm"
   const formatDateTime = (dateString) => {
-    if (!dateString) return "Ukjent dato";
-    const options = {
-      day: '2-digit', month: '2-digit', year: 'numeric',
-      hour: '2-digit', minute: '2-digit', second: '2-digit'
-    };
-    return new Date(dateString).toLocaleString('no-NO', options);
+    try {
+      if (!dateString) return 'Ukjent dato'; // Håndterer tomme eller ugyldige datoer
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return 'Ugyldig dato'; // Håndterer ugyldige datoer
+      return format(date, 'dd.MM.yy, HH:mm'); // Formaterer gyldig dato
+    } catch (error) {
+      console.error('Feil ved formatering av dato:', error);
+      return 'Ukjent dato';
+    }
   };
+  
 
   const handleMouseEnter = (order, event) => {
     setHoveredOrder(order); // Sett hover til ordren som er hoveret over

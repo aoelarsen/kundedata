@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom'; // Legg til useNavigate
+import { useParams, useNavigate } from 'react-router-dom'; 
+import { format } from 'date-fns'; // Importer format-funksjonen fra date-fns
 
 function OrderDetails() {
   const { id } = useParams(); // Henter _id fra URL (MongoDB ObjectId)
@@ -17,6 +18,11 @@ function OrderDetails() {
   const [orderDetails, setOrderDetails] = useState(null); // For å holde ordredetaljer fra API
   const [employees, setEmployees] = useState([]); // For å holde ansatte data
   const [updateMessage, setUpdateMessage] = useState(''); // For å vise oppdateringsmelding
+
+  // Funksjon for å formatere datoen
+  const formatDate = (dateString) => {
+    return format(new Date(dateString), 'dd.MM.yy, HH:mm');
+  };
 
   // Hent ordredetaljer
   useEffect(() => {
@@ -183,9 +189,18 @@ function OrderDetails() {
   return (
     <div className="max-w-5xl mx-auto py-8 bg-white shadow-lg rounded-lg p-6 mb-4">
       <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Kundeordre</h2>
+{/* Vis registrert og endret dato */}
+{orderDetails && (
+        <div className="mb-6">
+          <p><strong>Registrert dato:</strong> {formatDate(orderDetails.RegistrertDato)}</p>
+          {orderDetails.Endretdato && (
+            <p><strong>Endret dato:</strong> {formatDate(orderDetails.Endretdato)}</p>
+          )}
+        </div>
+      )}
+
       {customer && (
         <div className="bg-gray-100 p-6 rounded-lg mb-6 relative">
-          <h2 className="text-2xl font-semibold mb-4">Kundedetaljer</h2>
           <div className="space-y-4">
             <div>
               <span className="font-semibold">Navn: </span>

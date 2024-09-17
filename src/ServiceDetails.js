@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { format } from 'date-fns'; // Importer date-fns for formatering
 
 function ServiceDetails() {
   const { id } = useParams(); // Henter _id fra URL (MongoDB ObjectId)
@@ -118,9 +119,28 @@ function ServiceDetails() {
     }
   };
 
+   // Funksjon for å formatere datoer med sjekk
+   const formatDateTime = (dateString) => {
+    if (!dateString || isNaN(new Date(dateString).getTime())) {
+      return "Ukjent dato"; // Returner en fallback-verdi hvis datoen er ugyldig
+    }
+    return format(new Date(dateString), 'dd.MM.yy, HH:mm');
+  };
+
   return (
     <div className="max-w-5xl mx-auto py-8 bg-white shadow-lg rounded-lg p-6 mb-4">
       <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Tjenestedetaljer</h2>
+      
+      {/* Vis registrert dato og endret dato øverst */}
+      {serviceDetails && (
+        <div className="mb-4">
+          <p><strong>Registrert dato:</strong> {formatDateTime(serviceDetails.registrertDato)}</p>
+          {serviceDetails.endretdato && (
+            <p><strong>Endret dato:</strong> {formatDateTime(serviceDetails.endretdato)}</p>
+          )}
+        </div>
+      )}
+
       {customer && (
         <div className="bg-gray-100 p-6 rounded-lg mb-6">
           <h2 className="text-2xl font-semibold mb-4">Kundedetaljer</h2>

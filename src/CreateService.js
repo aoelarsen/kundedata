@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie'; // For å håndtere cookies
+import { format } from 'date-fns'; // Importer date-fns for formatering
 
 function CreateService() {
   const { customerNumber } = useParams(); // Hent customerNumber fra URL
@@ -83,11 +84,13 @@ function CreateService() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Formater registrert dato
+
     const newService = {
       ...formData,
       serviceid: formData.serviceid, // Forsikre at serviceid er inkludert
       butikkid: Cookies.get('butikkid') || formData.butikkid,  // Inkluder butikkid i tjenesten
-      registrertDato: new Date().toLocaleString(), // Sett registrertDato til nåværende tidspunkt
+      registrertDato: new Date().toISOString(), // Bruker ISO-format for dato
       status: 'Aktiv', // Sett standard status
       endretdato: '', // Sett endretdato som tom
       test: 'test' // Inkluder test-feltet

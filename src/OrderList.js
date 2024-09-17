@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
+import { format } from 'date-fns'; // Importer format-funksjonen fra date-fns
 
 function OrderList() {
   const [orders, setOrders] = useState([]);
@@ -96,12 +97,9 @@ function OrderList() {
     navigate(`/order-details/${order._id}`);
   };
 
+  // Oppdatert funksjon for å formatere datoer
   const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-    return `${day}.${month}.${year}`;
+    return format(new Date(dateString), 'dd.MM.yy, HH:mm'); // Bruk date-fns til å formatere datoen
   };
 
   const renderSortIndicator = (key) => {
@@ -201,7 +199,7 @@ function OrderList() {
                 Registrert Dato {renderSortIndicator('RegistrertDato')}
               </th>
               <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600 hidden md:table-cell cursor-pointer" onClick={() => handleSort('butikkid')}>
-                ButikkID {renderSortIndicator('butikkid')}
+                BID {renderSortIndicator('butikkid')}
               </th>
             </tr>
           </thead>
