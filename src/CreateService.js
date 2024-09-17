@@ -18,7 +18,7 @@ function CreateService() {
     Størrelse: '',
     Farge: '',
     Beskrivelse: '',
-    Ansatt: Cookies.get('selectedEmployee') || '', // Sett valgt ansatt fra cookies hvis tilgjengelig
+    ansatt: Cookies.get('selectedEmployee') || '', // Sett valgt ansatt fra cookies hvis tilgjengelig
     butikkid: Cookies.get('butikkid') || '', // Hent butikkid fra cookies
     kundeid: parseInt(customerNumber, 10), // Konverter customerNumber til et tall
     serviceid: '', // Nytt felt for service ID
@@ -62,7 +62,7 @@ function CreateService() {
     const { name, value } = e.target;
 
     // Hent butikkid basert på valgt ansatt
-    if (name === 'Ansatt') {
+    if (name === 'ansatt') {
       const selectedEmployee = employees.find(emp => emp.navn === value);
       console.log('Selected Employee:', selectedEmployee); // Logg den valgte ansatte
       console.log('ButikkID fra valgt ansatt:', selectedEmployee ? selectedEmployee.butikkid : 'Ingen butikkid funnet'); // Logg butikkid
@@ -84,7 +84,7 @@ function CreateService() {
     e.preventDefault();
   
     // Sjekk at ansatt er valgt
-    if (!formData.Ansatt) {
+    if (!formData.ansatt) {
       console.error('Ansatt er ikke valgt. Tjenesten kan ikke registreres uten ansatt.');
       return;
     }
@@ -186,7 +186,7 @@ function CreateService() {
           <label className="block text-sm font-medium text-gray-700">Ansatt</label>
           <select
             name="ansatt"
-            value={formData.Ansatt}
+            value={formData.ansatt}
             onChange={handleChange}
             required
             className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
