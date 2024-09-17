@@ -10,7 +10,20 @@ function NavBar() {
   const [selectedStore, setSelectedStore] = useState(Cookies.get('selectedStore') || '');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isStoreModalOpen, setIsStoreModalOpen] = useState(false);
+  const [isEmployeeModalOpen, setIsEmployeeModalOpen] = useState(false); // Legger til modal for ansattvalg
   const settingsRef = useRef(null);
+
+  useEffect(() => {
+    // Hvis ingen butikk er valgt, åpne modal for valg av butikk
+    if (!Cookies.get('selectedStore')) {
+      setIsStoreModalOpen(true);
+    }
+
+    // Hvis ingen ansatt er valgt, åpne modal for valg av ansatt
+    if (!Cookies.get('selectedEmployee')) {
+      setIsEmployeeModalOpen(true);
+    }
+  }, []);
 
   // Fetch employees and stores
   useEffect(() => {
@@ -36,37 +49,34 @@ function NavBar() {
 
     fetchEmployees();
     fetchStores();
-
-    // If no store is selected, open the modal
-    if (!Cookies.get('selectedStore')) {
-      setIsStoreModalOpen(true);
-    }
   }, []);
 
   // Handle store change and store it in cookies
   const handleStoreChange = (event) => {
     const selectedStoreName = event.target.value;
     const selectedStoreObject = stores.find(store => store.butikknavn === selectedStoreName);
-  
+
     if (selectedStoreObject) {
       Cookies.set('selectedStore', selectedStoreObject.butikknavn);
       Cookies.set('butikkid', selectedStoreObject.butikkid); // Lagre butikkid i cookies
       setSelectedStore(selectedStoreObject.butikknavn);
+      
+      // Tving en sideoppdatering for å gjøre endringene synlige
+      window.location.reload();
     }
-  
+
     setIsStoreModalOpen(false); // Lukk modalen etter valg av butikk
   };
-  
 
+  // Handle employee change and store it in cookies
   const handleEmployeeChange = (event) => {
     const selected = event.target.value;
     setSelectedEmployee(selected);
     Cookies.set('selectedEmployee', selected);
-  
-    // Oppdaterer siden etter at ansatt er valgt
+    
+    // Tving en sideoppdatering for å gjøre endringene synlige
     window.location.reload();
   };
-  
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -201,6 +211,27 @@ function NavBar() {
               {stores.map((store) => (
                 <option key={store.butikkid} value={store.butikknavn}>
                   {store.butikknavn}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      )}
+
+      {/* Employee selection modal */}
+      {isEmployeeModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h2 className="text-xl mb-4">Velg ansatt</h2>
+            <select
+              value={selectedEmployee}
+              onChange={handleEmployeeChange}
+              className="bg-white border border-gray-300 rounded p-2"
+            >
+              <option value="">Velg ansatt</option>
+              {employees.map((employee) => (
+                <option key={employee._id} value={employee.navn}>
+                  {employee.navn}
                 </option>
               ))}
             </select>

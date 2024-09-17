@@ -108,39 +108,63 @@ function CustomerDetails() {
 
   return (
     <div className="max-w-5xl mx-auto py-8 bg-white shadow-lg rounded-lg p-6 mb-4">
-      <div className="bg-white p-6 shadow rounded-lg">
-        <h2 className="text-2xl font-bold mb-6 text-center">Kundedetaljer</h2>
-        <div className="space-y-4">
-          <div>
-            <span className="font-semibold">Navn: </span>
-            {customer.firstName} {customer.lastName}
-          </div>
-          <div>
-            <span className="font-semibold">Telefonnummer: </span>
-            {customer.phoneNumber}
-          </div>
-          <div>
-            <span className="font-semibold">Epost: </span>
-            {customer.email}
-          </div>
-          <div>
-            <span className="font-semibold">Registrert dato: </span>
-            {formatDateTime(customer.registrationDate)}
-            {customer.lastModified && (
-              <span className="text-gray-600">
-                {' '}({formatDateTime(customer.lastModified)})
-              </span>
-            )}
-          </div>
+    
+    <div className="bg-white p-6 shadow rounded-lg">
+      <h2 className="text-2xl font-bold mb-6 text-center">Kundedetaljer</h2>
+      <div className="space-y-4">
+        <div>
+          <span className="font-semibold">Navn: </span>
+          {customer.firstName} {customer.lastName}
         </div>
+        <div>
+          <span className="font-semibold">Telefonnummer: </span>
+          {customer.phoneNumber}
+        </div>
+        <div>
+          <span className="font-semibold">Epost: </span>
+          {customer.email}
+        </div>
+        <div>
+          <span className="font-semibold">Registrert dato: </span>
+          {formatDateTime(customer.registrationDate)}
+          {customer.lastModified && (
+            <span className="text-gray-600">
+              {' '}({formatDateTime(customer.lastModified)})
+            </span>
+          )}
+        </div>
+      </div>
+      <Link
+        to={`/edit-customer/${customer._id}`}
+        className="text-blue-500 mt-4 block hover:underline"
+      >
+        Endre Kunde
+      </Link>
+    </div>
+
+    {/* Knappene plassert med mer plass over */}
+    <div className="flex justify-between items-center mt-8 mb-6">
+      <div className="flex space-x-4">
         <Link
-          to={`/edit-customer/${customer._id}`}
-          className="text-blue-500 mt-4 block hover:underline"
+          to={`/create-order/${customer.customerNumber}`}
+          className="inline-block bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-600"
         >
-          Endre Kunde
+          Ny Ordre
+        </Link>
+        <Link
+          to={`/create-service/${customer.customerNumber}`}
+          className="inline-block bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-600"
+        >
+          Ny Service
         </Link>
       </div>
-
+      <Link
+        to={`/sendsms`}
+        className="inline-block bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-600"
+      >
+        Send SMS
+      </Link>
+    </div>
       {/* SMS Historikk */}
       <div className="mt-8">
         <h3 className="text-xl font-semibold mb-4">Sendte SMS-er</h3>
@@ -209,14 +233,7 @@ function CustomerDetails() {
         )}
       </div>
 
-      <div className="flex justify-between mt-8">
-        <Link
-          to={`/create-order/${customer.customerNumber}`}
-          className="inline-block bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-600"
-        >
-          Ny Ordre
-        </Link>
-      </div>
+
 
       {/* Kundens Tjenester */}
       <div className="mt-8">
@@ -259,14 +276,7 @@ function CustomerDetails() {
         )}
       </div>
 
-      <div className="flex justify-between mt-8">
-        <Link
-          to={`/create-service/${customer.customerNumber}`}
-          className="inline-block bg-green-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-600"
-        >
-          Ny Service
-        </Link>
-      </div>
+
 
       {/* Tooltip for kommentar */}
       {hoveredOrder && (
