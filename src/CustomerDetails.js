@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { format } from 'date-fns'; // Importer date-fns for formatering
 
+import Cookies from 'js-cookie'; // Importer Cookies for å hente butikkid
+
 function CustomerDetails() {
   const { id } = useParams(); // Dette vil nå referere til _id fra MongoDB
   const [customer, setCustomer] = useState(null);
@@ -11,6 +13,9 @@ function CustomerDetails() {
   const [hoveredOrder, setHoveredOrder] = useState(null); // For å holde styr på hvilken ordre som er hoveret over
   const [tooltipStyle, setTooltipStyle] = useState({}); // Style for tooltip plassering
   const navigate = useNavigate();
+
+  // Hent butikkid fra cookies
+  const butikkid = Cookies.get('butikkid') || null;
 
   useEffect(() => {
     const fetchCustomer = async () => {
@@ -35,6 +40,12 @@ function CustomerDetails() {
         const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders?kundeid=${customerNumber}`);
         if (response.ok) {
           let ordersData = await response.json();
+          
+          // Filtrer ordrer basert på butikkid
+          if (butikkid) {
+            ordersData = ordersData.filter(order => order.butikkid === parseInt(butikkid, 10));
+          }
+
           ordersData = ordersData.sort((a, b) => new Date(b.RegistrertDato) - new Date(a.RegistrertDato));
           setOrders(ordersData);
         } else {
@@ -50,6 +61,12 @@ function CustomerDetails() {
         const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/services?kundeid=${customerNumber}`);
         if (response.ok) {
           let servicesData = await response.json();
+
+          // Filtrer tjenester basert på butikkid
+          if (butikkid) {
+            servicesData = servicesData.filter(service => service.butikkid === parseInt(butikkid, 10));
+          }
+
           servicesData = servicesData.sort((a, b) => new Date(b.RegistrertDato) - new Date(a.RegistrertDato));
           setServices(servicesData);
         } else {
@@ -75,7 +92,10 @@ function CustomerDetails() {
     };
 
     fetchCustomer();
-  }, [id]);
+  }, [id, butikkid]);
+
+  // Resten av komponenten forblir den samme...
+
 
   // Formaterer dato til "dd.MM.yy, HH:mm"
   const formatDateTime = (dateString) => {
@@ -159,11 +179,15 @@ function CustomerDetails() {
         </Link>
       </div>
       <Link
-        to={`/sendsms`}
-        className="inline-block bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-600"
-      >
-        Send SMS
-      </Link>
+  to={{
+    pathname: '/sendsms',
+  }}
+  state={{ customer }} // Send customer data to SendSMS component
+  className="inline-block bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-600"
+>
+  Send SMS
+</Link>
+
     </div>
       {/* SMS Historikk */}
       <div className="mt-8">

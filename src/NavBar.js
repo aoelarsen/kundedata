@@ -14,18 +14,15 @@ function NavBar() {
   const settingsRef = useRef(null);
 
   useEffect(() => {
-    // Hvis ingen butikk er valgt, åpne modal for valg av butikk
     if (!Cookies.get('selectedStore')) {
       setIsStoreModalOpen(true);
     }
 
-    // Hvis ingen ansatt er valgt, åpne modal for valg av ansatt
     if (!Cookies.get('selectedEmployee')) {
       setIsEmployeeModalOpen(true);
     }
   }, []);
 
-  // Fetch employees and stores
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
@@ -51,7 +48,6 @@ function NavBar() {
     fetchStores();
   }, []);
 
-  // Handle store change and store it in cookies
   const handleStoreChange = (event) => {
     const selectedStoreName = event.target.value;
     const selectedStoreObject = stores.find(store => store.butikknavn === selectedStoreName);
@@ -60,21 +56,16 @@ function NavBar() {
       Cookies.set('selectedStore', selectedStoreObject.butikknavn);
       Cookies.set('butikkid', selectedStoreObject.butikkid); // Lagre butikkid i cookies
       setSelectedStore(selectedStoreObject.butikknavn);
-      
-      // Tving en sideoppdatering for å gjøre endringene synlige
       window.location.reload();
     }
 
     setIsStoreModalOpen(false); // Lukk modalen etter valg av butikk
   };
 
-  // Handle employee change and store it in cookies
   const handleEmployeeChange = (event) => {
     const selected = event.target.value;
     setSelectedEmployee(selected);
     Cookies.set('selectedEmployee', selected);
-    
-    // Tving en sideoppdatering for å gjøre endringene synlige
     window.location.reload();
   };
 
@@ -86,7 +77,6 @@ function NavBar() {
     setIsSettingsOpen(!isSettingsOpen);
   };
 
-  // Lukk menyen når man klikker utenfor
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (settingsRef.current && !settingsRef.current.contains(event.target)) {
@@ -105,10 +95,17 @@ function NavBar() {
     setIsStoreModalOpen(true);
   };
 
+  // Funksjon for å lukke modalen ved klikk utenfor
+  const handleOutsideClick = (event) => {
+    if (event.target.classList.contains('modal-background')) {
+      setIsStoreModalOpen(false);
+      setIsEmployeeModalOpen(false);
+    }
+  };
+
   return (
     <nav className="bg-gray-800 p-4">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        {/* Left side with employee dropdown */}
         <div className="flex items-center space-x-4">
           <Link to="/" className="text-white text-lg font-semibold">Søk/Registrer</Link>
 
@@ -117,6 +114,7 @@ function NavBar() {
             value={selectedEmployee}
             onChange={handleEmployeeChange}
             className="bg-white border border-gray-300 rounded p-1"
+            disabled={isStoreModalOpen || isEmployeeModalOpen} // Disable dropdown når modal er åpen
           >
             <option value="">Velg ansatt</option>
             {employees.map((employee) => (
@@ -127,18 +125,15 @@ function NavBar() {
           </select>
         </div>
 
-        {/* Center part with navigation links */}
         <div className="hidden md:flex items-center space-x-4">
           <Link to="/customer-list" className="text-white text-lg font-semibold">Kunder</Link>
           <Link to="/ordre" className="text-white text-lg font-semibold">Ordre</Link>
           <Link to="/service" className="text-white text-lg font-semibold">Service</Link>
-          {/* Store display visible only on large screens */}
           {selectedStore && (
             <span className="text-white ml-4">Butikk: {Cookies.get('butikkid')} {selectedStore}</span>
           )}
         </div>
 
-        {/* Settings icon */}
         <div className="flex items-center space-x-4">
           <div className="md:hidden">
             <button onClick={toggleMenu} className="text-white focus:outline-none">
@@ -184,10 +179,8 @@ function NavBar() {
         </div>
       </div>
 
-      {/* Dropdown menu for small screens */}
       {isOpen && (
         <div className="md:hidden">
-          {/* Store dropdown at the top of the menu */}
           {selectedStore && (
             <span className="block px-4 py-2 text-white">Butikk: {selectedStore}</span>
           )}
@@ -199,7 +192,10 @@ function NavBar() {
 
       {/* Store selection modal */}
       {isStoreModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div
+          className="modal-background fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+          onClick={handleOutsideClick} // Legg til denne for å lytte på klikk utenfor
+        >
           <div className="bg-white p-6 rounded-lg shadow-lg">
             <h2 className="text-xl mb-4">Velg butikk</h2>
             <select
@@ -220,7 +216,10 @@ function NavBar() {
 
       {/* Employee selection modal */}
       {isEmployeeModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div
+          className="modal-background fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+          onClick={handleOutsideClick} // Lukk modal når man klikker utenfor
+        >
           <div className="bg-white p-6 rounded-lg shadow-lg">
             <h2 className="text-xl mb-4">Velg ansatt</h2>
             <select
