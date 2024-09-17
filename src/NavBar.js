@@ -129,9 +129,9 @@ function NavBar() {
 
         {/* Center part with navigation links */}
         <div className="hidden md:flex items-center space-x-4">
-          <Link to="/customer-list" className="text-white">Kunder</Link>
-          <Link to="/ordre" className="text-white">Ordre</Link>
-          <Link to="/service" className="text-white">Service</Link>
+          <Link to="/customer-list" className="text-white text-lg font-semibold">Kunder</Link>
+          <Link to="/ordre" className="text-white text-lg font-semibold">Ordre</Link>
+          <Link to="/service" className="text-white text-lg font-semibold">Service</Link>
           {/* Store display visible only on large screens */}
           {selectedStore && (
             <span className="text-white ml-4">Butikk: {Cookies.get('butikkid')} {selectedStore}</span>
