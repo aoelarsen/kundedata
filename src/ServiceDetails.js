@@ -27,51 +27,59 @@ function ServiceDetails() {
     return format(new Date(dateString), 'dd.MM.yy, HH:mm');
   };
 
-  // Hent servicedetaljer
-  useEffect(() => {
-    const fetchService = async () => {
-      try {
-        const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/services/${id}`);
-        if (response.ok) {
-          const service = await response.json();
-          setServiceDetails(service);
-          setFormData({
-            beskrivelse: service.Beskrivelse,
-            status: service.status || 'Aktiv',
-            ansatt: service.ansatt,
-            Varemerke: service.Varemerke,
-            Produkt: service.Produkt,
-            Størrelse: service.Størrelse,
-            Farge: service.Farge,
-          });
-          if (service.kundeid) {
-            fetchCustomer(service.kundeid);
-          }
-        } else {
-          console.error('Tjeneste ble ikke funnet');
-        }
-      } catch (error) {
-        console.error('Feil ved henting av tjenesten:', error);
-      }
-    };
+// Hent servicedetaljer
+useEffect(() => {
+  const fetchService = async () => {
+    try {
+      const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/services/${id}`);
+      if (response.ok) {
+        const service = await response.json();
+        
+        // Legg inn console.log for å se om ansatt blir hentet
+        console.log('Service data:', service);
+        console.log('Ansatt fra service:', service.ansatt);
 
-    const fetchCustomer = async (kundeid) => {
-      try {
-        const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customers?customerNumber`);
-        if (response.ok) {
-          const customerData = await response.json();
-          const customer = customerData.find(c => c.customerNumber === kundeid);
-          if (customer) {
-            setCustomer(customer);
-          }
-        }
-      } catch (error) {
-        console.error('Feil ved henting av kunden:', error);
-      }
-    };
+        setServiceDetails(service);
+        setFormData({
+          beskrivelse: service.Beskrivelse,
+          status: service.status || 'Aktiv',
+          ansatt: service.ansatt || '', // Pass på at ansatt er riktig referert
+          Varemerke: service.Varemerke,
+          Produkt: service.Produkt,
+          Størrelse: service.Størrelse,
+          Farge: service.Farge,
+        });
 
-    fetchService();
-  }, [id]);
+        if (service.kundeid) {
+          fetchCustomer(service.kundeid);
+        }
+      } else {
+        console.error('Tjeneste ble ikke funnet');
+      }
+    } catch (error) {
+      console.error('Feil ved henting av tjenesten:', error);
+    }
+  };
+
+  const fetchCustomer = async (kundeid) => {
+    try {
+      const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customers?customerNumber`);
+      if (response.ok) {
+        const customerData = await response.json();
+        const customer = customerData.find(c => c.customerNumber === kundeid);
+        if (customer) {
+          setCustomer(customer);
+        }
+      }
+    } catch (error) {
+      console.error('Feil ved henting av kunden:', error);
+    }
+  };
+
+  fetchService();
+}, [id]);
+
+
 
   // Hent ansatte fra databasen
   useEffect(() => {
@@ -99,12 +107,15 @@ function ServiceDetails() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     const updatedService = {
       ...formData,
       endretdato: new Date().toISOString(), // Oppdaterer endret dato
     };
-
+  
+    // Legg til logging for å se hva som faktisk sendes
+    console.log('Oppdatert tjeneste som sendes til server:', updatedService);
+  
     try {
       const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/services/${id}`, {
         method: 'PATCH',
@@ -113,7 +124,7 @@ function ServiceDetails() {
         },
         body: JSON.stringify(updatedService),
       });
-
+  
       if (response.ok) {
         setUpdateMessage('Tjenesten er oppdatert');
         if (customer) {
@@ -126,6 +137,7 @@ function ServiceDetails() {
       console.error('Feil ved kommunikasjon med serveren:', error);
     }
   };
+  
 
   // Funksjon for å skrive ut labelen
   const handlePrintLabel = () => {
@@ -290,21 +302,24 @@ function ServiceDetails() {
           </select>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">Ansatt:</label>
-          <select
-            name="ansatt"
-            value={formData.ansatt}
-            onChange={handleChange}
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-          >
-            <option value="">Velg ansatt</option>
-            {employees.map((employee) => (
-              <option key={employee._id} value={employee.navn}>
-                {employee.navn}
-              </option>
-            ))}
-          </select>
-        </div>
+  <label className="block text-sm font-medium text-gray-700">Ansatt:</label>
+  <select
+    name="ansatt"
+    value={formData.ansatt}
+    onChange={handleChange}
+    className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+  >
+    <option value="">Velg ansatt</option>
+    {employees.map((employee) => (
+      <option key={employee._id} value={employee.navn}>
+        {employee.navn}
+      </option>
+    ))}
+  </select>
+  {/* Legg til logging for å se valgte ansatt */}
+  <p>Valgt ansatt: {formData.ansatt}</p>
+</div>
+
         <div className="text-center mt-6">
           <button
             type="submit"

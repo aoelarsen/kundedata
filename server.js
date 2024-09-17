@@ -687,7 +687,7 @@ app.post('/services', async (req, res) => {
       Farge: req.body.Farge,
       Beskrivelse: req.body.Beskrivelse,
       status: req.body.status || 'Aktiv',
-      ansatt: req.body.ansatt,
+      Ansatt: req.body.Ansatt,
       registrertDato: req.body.registrertDato || new Date().toLocaleString(),
       kundeid: req.body.kundeid,
       KundeTelefon: req.body.KundeTelefon,

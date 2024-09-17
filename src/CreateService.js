@@ -82,9 +82,14 @@ function CreateService() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
+    // Sjekk at ansatt er valgt
+    if (!formData.Ansatt) {
+      console.error('Ansatt er ikke valgt. Tjenesten kan ikke registreres uten ansatt.');
+      return;
+    }
+  
     // Formater registrert dato
-
     const newService = {
       ...formData,
       serviceid: formData.serviceid, // Forsikre at serviceid er inkludert
@@ -94,9 +99,9 @@ function CreateService() {
       endretdato: '', // Sett endretdato som tom
       test: 'test' // Inkluder test-feltet
     };
-
+  
     console.log('Sender servicedata til server:', newService);
-
+  
     try {
       const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/services', {
         method: 'POST',
@@ -105,7 +110,7 @@ function CreateService() {
         },
         body: JSON.stringify(newService),
       });
-
+  
       if (response.ok) {
         const addedService = await response.json();
         console.log('Suksess! Tjeneste lagt til:', addedService);
@@ -118,7 +123,7 @@ function CreateService() {
       console.error('Feil ved kommunikasjon med serveren:', error);
     }
   };
-
+  
   return (
     <div className="max-w-5xl mx-auto py-8 bg-white shadow-lg rounded-lg p-6 mb-4">
       <h2 className="text-2xl font-bold mb-4">Registrer ny tjeneste</h2>
@@ -180,7 +185,7 @@ function CreateService() {
         <div>
           <label className="block text-sm font-medium text-gray-700">Ansatt</label>
           <select
-            name="Ansatt"
+            name="ansatt"
             value={formData.Ansatt}
             onChange={handleChange}
             required
