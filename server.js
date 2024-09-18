@@ -745,6 +745,76 @@ app.delete('/services/:id', async (req, res) => {
   }
 });
 
+// Schema and Model for Status
+const statusSchema = new mongoose.Schema({
+  navn: { type: String, required: true },
+  beskrivelse: String, // Valgfritt felt for beskrivelse
+  opprettetDato: { type: Date, default: Date.now }
+});
+
+const Status = mongoose.model('Status', statusSchema);
+
+// Endpoint to get all statuses
+app.get('/statuses', async (req, res) => {
+  try {
+    const statuses = await Status.find();
+    res.json(statuses);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Endpoint to create a new status
+app.post('/statuses', async (req, res) => {
+  const status = new Status({
+    navn: req.body.navn,
+    beskrivelse: req.body.beskrivelse
+  });
+
+  try {
+    const newStatus = await status.save();
+    res.status(201).json(newStatus);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+// Endpoint to update a status
+app.patch('/statuses/:id', async (req, res) => {
+  try {
+    const status = await Status.findById(req.params.id);
+    if (status == null) {
+      return res.status(404).json({ message: 'Status ikke funnet' });
+    }
+
+    if (req.body.navn != null) {
+      status.navn = req.body.navn;
+    }
+    if (req.body.beskrivelse != null) {
+      status.beskrivelse = req.body.beskrivelse;
+    }
+
+    const updatedStatus = await status.save();
+    res.json(updatedStatus);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+// Endpoint to delete a status
+app.delete('/statuses/:id', async (req, res) => {
+  try {
+    const status = await Status.findById(req.params.id);
+    if (status == null) {
+      return res.status(404).json({ message: 'Status ikke funnet' });
+    }
+
+    await status.remove();
+    res.json({ message: 'Status slettet' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
 
 
 
