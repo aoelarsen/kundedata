@@ -764,6 +764,20 @@ app.get('/statuses', async (req, res) => {
   }
 });
 
+// Endpoint to get a single status by ID
+app.get('/statuses/:id', async (req, res) => {
+  try {
+    const status = await Status.findById(req.params.id);
+    if (status == null) {
+      return res.status(404).json({ message: 'Status ikke funnet' });
+    }
+    res.json(status);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+
 // Endpoint to create a new status
 app.post('/statuses', async (req, res) => {
   const status = new Status({

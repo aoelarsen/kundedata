@@ -160,7 +160,7 @@ function NavBar() {
                   <Link to="/employees" className="block px-4 py-2 text-gray-700 hover:bg-gray-100" onClick={toggleSettingsMenu}>Ansatte</Link>
                 </li>
                 <li className="border-b border-gray-200">
-                  <Link to="/status" className="block px-4 py-2 text-gray-700 hover:bg-gray-100" onClick={toggleSettingsMenu}>Status</Link>
+                  <Link to="/status-list" className="block px-4 py-2 text-gray-700 hover:bg-gray-100" onClick={toggleSettingsMenu}>Status</Link>
                 </li>
                 <li className="border-b border-gray-200">
                   <Link to="/sms-templates" className="block px-4 py-2 text-gray-700 hover:bg-gray-100" onClick={toggleSettingsMenu}>SMS-maler</Link>

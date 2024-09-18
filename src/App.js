@@ -20,6 +20,11 @@ import SmsTemplateList from './SmsTemplateList';
 import SmsTemplateForm from './SmsTemplateForm';
 import SmsTemplateChange from './SmsTemplateChange';
 import SendSMS from './SendSMS'; // Import SendSMS
+import StatusForm from './StatusForm';
+import StatusList from './StatusList';
+import StatusChange from './StatusChange';
+
+
 
 
 
@@ -188,7 +193,9 @@ function App() {
             <Route path="/employee-form" element={<EmployeeForm />} />
             <Route path="/create-order/:customerNumber" element={<CreateOrder />} />
             <Route path="/create-service/:customerNumber" element={<CreateService />} />
-
+            <Route path="/status-form" element={<StatusForm />} />
+            <Route path="/status-list" element={<StatusList />} />
+            <Route path="/status-change/:id" element={<StatusChange />} />
             <Route path="/sendsms" element={<SendSMS />} />
           </Routes>
         </div>
