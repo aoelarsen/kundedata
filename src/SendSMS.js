@@ -1,19 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { format } from 'date-fns'; // Importer date-fns for datoformatering
+import { format } from 'date-fns';
+import Cookies from 'js-cookie'; // Importer js-cookie for å håndtere cookies
 
 function SendSMS() {
   const location = useLocation();
   const { orderDetails, serviceDetails, customer } = location.state || {};
   const [customers, setCustomers] = useState([]);
   const [smsTemplates, setSmsTemplates] = useState([]);
+  const [filteredSmsTemplates, setFilteredSmsTemplates] = useState([]);
   const [smsArchive, setSmsArchive] = useState([]);
-  const [searchTerm, setSearchTerm] = useState(""); // Legg til state for søkefelt
+  const [searchTerm, setSearchTerm] = useState('');
   const [formData, setFormData] = useState({
     telefonnummer: customer?.phoneNumber || '',
     meldingstekst: '',
     kundeNavn: `${customer?.firstName || ''} ${customer?.lastName || ''}`,
   });
+
+  // Hent butikknavn fra cookie
+  const butikkNavn = Cookies.get('butikkNavn') || 'Ukjent butikk'; // Standard hvis ingen cookie er satt
 
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -31,6 +36,17 @@ function SendSMS() {
         const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/smstemplates');
         const data = await response.json();
         setSmsTemplates(data);
+
+        // Filtrer SMS-maler basert på rute
+        let filteredTemplates = data;
+        if (orderDetails) {
+          filteredTemplates = data.filter(template => template.type === 'ordre');
+        } else if (serviceDetails) {
+          filteredTemplates = data.filter(template => template.type === 'tjeneste');
+        } else if (customer) {
+          filteredTemplates = data.filter(template => template.type === 'kunde');
+        }
+        setFilteredSmsTemplates(filteredTemplates);
       } catch (error) {
         console.error('Feil ved henting av SMS-maler:', error);
       }
@@ -40,7 +56,7 @@ function SendSMS() {
       try {
         const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/smsarchives');
         const data = await response.json();
-        setSmsArchive(data.reverse()); // Lagrer siste meldinger øverst
+        setSmsArchive(data.reverse());
       } catch (error) {
         console.error('Feil ved henting av SMS-arkiv:', error);
       }
@@ -49,7 +65,7 @@ function SendSMS() {
     fetchCustomers();
     fetchSmsTemplates();
     fetchSmsArchive();
-  }, []);
+  }, [orderDetails, serviceDetails, customer]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -71,31 +87,39 @@ function SendSMS() {
   };
 
   const handleSmsTemplateChange = (e) => {
-    const selectedTemplate = smsTemplates.find(template => template._id === e.target.value);
+    const selectedTemplate = filteredSmsTemplates.find(template => template._id === e.target.value);
     if (selectedTemplate) {
       let updatedMessage = selectedTemplate.tekst;
-  
+
+      // Erstatt %ordreid% hvis det finnes og vi har ordredata
       if (updatedMessage.includes('%ordreid%') && orderDetails) {
         updatedMessage = updatedMessage.replace('%ordreid%', orderDetails.ordreid);
       }
-  
+
+      // Erstatt %serviceid% hvis det finnes og vi har servicedata
       if (updatedMessage.includes('%serviceid%') && serviceDetails) {
         updatedMessage = updatedMessage.replace('%serviceid%', serviceDetails.serviceid);
       }
-  
+
+      // Hent butikknavn fra cookies og erstatt %butikk%
+      const selectedStore = Cookies.get('selectedStore') || 'Ukjent butikk';  // Hent butikknavn fra cookie
+      if (updatedMessage.includes('%butikk%')) {
+        updatedMessage = updatedMessage.replace('%butikk%', selectedStore);  // Erstatt %butikk% med butikknavn
+      }
+
       setFormData((prevData) => ({
         ...prevData,
         meldingstekst: updatedMessage,
       }));
     }
-  };
+};
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const smsData = {
       ...formData,
-      sendtDato: new Date().toISOString(), // Sett sendtDato til nåværende tidspunkt i ISO-format
+      sendtDato: new Date().toISOString(),
     };
 
     try {
@@ -130,7 +154,6 @@ function SendSMS() {
     setSearchTerm(e.target.value);
   };
 
-  // Filtrer meldinger basert på søketerm
   const filteredSmsArchive = smsArchive.filter((sms) => {
     return (
       sms.kundeNavn.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -139,10 +162,8 @@ function SendSMS() {
     );
   });
 
-  // Vis bare de 5 siste
   const lastTenSms = filteredSmsArchive.slice(0, 5);
 
-  // Funksjon for å formatere datoen riktig
   const formatDateTime = (dateString) => {
     try {
       return format(new Date(dateString), 'dd.MM.yyyy HH:mm');
@@ -184,7 +205,7 @@ function SendSMS() {
           <label className="block text-sm font-medium text-gray-700">Velg SMS-mal</label>
           <select onChange={handleSmsTemplateChange} className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
             <option value="">Velg en SMS-mal</option>
-            {smsTemplates.map((template) => (
+            {filteredSmsTemplates.map((template) => (
               <option key={template._id} value={template._id}>
                 {template.tittel}
               </option>

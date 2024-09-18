@@ -65,8 +65,10 @@ function SmsTemplateForm() {
                         className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
                     >
                         <option value="ordre">Ordre</option>
-                        <option value="service">Service</option>
+                        <option value="sykkelservice">Sykkelservice</option>
+                        <option value="skiservice">Skiservice</option>
                         <option value="kunde">Kunde</option>
+                        <option value="tjeneste">Tjeneste</option>
                     </select>
                 </div>
                 <div>

@@ -126,11 +126,11 @@ function NavBar() {
         </div>
 
         <div className="hidden md:flex items-center space-x-4">
-          <Link to="/customer-list" className="text-white text-lg font-semibold">Kunder</Link>
-          <Link to="/ordre" className="text-white text-lg font-semibold">Ordre</Link>
-          <Link to="/service" className="text-white text-lg font-semibold">Service</Link>
+          <Link to="/customer-list" className="text-white text-lg font-semibold">KUNDER</Link>
+          <Link to="/ordre" className="text-white text-lg font-semibold">ORDRE</Link>
+          <Link to="/service" className="text-white text-lg font-semibold">SERVICE</Link>
           {selectedStore && (
-            <span className="text-white ml-4">Butikk: {Cookies.get('butikkid')} {selectedStore}</span>
+            <span className="text-white ml-4">Butikk: {selectedStore}</span>
           )}
         </div>
 
@@ -160,13 +160,10 @@ function NavBar() {
                   <Link to="/employees" className="block px-4 py-2 text-gray-700 hover:bg-gray-100" onClick={toggleSettingsMenu}>Ansatte</Link>
                 </li>
                 <li className="border-b border-gray-200">
-                  <Link to="/status-list" className="block px-4 py-2 text-gray-700 hover:bg-gray-100" onClick={toggleSettingsMenu}>Status</Link>
-                </li>
-                <li className="border-b border-gray-200">
                   <Link to="/sms-templates" className="block px-4 py-2 text-gray-700 hover:bg-gray-100" onClick={toggleSettingsMenu}>SMS-maler</Link>
                 </li>
                 <li>
-                  <Link to="/hjelpemidler" className="block px-4 py-2 text-gray-700 hover:bg-gray-100" onClick={toggleSettingsMenu}>Hjelpemidler</Link>
+                  <Link to="/hjelpemidler" className="block px-4 py-2 text-gray-700 hover:bg-gray-100" onClick={toggleSettingsMenu}>Kalkylekalkulator</Link>
                 </li>
                 <li>
                   <button onClick={openStoreModal} className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">
