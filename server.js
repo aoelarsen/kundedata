@@ -921,14 +921,16 @@ const fetchCustomTasks = async () => {
 
 // Modell for fullførte oppgaver
 const completedTaskSchema = new mongoose.Schema({
-  taskId: { type: mongoose.Schema.Types.ObjectId }, // Fjern required hvis det ikke er nødvendig
+  taskId: { type: mongoose.Schema.Types.ObjectId }, // Valgfritt felt
   task: { type: String, required: true },
   taskType: { type: String, required: true }, // daily eller custom
   dueDate: { type: Date }, // Valgfritt for custom tasks
   employee: { type: String, required: true },
   dateCompleted: { type: Date, required: true },
-  store: { type: String, required: true } // Butikk-ID
+  store: { type: String, required: true }, // Butikk-ID
+  completedBy: { type: String } // Ansatt som utførte oppgaven
 });
+
 
 
 const CompletedTask = mongoose.model('CompletedTask', completedTaskSchema);
@@ -998,6 +1000,51 @@ app.get('/completedtasks', async (req, res) => {
   }
 });
 
+// Oppdater en daglig oppgave
+app.patch('/dailytasks/:id', async (req, res) => {
+  try {
+    const task = await DailyTask.findById(req.params.id);
+    if (!task) {
+      return res.status(404).json({ message: 'Daglig oppgave ikke funnet' });
+    }
+
+    if (req.body.completed != null) {
+      task.completed = req.body.completed;
+    }
+
+    if (req.body.completedBy != null) {
+      task.completedBy = req.body.completedBy;
+    }
+
+    const updatedTask = await task.save();
+    res.json(updatedTask);
+  } catch (error) {
+    res.status(400).json({ message: 'Feil ved oppdatering av daglig oppgave', error });
+  }
+});
+
+// Oppdater en egendefinert oppgave
+app.patch('/customtasks/:id', async (req, res) => {
+  try {
+    const task = await CustomTask.findById(req.params.id);
+    if (!task) {
+      return res.status(404).json({ message: 'Egendefinert oppgave ikke funnet' });
+    }
+
+    if (req.body.completed != null) {
+      task.completed = req.body.completed;
+    }
+
+    if (req.body.completedBy != null) {
+      task.completedBy = req.body.completedBy;
+    }
+
+    const updatedTask = await task.save();
+    res.json(updatedTask);
+  } catch (error) {
+    res.status(400).json({ message: 'Feil ved oppdatering av egendefinert oppgave', error });
+  }
+});
 
 
 // Start the server

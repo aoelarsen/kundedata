@@ -70,31 +70,39 @@ function TodoList() {
     } catch (error) {
       console.error('Feil ved kommunikasjon med serveren:', error);
     }
-};
-
+  };
 
   // Funksjon for å markere en egendefinert oppgave som fullført
   const handleCompleteCustomTask = async (taskId, taskDescription, dueDate) => {
+    const bodyData = {
+      task: taskDescription,
+      taskType: 'custom',
+      dueDate: dueDate,  // Dato for når oppgaven skulle være fullført
+      dateCompleted: new Date().toISOString(),
+      employee,
+      store,  // Inkluder butikk-ID
+    };
+
+    console.log('Sender POST request med data:', bodyData); // Logg dataen før den sendes
+
     try {
       const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          task: taskDescription,
-          taskType: 'custom',
-          dueDate: dueDate,  // Dato for når oppgaven skulle være fullført
-          dateCompleted: new Date().toISOString(),
-          employee,
-          store,  // Inkluder butikk-ID
-        }),
+        body: JSON.stringify(bodyData),
       });
 
       if (response.ok) {
-        setCustomTasks(customTasks.filter((task) => task._id !== taskId));
+        console.log("Oppgaven ble registrert som fullført:", await response.json());
+        setCustomTasks((prevTasks) =>
+          prevTasks.map((task) =>
+            task._id === taskId ? { ...task, completed: true, completedBy: employee } : task
+          )
+        );
       } else {
-        console.error('Feil ved oppdatering av oppgave');
+        console.error('Feil ved oppdatering av oppgave:', response.statusText);
       }
     } catch (error) {
       console.error('Feil ved kommunikasjon med serveren:', error);
@@ -143,12 +151,16 @@ function TodoList() {
           {dailyTasks.map((task) => (
             <li key={task._id} className="flex justify-between items-center mb-2">
               <span>{task.task}</span>
-              <button
-                onClick={() => handleCompleteDailyTask(task._id, task.task)}
-                className="bg-green-500 text-white px-4 py-1 rounded"
-              >
-                Utført
-              </button>
+              {task.completed ? (
+                <span>Oppgave utført av: {task.completedBy}</span>
+              ) : (
+                <button
+                  onClick={() => handleCompleteDailyTask(task._id, task.task)}
+                  className="bg-green-500 text-white px-4 py-1 rounded"
+                >
+                  Merk som utført
+                </button>
+              )}
             </li>
           ))}
         </ul>
@@ -157,15 +169,19 @@ function TodoList() {
       <div className="mt-8">
         <h3 className="text-2xl font-bold mb-4">Dagens oppgaver</h3>
         <ul>
-          {customTasks.map((task) => (
-            <li key={task._id} className="flex justify-between items-center mb-2">
-              <span>{task.task} - {new Date(task.dueDate).toLocaleDateString()}</span>
-              <button
-                onClick={() => handleCompleteCustomTask(task._id, task.task, task.dueDate)}
-                className="bg-green-500 text-white px-4 py-1 rounded"
-              >
-                Utført
-              </button>
+        {customTasks.map((task) => (
+      <li key={task._id} className="flex justify-between items-center mb-2">
+        <span>{task.task} - {new Date(task.dueDate).toLocaleDateString()}</span>
+        {task.completed ? (
+          <span>Oppgave utført av: {task.completedBy}</span>
+        ) : (
+          <button
+            onClick={() => handleCompleteCustomTask(task._id, task.task, task.dueDate)}
+            className="bg-green-500 text-white px-4 py-1 rounded"
+          >
+            Merk som utført
+          </button>
+        )}
             </li>
           ))}
         </ul>
