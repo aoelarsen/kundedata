@@ -830,6 +830,71 @@ app.delete('/statuses/:id', async (req, res) => {
   }
 });
 
+const mongoose = require('mongoose');
+
+const dailyTaskSchema = new mongoose.Schema({
+  task: { type: String, required: true },
+});
+
+const DailyTask = mongoose.model('DailyTask', dailyTaskSchema);
+
+module.exports = DailyTask;
+
+const customTaskSchema = new mongoose.Schema({
+  task: { type: String, required: true },
+  dueDate: { type: Date, required: true },
+});
+
+const CustomTask = mongoose.model('CustomTask', customTaskSchema);
+
+module.exports = CustomTask;
+
+const completedTaskSchema = new mongoose.Schema({
+  taskId: { type: mongoose.Schema.Types.ObjectId, required: true },
+  employee: { type: String, required: true },
+  dateCompleted: { type: Date, required: true },
+});
+
+const CompletedTask = mongoose.model('CompletedTask', completedTaskSchema);
+
+module.exports = CompletedTask;
+
+const express = require('express');
+const router = express.Router();
+const DailyTask = require('./models/DailyTask');
+const CustomTask = require('./models/CustomTask');
+const CompletedTask = require('./models/CompletedTask');
+
+// Få alle daglige oppgaver
+router.get('/dailytasks', async (req, res) => {
+  const tasks = await DailyTask.find();
+  res.json(tasks);
+});
+
+// Få alle egendefinerte oppgaver
+router.get('/customtasks', async (req, res) => {
+  const tasks = await CustomTask.find();
+  res.json(tasks);
+});
+
+// Legg til egendefinert oppgave
+router.post('/customtasks', async (req, res) => {
+  const { task, dueDate } = req.body;
+  const newTask = new CustomTask({ task, dueDate });
+  await newTask.save();
+  res.json(newTask);
+});
+
+// Marker en oppgave som fullført
+router.post('/completedtasks', async (req, res) => {
+  const { taskId, employee, dateCompleted } = req.body;
+  const completedTask = new CompletedTask({ taskId, employee, dateCompleted });
+  await completedTask.save();
+  res.json(completedTask);
+});
+
+module.exports = router;
+
 
 
 // Start the server

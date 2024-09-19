@@ -129,6 +129,7 @@ function NavBar() {
           <Link to="/customer-list" className="text-white text-lg font-semibold">KUNDER</Link>
           <Link to="/ordre" className="text-white text-lg font-semibold">ORDRE</Link>
           <Link to="/service" className="text-white text-lg font-semibold">SERVICE</Link>
+          <Link to="/todo" className="text-white text-lg font-semibold">TO DO</Link>
           {selectedStore && (
             <span className="text-white ml-4">Butikk: {selectedStore}</span>
           )}
@@ -184,6 +185,7 @@ function NavBar() {
           <Link to="/customer-list" className="block px-4 py-2 text-white">Kunder</Link>
           <Link to="/ordre" className="block px-4 py-2 text-white">Ordre</Link>
           <Link to="/service" className="block px-4 py-2 text-white">Service</Link>
+          <Link to="/todo" className="block px-4 py-2 text-white">To do</Link>
         </div>
       )}
 

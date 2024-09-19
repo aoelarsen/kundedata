@@ -23,6 +23,8 @@ import SendSMS from './SendSMS'; // Import SendSMS
 import StatusForm from './StatusForm';
 import StatusList from './StatusList';
 import StatusChange from './StatusChange';
+import TodoList from './TodoList';
+
 
 
 
@@ -197,6 +199,8 @@ function App() {
             <Route path="/status-list" element={<StatusList />} />
             <Route path="/status-change/:id" element={<StatusChange />} />
             <Route path="/sendsms" element={<SendSMS />} />
+            <Route path="/todo" element={<TodoList />} />
+
           </Routes>
         </div>
       </div>
