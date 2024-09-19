@@ -830,7 +830,6 @@ app.delete('/statuses/:id', async (req, res) => {
   }
 });
 
-const mongoose = require('mongoose');
 
 const dailyTaskSchema = new mongoose.Schema({
   task: { type: String, required: true },
