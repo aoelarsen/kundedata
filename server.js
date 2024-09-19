@@ -830,15 +830,14 @@ app.delete('/statuses/:id', async (req, res) => {
   }
 });
 
-
+// Modell for daglige oppgaver
 const dailyTaskSchema = new mongoose.Schema({
   task: { type: String, required: true },
 });
 
 const DailyTask = mongoose.model('DailyTask', dailyTaskSchema);
 
-module.exports = DailyTask;
-
+// Modell for egendefinerte oppgaver
 const customTaskSchema = new mongoose.Schema({
   task: { type: String, required: true },
   dueDate: { type: Date, required: true },
@@ -846,88 +845,79 @@ const customTaskSchema = new mongoose.Schema({
 
 const CustomTask = mongoose.model('CustomTask', customTaskSchema);
 
-module.exports = CustomTask;
-
-const completedTaskSchema = new mongoose.Schema({
-  taskId: { type: mongoose.Schema.Types.ObjectId, required: true },
-  employee: { type: String, required: true },
-  dateCompleted: { type: Date, required: true },
-});
-
-const CompletedTask = mongoose.model('CompletedTask', completedTaskSchema);
-
-module.exports = CompletedTask;
-
-const router = express.Router();
-
-
-// Få alle daglige oppgaver
-router.get('/dailytasks', async (req, res) => {
-  const tasks = await DailyTask.find();
-  res.json(tasks);
-});
-
-// Få alle egendefinerte oppgaver
-router.get('/customtasks', async (req, res) => {
-  const tasks = await CustomTask.find();
-  res.json(tasks);
-});
-
-// Legg til egendefinert oppgave
-router.post('/customtasks', async (req, res) => {
-  const { task, dueDate } = req.body;
-  const newTask = new CustomTask({ task, dueDate });
-  await newTask.save();
-  res.json(newTask);
-});
-
-// Marker en oppgave som fullført
-router.post('/completedtasks', async (req, res) => {
-  const { taskId, employee, dateCompleted } = req.body;
-  const completedTask = new CompletedTask({ taskId, employee, dateCompleted });
-  await completedTask.save();
-  res.json(completedTask);
-});
-
-module.exports = router;
-
-
-// Funksjon for å sette inn demo-data
-const seedData = async () => {
+// Hent alle daglige oppgaver
+app.get('/dailytasks', async (req, res) => {
   try {
-    // Fjern eksisterende data for å unngå duplikater
-    await DailyTask.deleteMany({});
-    await CustomTask.deleteMany({});
-
-    // Legg til demo-data for daglige oppgaver
-    const dailyTasks = [
-      { task: 'Sjekk lagerstatus' },
-      { task: 'Rydd i butikkområdet' },
-      { task: 'Oppdater prislapper' },
-    ];
-
-    // Legg til demo-data for egendefinerte oppgaver
-    const customTasks = [
-      { task: 'Ordne med reklamebanner', dueDate: new Date('2024-09-20') },
-      { task: 'Bestill varer fra leverandør', dueDate: new Date('2024-09-25') },
-    ];
-
-    // Lagre dataene i databasen
-    await DailyTask.insertMany(dailyTasks);
-    await CustomTask.insertMany(customTasks);
-
-    console.log('Demo-data er lagt til i både DailyTask og CustomTask collections');
+    const tasks = await DailyTask.find();
+    res.status(200).json(tasks);
   } catch (error) {
-    console.error('Feil ved lagring av demo-data:', error);
+    res.status(500).json({ message: 'Feil ved henting av daglige oppgaver', error });
+  }
+});
+
+// Legg til en ny daglig oppgave
+app.post('/dailytasks', async (req, res) => {
+  const { task } = req.body;
+
+  if (!task) {
+    return res.status(400).json({ message: 'Oppgaven er påkrevd' });
+  }
+
+  try {
+    const newTask = new DailyTask({ task });
+    await newTask.save();
+    res.status(201).json(newTask);
+  } catch (error) {
+    res.status(500).json({ message: 'Feil ved opprettelse av daglig oppgave', error });
+  }
+});
+
+// Hent alle egendefinerte oppgaver
+app.get('/customtasks', async (req, res) => {
+  try {
+    const tasks = await CustomTask.find();
+    res.status(200).json(tasks);
+  } catch (error) {
+    res.status(500).json({ message: 'Feil ved henting av egendefinerte oppgaver', error });
+  }
+});
+
+// Legg til en ny egendefinert oppgave
+app.post('/customtasks', async (req, res) => {
+  const { task, dueDate } = req.body;
+
+  if (!task || !dueDate) {
+    return res.status(400).json({ message: 'Oppgaven og datoen er påkrevd' });
+  }
+
+  try {
+    const newTask = new CustomTask({ task, dueDate });
+    await newTask.save();
+    res.status(201).json(newTask);
+  } catch (error) {
+    res.status(500).json({ message: 'Feil ved opprettelse av egendefinert oppgave', error });
+  }
+});
+
+const fetchDailyTasks = async () => {
+  try {
+    const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/dailytasks');
+    const data = await response.json();
+    setDailyTasks(data);
+  } catch (error) {
+    console.error('Feil ved henting av faste oppgaver:', error);
   }
 };
 
-// Kjør denne funksjonen kun hvis en spesifikk miljøvariabel er satt
-if (process.env.SEED_DEMO_DATA === 'true') {
-  seedData();
-}
-
-
+const fetchCustomTasks = async () => {
+  try {
+    const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks');
+    const data = await response.json();
+    setCustomTasks(data);
+  } catch (error) {
+    console.error('Feil ved henting av oppgaver:', error);
+  }
+};
 
 
 // Start the server
