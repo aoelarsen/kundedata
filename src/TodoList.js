@@ -14,22 +14,6 @@ function TodoList() {
     fetchCustomTasks();
   }, []);
 
-  // Funksjon for å oppdatere todo-listen ved midnatt
-  useEffect(() => {
-    const updateTodoAtMidnight = () => {
-      const now = new Date();
-      const msUntilMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0) - now;
-
-      setTimeout(() => {
-        fetchDailyTasks(); // Resetter daglige oppgaver
-        fetchCustomTasks(); // Oppdaterer egendefinerte oppgaver
-        updateTodoAtMidnight(); // Set next timeout
-      }, msUntilMidnight);
-    };
-
-    updateTodoAtMidnight();
-  }, []);
-
   // Hent daglige oppgaver fra serveren
   const fetchDailyTasks = async () => {
     try {
@@ -52,43 +36,7 @@ function TodoList() {
     }
   };
 
-// Funksjon for å markere en daglig oppgave som fullført og lagre til databasen
-const handleCompleteDailyTask = async (taskId, taskDescription) => {
-    const bodyData = {
-      task: taskDescription,
-      taskType: 'daily',
-      dateCompleted: new Date().toISOString(),
-      employee,
-      store, // Butikk-ID inkludert
-    };
-  
-    console.log('Sender POST request med data:', bodyData); // Logg dataen før den sendes
-  
-    try {
-      const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(bodyData),
-      });
-  
-      if (response.ok) {
-        setDailyTasks((prevTasks) =>
-          prevTasks.map((task) =>
-            task._id === taskId ? { ...task, completed: true, completedBy: employee } : task
-          )
-        );
-      } else {
-        console.error('Feil ved oppdatering av daglig oppgave:', response.statusText);
-      }
-    } catch (error) {
-      console.error('Feil ved kommunikasjon med serveren:', error);
-    }
-  };
-  
-  
-  // Funksjon for å markere en egendefinert oppgave som fullført og lagre til databasen
+  // Funksjon for å markere en daglig oppgave som fullført og lagre til databasen
   const handleCompleteDailyTask = async (taskId, taskDescription) => {
     const bodyData = {
       task: taskDescription,
@@ -124,6 +72,34 @@ const handleCompleteDailyTask = async (taskId, taskDescription) => {
     }
 };
 
+
+  // Funksjon for å markere en egendefinert oppgave som fullført
+  const handleCompleteCustomTask = async (taskId, taskDescription, dueDate) => {
+    try {
+      const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          task: taskDescription,
+          taskType: 'custom',
+          dueDate: dueDate,  // Dato for når oppgaven skulle være fullført
+          dateCompleted: new Date().toISOString(),
+          employee,
+          store,  // Inkluder butikk-ID
+        }),
+      });
+
+      if (response.ok) {
+        setCustomTasks(customTasks.filter((task) => task._id !== taskId));
+      } else {
+        console.error('Feil ved oppdatering av oppgave');
+      }
+    } catch (error) {
+      console.error('Feil ved kommunikasjon med serveren:', error);
+    }
+  };
 
   // Funksjon for å legge til en ny egendefinert oppgave
   const handleAddCustomTask = async () => {
@@ -167,16 +143,12 @@ const handleCompleteDailyTask = async (taskId, taskDescription) => {
           {dailyTasks.map((task) => (
             <li key={task._id} className="flex justify-between items-center mb-2">
               <span>{task.task}</span>
-              {task.completed ? (
-                <span>Utført av {task.completedBy}</span>
-              ) : (
-                <button
-                  onClick={() => handleCompleteDailyTask(task._id, task.task)}
-                  className="bg-green-500 text-white px-4 py-1 rounded"
-                >
-                  Utført
-                </button>
-              )}
+              <button
+                onClick={() => handleCompleteDailyTask(task._id, task.task)}
+                className="bg-green-500 text-white px-4 py-1 rounded"
+              >
+                Utført
+              </button>
             </li>
           ))}
         </ul>
@@ -188,16 +160,12 @@ const handleCompleteDailyTask = async (taskId, taskDescription) => {
           {customTasks.map((task) => (
             <li key={task._id} className="flex justify-between items-center mb-2">
               <span>{task.task} - {new Date(task.dueDate).toLocaleDateString()}</span>
-              {task.completed ? (
-                <span>Utført av {task.completedBy}</span>
-              ) : (
-                <button
-                  onClick={() => handleCompleteCustomTask(task._id, task.task, task.dueDate)}
-                  className="bg-green-500 text-white px-4 py-1 rounded"
-                >
-                  Utført
-                </button>
-              )}
+              <button
+                onClick={() => handleCompleteCustomTask(task._id, task.task, task.dueDate)}
+                className="bg-green-500 text-white px-4 py-1 rounded"
+              >
+                Utført
+              </button>
             </li>
           ))}
         </ul>
