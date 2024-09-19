@@ -919,6 +919,40 @@ const fetchCustomTasks = async () => {
   }
 };
 
+// Modell for fullførte oppgaver
+const completedTaskSchema = new mongoose.Schema({
+  task: { type: String, required: true },  // Beskrivelse av oppgaven
+  taskType: { type: String, required: true }, // F.eks. 'daily' eller 'custom'
+  dueDate: { type: Date },  // Dato oppgaven skulle vært fullført (gjelder for egendefinerte oppgaver)
+  dateCompleted: { type: Date, required: true },  // Dato for når oppgaven ble utført
+  employee: { type: String, required: true },  // Ansatt som fullførte oppgaven
+});
+
+const CompletedTask = mongoose.model('CompletedTask', completedTaskSchema);
+
+// Legg til en fullført oppgave
+app.post('/completedtasks', async (req, res) => {
+  const { task, taskType, dueDate, dateCompleted, employee } = req.body;
+
+  if (!task || !dateCompleted || !employee || !taskType) {
+    return res.status(400).json({ message: 'Alle felt er påkrevd' });
+  }
+
+  try {
+    const completedTask = new CompletedTask({
+      task,
+      taskType,
+      dueDate,
+      dateCompleted,
+      employee,
+    });
+    await completedTask.save();
+    res.status(201).json(completedTask);
+  } catch (error) {
+    res.status(500).json({ message: 'Feil ved registrering av fullført oppgave', error });
+  }
+});
+
 
 // Start the server
 app.listen(port, () => {
