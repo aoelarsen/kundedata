@@ -138,7 +138,7 @@ function TodoList() {
       </div>
 
       <div className="mt-8">
-        <h3 className="text-2xl font-bold mb-4">Egendefinerte oppgaver</h3>
+        <h3 className="text-2xl font-bold mb-4">Dagens oppgaver</h3>
         <ul>
           {customTasks.map((task) => (
             <li key={task._id} className="flex justify-between items-center mb-2">

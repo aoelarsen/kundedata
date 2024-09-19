@@ -858,11 +858,8 @@ const CompletedTask = mongoose.model('CompletedTask', completedTaskSchema);
 
 module.exports = CompletedTask;
 
-const express = require('express');
 const router = express.Router();
-const DailyTask = require('./models/DailyTask');
-const CustomTask = require('./models/CustomTask');
-const CompletedTask = require('./models/CompletedTask');
+
 
 // Få alle daglige oppgaver
 router.get('/dailytasks', async (req, res) => {
