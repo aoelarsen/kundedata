@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { format } from 'date-fns';
-import Cookies from 'js-cookie'; // Importer js-cookie for å håndtere cookies
+import Cookies from 'js-cookie';
 
 function SendSMS() {
   const location = useLocation();
   const { orderDetails, serviceDetails, customer } = location.state || {};
   const [customers, setCustomers] = useState([]);
-  const [smsTemplates, setSmsTemplates] = useState([]);
   const [filteredSmsTemplates, setFilteredSmsTemplates] = useState([]);
   const [smsArchive, setSmsArchive] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -18,7 +17,7 @@ function SendSMS() {
   });
 
   // Hent butikknavn fra cookie
-  const butikkNavn = Cookies.get('butikkNavn') || 'Ukjent butikk'; // Standard hvis ingen cookie er satt
+  const selectedStore = Cookies.get('selectedStore') || 'Ukjent butikk';
 
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -35,7 +34,6 @@ function SendSMS() {
       try {
         const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/smstemplates');
         const data = await response.json();
-        setSmsTemplates(data);
 
         // Filtrer SMS-maler basert på rute
         let filteredTemplates = data;
@@ -101,10 +99,9 @@ function SendSMS() {
         updatedMessage = updatedMessage.replace('%serviceid%', serviceDetails.serviceid);
       }
 
-      // Hent butikknavn fra cookies og erstatt %butikk%
-      const selectedStore = Cookies.get('selectedStore') || 'Ukjent butikk';  // Hent butikknavn fra cookie
+      // Erstatt %butikk% med butikknavn fra cookies
       if (updatedMessage.includes('%butikk%')) {
-        updatedMessage = updatedMessage.replace('%butikk%', selectedStore);  // Erstatt %butikk% med butikknavn
+        updatedMessage = updatedMessage.replace('%butikk%', selectedStore);
       }
 
       setFormData((prevData) => ({
@@ -112,7 +109,7 @@ function SendSMS() {
         meldingstekst: updatedMessage,
       }));
     }
-};
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
