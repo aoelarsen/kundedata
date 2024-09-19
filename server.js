@@ -959,6 +959,39 @@ app.post('/completedtasks', async (req, res) => {
   }
 });
 
+// Hent alle fullførte oppgaver, med mulighet for å filtrere på butikk, ansatt eller dato
+app.get('/completedtasks', async (req, res) => {
+  const { store, employee, fromDate, toDate } = req.query;
+
+  const filter = {};
+
+  // Filtrer på butikk-ID hvis den er angitt
+  if (store) {
+    filter.store = store;
+  }
+
+  // Filtrer på ansatt hvis den er angitt
+  if (employee) {
+    filter.employee = employee;
+  }
+
+  // Filtrer på dato for fullføring (mellom fromDate og toDate hvis de er angitt)
+  if (fromDate && toDate) {
+    filter.dateCompleted = { $gte: new Date(fromDate), $lte: new Date(toDate) };
+  } else if (fromDate) {
+    filter.dateCompleted = { $gte: new Date(fromDate) };
+  } else if (toDate) {
+    filter.dateCompleted = { $lte: new Date(toDate) };
+  }
+
+  try {
+    const completedTasks = await CompletedTask.find(filter);
+    res.status(200).json(completedTasks);
+  } catch (error) {
+    console.error('Feil ved henting av fullførte oppgaver:', error);
+    res.status(500).json({ message: 'Feil ved henting av fullførte oppgaver', error });
+  }
+});
 
 
 
