@@ -934,6 +934,8 @@ const CompletedTask = mongoose.model('CompletedTask', completedTaskSchema);
 
 // Legg til en fullført oppgave
 app.post('/completedtasks', async (req, res) => {
+  console.log('Mottatt request body:', req.body); // Log request body for inspeksjon
+
   const { task, taskType, dueDate, dateCompleted, employee, store } = req.body;
 
   if (!task || !dateCompleted || !employee || !taskType || !store) {
@@ -952,9 +954,11 @@ app.post('/completedtasks', async (req, res) => {
     await completedTask.save();
     res.status(201).json(completedTask);
   } catch (error) {
+    console.error('Feil ved registrering av fullført oppgave:', error); // Log feilen
     res.status(500).json({ message: 'Feil ved registrering av fullført oppgave', error });
   }
 });
+
 
 
 
