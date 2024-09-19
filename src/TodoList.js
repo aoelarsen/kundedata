@@ -89,36 +89,41 @@ const handleCompleteDailyTask = async (taskId, taskDescription) => {
   
   
   // Funksjon for å markere en egendefinert oppgave som fullført og lagre til databasen
-  const handleCompleteCustomTask = async (taskId, taskDescription, dueDate) => {
+  const handleCompleteDailyTask = async (taskId, taskDescription) => {
+    const bodyData = {
+      task: taskDescription,
+      taskType: 'daily',
+      dateCompleted: new Date().toISOString(),
+      employee,
+      store, // Butikk-ID inkludert
+    };
+
+    console.log('Sender POST request med data:', bodyData); // Logg dataen før den sendes
+  
     try {
       const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          task: taskDescription,
-          taskType: 'custom',
-          dueDate: dueDate,  // Dato for når oppgaven skulle være fullført
-          dateCompleted: new Date().toISOString(),
-          employee,
-          store, // Butikk-ID inkludert
-        }),
+        body: JSON.stringify(bodyData),
       });
-  
+
       if (response.ok) {
-        setCustomTasks((prevTasks) =>
+        console.log("Oppgaven ble registrert som fullført:", await response.json());
+        setDailyTasks((prevTasks) =>
           prevTasks.map((task) =>
             task._id === taskId ? { ...task, completed: true, completedBy: employee } : task
           )
         );
       } else {
-        console.error('Feil ved oppdatering av oppgave');
+        console.error('Feil ved oppdatering av daglig oppgave:', response.statusText);
       }
     } catch (error) {
       console.error('Feil ved kommunikasjon med serveren:', error);
     }
-  };
+};
+
 
   // Funksjon for å legge til en ny egendefinert oppgave
   const handleAddCustomTask = async () => {

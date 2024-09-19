@@ -921,7 +921,7 @@ const fetchCustomTasks = async () => {
 
 // Modell for fullførte oppgaver
 const completedTaskSchema = new mongoose.Schema({
-  taskId: { type: mongoose.Schema.Types.ObjectId, required: true },
+  taskId: { type: mongoose.Schema.Types.ObjectId }, // Fjern required hvis det ikke er nødvendig
   task: { type: String, required: true },
   taskType: { type: String, required: true }, // daily eller custom
   dueDate: { type: Date }, // Valgfritt for custom tasks
@@ -929,6 +929,7 @@ const completedTaskSchema = new mongoose.Schema({
   dateCompleted: { type: Date, required: true },
   store: { type: String, required: true } // Butikk-ID
 });
+
 
 const CompletedTask = mongoose.model('CompletedTask', completedTaskSchema);
 
@@ -950,7 +951,7 @@ app.post('/completedtasks', async (req, res) => {
       dueDate,
       dateCompleted,
       employee,
-      store
+      store // Legg til butikk-ID her
     });
     await completedTask.save();
     console.log('Fullført oppgave lagret:', completedTask); // Bekreft at oppgaven er lagret
@@ -960,6 +961,7 @@ app.post('/completedtasks', async (req, res) => {
     res.status(500).json({ message: 'Feil ved registrering av fullført oppgave', error });
   }
 });
+
 
 
 // Hent alle fullførte oppgaver, med mulighet for å filtrere på butikk, ansatt eller dato
