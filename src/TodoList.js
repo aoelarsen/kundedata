@@ -7,12 +7,14 @@ function TodoList() {
   const [newCustomTask, setNewCustomTask] = useState('');
   const [customTaskDate, setCustomTaskDate] = useState('');
   const [employee, setEmployee] = useState(Cookies.get('selectedEmployee') || ''); // Ansatt hentet fra cookie
+  const [store, setStore] = useState(Cookies.get('selectedStore') || ''); // Butikk hentet fra cookie
 
   useEffect(() => {
     fetchDailyTasks();
     fetchCustomTasks();
   }, []);
 
+  // Hent daglige oppgaver fra serveren
   const fetchDailyTasks = async () => {
     try {
       const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/dailytasks');
@@ -23,6 +25,7 @@ function TodoList() {
     }
   };
 
+  // Hent egendefinerte oppgaver fra serveren
   const fetchCustomTasks = async () => {
     try {
       const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks');
@@ -34,17 +37,19 @@ function TodoList() {
   };
 
   // Funksjon for å markere en daglig oppgave som fullført og lagre til databasen
-  const handleCompleteDailyTask = async (taskId) => {
+  const handleCompleteDailyTask = async (taskId, taskDescription) => {
     try {
-      const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks`, {
+      const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          taskId,
-          employee,
+          task: taskDescription,
+          taskType: 'daily',
           dateCompleted: new Date().toISOString(),
+          employee,
+          store,  // Inkluder butikk-ID
         }),
       });
 
@@ -53,6 +58,34 @@ function TodoList() {
         setDailyTasks(dailyTasks.filter((task) => task._id !== taskId));
       } else {
         console.error('Feil ved oppdatering av daglig oppgave');
+      }
+    } catch (error) {
+      console.error('Feil ved kommunikasjon med serveren:', error);
+    }
+  };
+
+  // Funksjon for å markere en egendefinert oppgave som fullført
+  const handleCompleteCustomTask = async (taskId, taskDescription, dueDate) => {
+    try {
+      const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          task: taskDescription,
+          taskType: 'custom',
+          dueDate: dueDate,  // Dato for når oppgaven skulle være fullført
+          dateCompleted: new Date().toISOString(),
+          employee,
+          store,  // Inkluder butikk-ID
+        }),
+      });
+
+      if (response.ok) {
+        setCustomTasks(customTasks.filter((task) => task._id !== taskId));
+      } else {
+        console.error('Feil ved oppdatering av oppgave');
       }
     } catch (error) {
       console.error('Feil ved kommunikasjon med serveren:', error);
@@ -91,31 +124,6 @@ function TodoList() {
     }
   };
 
-  // Funksjon for å markere egendefinert oppgave som fullført
-  const handleCompleteCustomTask = async (taskId) => {
-    try {
-      const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          taskId,
-          employee,
-          dateCompleted: new Date().toISOString(),
-        }),
-      });
-
-      if (response.ok) {
-        setCustomTasks(customTasks.filter((task) => task._id !== taskId));
-      } else {
-        console.error('Feil ved oppdatering av oppgave');
-      }
-    } catch (error) {
-      console.error('Feil ved kommunikasjon med serveren:', error);
-    }
-  };
-
   return (
     <div className="max-w-5xl mx-auto py-8 bg-white shadow-lg rounded-lg p-6 mb-4">
       <h2 className="text-3xl font-bold mb-6 text-center">Todo-liste</h2>
@@ -127,7 +135,7 @@ function TodoList() {
             <li key={task._id} className="flex justify-between items-center mb-2">
               <span>{task.task}</span>
               <button
-                onClick={() => handleCompleteDailyTask(task._id)}
+                onClick={() => handleCompleteDailyTask(task._id, task.task)}
                 className="bg-green-500 text-white px-4 py-1 rounded"
               >
                 Utført
@@ -144,7 +152,7 @@ function TodoList() {
             <li key={task._id} className="flex justify-between items-center mb-2">
               <span>{task.task} - {new Date(task.dueDate).toLocaleDateString()}</span>
               <button
-                onClick={() => handleCompleteCustomTask(task._id)}
+                onClick={() => handleCompleteCustomTask(task._id, task.task, task.dueDate)}
                 className="bg-green-500 text-white px-4 py-1 rounded"
               >
                 Utført

@@ -921,12 +921,15 @@ const fetchCustomTasks = async () => {
 
 // Modell for fullførte oppgaver
 const completedTaskSchema = new mongoose.Schema({
-  task: { type: String, required: true },  // Beskrivelse av oppgaven
-  taskType: { type: String, required: true }, // F.eks. 'daily' eller 'custom'
-  dueDate: { type: Date },  // Dato oppgaven skulle vært fullført (gjelder for egendefinerte oppgaver)
-  dateCompleted: { type: Date, required: true },  // Dato for når oppgaven ble utført
-  employee: { type: String, required: true },  // Ansatt som fullførte oppgaven
+  taskId: { type: mongoose.Schema.Types.ObjectId, required: true },
+  task: { type: String, required: true },
+  taskType: { type: String, required: true }, // daily eller custom
+  dueDate: { type: Date }, // Valgfritt for custom tasks
+  employee: { type: String, required: true },
+  dateCompleted: { type: Date, required: true },
+  store: { type: String, required: true } // Butikk-ID
 });
+
 
 const CompletedTask = mongoose.model('CompletedTask', completedTaskSchema);
 
