@@ -930,14 +930,13 @@ const completedTaskSchema = new mongoose.Schema({
   store: { type: String, required: true } // Butikk-ID
 });
 
-
 const CompletedTask = mongoose.model('CompletedTask', completedTaskSchema);
 
 // Legg til en fullført oppgave
 app.post('/completedtasks', async (req, res) => {
-  const { task, taskType, dueDate, dateCompleted, employee } = req.body;
+  const { task, taskType, dueDate, dateCompleted, employee, store } = req.body;
 
-  if (!task || !dateCompleted || !employee || !taskType) {
+  if (!task || !dateCompleted || !employee || !taskType || !store) {
     return res.status(400).json({ message: 'Alle felt er påkrevd' });
   }
 
@@ -948,6 +947,7 @@ app.post('/completedtasks', async (req, res) => {
       dueDate,
       dateCompleted,
       employee,
+      store // Legg til butikk-ID her
     });
     await completedTask.save();
     res.status(201).json(completedTask);
@@ -955,6 +955,7 @@ app.post('/completedtasks', async (req, res) => {
     res.status(500).json({ message: 'Feil ved registrering av fullført oppgave', error });
   }
 });
+
 
 
 // Start the server
