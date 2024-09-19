@@ -939,6 +939,7 @@ app.post('/completedtasks', async (req, res) => {
   const { task, taskType, dueDate, dateCompleted, employee, store } = req.body;
 
   if (!task || !dateCompleted || !employee || !taskType || !store) {
+    console.error('Feil: Manglende felt i request body');
     return res.status(400).json({ message: 'Alle felt er påkrevd' });
   }
 
@@ -949,15 +950,17 @@ app.post('/completedtasks', async (req, res) => {
       dueDate,
       dateCompleted,
       employee,
-      store // Legg til butikk-ID her
+      store
     });
     await completedTask.save();
+    console.log('Fullført oppgave lagret:', completedTask); // Bekreft at oppgaven er lagret
     res.status(201).json(completedTask);
   } catch (error) {
     console.error('Feil ved registrering av fullført oppgave:', error); // Log feilen
     res.status(500).json({ message: 'Feil ved registrering av fullført oppgave', error });
   }
 });
+
 
 // Hent alle fullførte oppgaver, med mulighet for å filtrere på butikk, ansatt eller dato
 app.get('/completedtasks', async (req, res) => {

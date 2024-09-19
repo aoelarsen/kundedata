@@ -54,19 +54,23 @@ function TodoList() {
 
 // Funksjon for å markere en daglig oppgave som fullført og lagre til databasen
 const handleCompleteDailyTask = async (taskId, taskDescription) => {
+    const bodyData = {
+      task: taskDescription,
+      taskType: 'daily',
+      dateCompleted: new Date().toISOString(),
+      employee,
+      store, // Butikk-ID inkludert
+    };
+  
+    console.log('Sender POST request med data:', bodyData); // Logg dataen før den sendes
+  
     try {
       const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          task: taskDescription,
-          taskType: 'daily',
-          dateCompleted: new Date().toISOString(),
-          employee,
-          store, // Butikk-ID inkludert
-        }),
+        body: JSON.stringify(bodyData),
       });
   
       if (response.ok) {
@@ -76,12 +80,13 @@ const handleCompleteDailyTask = async (taskId, taskDescription) => {
           )
         );
       } else {
-        console.error('Feil ved oppdatering av daglig oppgave');
+        console.error('Feil ved oppdatering av daglig oppgave:', response.statusText);
       }
     } catch (error) {
       console.error('Feil ved kommunikasjon med serveren:', error);
     }
   };
+  
   
   // Funksjon for å markere en egendefinert oppgave som fullført og lagre til databasen
   const handleCompleteCustomTask = async (taskId, taskDescription, dueDate) => {
