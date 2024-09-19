@@ -892,6 +892,43 @@ router.post('/completedtasks', async (req, res) => {
 module.exports = router;
 
 
+// Funksjon for å sette inn demo-data
+const seedData = async () => {
+  try {
+    // Fjern eksisterende data for å unngå duplikater
+    await DailyTask.deleteMany({});
+    await CustomTask.deleteMany({});
+
+    // Legg til demo-data for daglige oppgaver
+    const dailyTasks = [
+      { task: 'Sjekk lagerstatus' },
+      { task: 'Rydd i butikkområdet' },
+      { task: 'Oppdater prislapper' },
+    ];
+
+    // Legg til demo-data for egendefinerte oppgaver
+    const customTasks = [
+      { task: 'Ordne med reklamebanner', dueDate: new Date('2024-09-20') },
+      { task: 'Bestill varer fra leverandør', dueDate: new Date('2024-09-25') },
+    ];
+
+    // Lagre dataene i databasen
+    await DailyTask.insertMany(dailyTasks);
+    await CustomTask.insertMany(customTasks);
+
+    console.log('Demo-data er lagt til i både DailyTask og CustomTask collections');
+  } catch (error) {
+    console.error('Feil ved lagring av demo-data:', error);
+  }
+};
+
+// Kjør denne funksjonen kun hvis en spesifikk miljøvariabel er satt
+if (process.env.SEED_DEMO_DATA === 'true') {
+  seedData();
+}
+
+
+
 
 // Start the server
 app.listen(port, () => {
