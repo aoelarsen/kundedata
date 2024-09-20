@@ -47,17 +47,22 @@ function TodoList() {
       const customTasksData = await customTasksResponse.json();
       const completedTasksData = await completedTasksResponse.json();
   
-      // Slå sammen completedTasks med customTasks
-      const updatedCustomTasks = customTasksData.map(task => {
-        const completedTask = completedTasksData.find(ct => ct.task === task.task);
-        return completedTask ? { ...task, completed: true, completedBy: completedTask.employee } : task;
-      });
+      const today = new Date();
+  
+      // Slå sammen completedTasks med customTasks og filtrer ut oppgaver som er fullført og har forfalt
+      const updatedCustomTasks = customTasksData
+        .filter(task => new Date(task.dueDate) >= today || !task.completed) // Vis kun oppgaver som ikke er forfalt eller ufullførte
+        .map(task => {
+          const completedTask = completedTasksData.find(ct => ct.task === task.task);
+          return completedTask ? { ...task, completed: true, completedBy: completedTask.employee } : task;
+        });
   
       setCustomTasks(updatedCustomTasks);
     } catch (error) {
       console.error('Feil ved henting av egendefinerte oppgaver:', error);
     }
   };
+  
   
 
   // Funksjon for å markere en daglig oppgave som fullført og lagre til databasen
