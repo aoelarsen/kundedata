@@ -6,8 +6,8 @@ function TodoList() {
   const [customTasks, setCustomTasks] = useState([]);
   const [newCustomTask, setNewCustomTask] = useState('');
   const [customTaskDate, setCustomTaskDate] = useState('');
-  const [employee, setEmployee] = useState(Cookies.get('selectedEmployee') || ''); // Ansatt hentet fra cookie
-  const [store, setStore] = useState(Cookies.get('selectedStore') || ''); // Butikk hentet fra cookie
+  const [employee] = useState(Cookies.get('selectedEmployee') || ''); // Ansatt hentet fra cookie
+  const [store] = useState(Cookies.get('selectedStore') || ''); // Butikk hentet fra cookie
 
   useEffect(() => {
     fetchDailyTasks();
