@@ -1044,7 +1044,27 @@ app.patch('/customtasks/:id', async (req, res) => {
   }
 });
 
+const cron = require('node-cron');
 
+// Reset daily tasks every day at midnight
+cron.schedule('0 0 * * *', async () => {
+  try {
+    await DailyTask.updateMany({}, { $set: { completed: false, completedBy: null } });
+    console.log('Daily tasks have been reset');
+  } catch (error) {
+    console.error('Error resetting daily tasks:', error);
+  }
+});
+
+cron.schedule('0 0 * * *', async () => {
+  try {
+    const today = new Date();
+    await CustomTask.deleteMany({ dueDate: { $lt: today }, completed: true });
+    console.log('Expired and completed custom tasks have been removed');
+  } catch (error) {
+    console.error('Error deleting expired custom tasks:', error);
+  }
+});
 
 
 // Start the server
