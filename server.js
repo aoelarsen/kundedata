@@ -964,6 +964,37 @@ app.post('/completedtasks', async (req, res) => {
   }
 });
 
+// Hent alle fullførte oppgaver, med mulighet for å filtrere på butikk, ansatt eller taskType
+app.get('/completedtasks', async (req, res) => {
+  const { store, employee, fromDate, toDate, taskType } = req.query;
+
+  const filter = {};
+
+  if (store) {
+    filter.store = store;
+  }
+  if (employee) {
+    filter.employee = employee;
+  }
+  if (taskType) {
+    filter.taskType = taskType;
+  }
+  if (fromDate && toDate) {
+    filter.dateCompleted = { $gte: new Date(fromDate), $lte: new Date(toDate) };
+  } else if (fromDate) {
+    filter.dateCompleted = { $gte: new Date(fromDate) };
+  } else if (toDate) {
+    filter.dateCompleted = { $lte: new Date(toDate) };
+  }
+
+  try {
+    const completedTasks = await CompletedTask.find(filter);
+    res.status(200).json(completedTasks);
+  } catch (error) {
+    console.error('Feil ved henting av fullførte oppgaver:', error);
+    res.status(500).json({ message: 'Feil ved henting av fullførte oppgaver', error });
+  }
+});
 
 
 // Hent alle fullførte oppgaver, med mulighet for å filtrere på butikk, ansatt eller dato
