@@ -17,28 +17,6 @@ function TodoList() {
   // Hent daglige oppgaver fra serveren
   const fetchDailyTasks = async () => {
     try {
-      const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/dailytasks');
-      const data = await response.json();
-      setDailyTasks(data);
-    } catch (error) {
-      console.error('Feil ved henting av faste oppgaver:', error);
-    }
-  };
-
-  // Hent egendefinerte oppgaver fra serveren
-  const fetchCustomTasks = async () => {
-    try {
-      const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks');
-      const data = await response.json();
-      setCustomTasks(data);
-    } catch (error) {
-      console.error('Feil ved henting av oppgaver:', error);
-    }
-  };
-
-  // Funksjon for å markere en daglig oppgave som fullført og lagre til databasen
-  const fetchDailyTasks = async () => {
-    try {
       const [dailyTasksResponse, completedTasksResponse] = await Promise.all([
         fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/dailytasks'),
         fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks?taskType=daily')
@@ -81,6 +59,43 @@ function TodoList() {
     }
   };
   
+
+  // Funksjon for å markere en daglig oppgave som fullført og lagre til databasen
+  const handleCompleteDailyTask = async (taskId, taskDescription) => {
+    const bodyData = {
+      task: taskDescription,
+      taskType: 'daily',
+      dateCompleted: new Date().toISOString(),
+      employee,
+      store, 
+    };
+  
+    try {
+      // Oppdater completedtasks
+      await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bodyData),
+      });
+  
+      // Oppdater dailytasks
+      const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/dailytasks/${taskId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ completed: true, completedBy: employee }),
+      });
+  
+      if (response.ok) {
+        setDailyTasks((prevTasks) =>
+          prevTasks.map((task) =>
+            task._id === taskId ? { ...task, completed: true, completedBy: employee } : task
+          )
+        );
+      }
+    } catch (error) {
+      console.error('Feil ved oppdatering av daglig oppgave:', error);
+    }
+  };
   
 
   // Funksjon for å markere en egendefinert oppgave som fullført
