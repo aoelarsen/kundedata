@@ -605,7 +605,7 @@ app.post('/smsarchives', async (req, res) => {
   const { telefonnummer, meldingstekst, kundeNavn } = req.body;
 
   // Bruker Date-objekt for å lagre nåværende dato i ISO-format
-  const sendtDato = new Date().toLocaleString('no-NO', { timeZone: 'Europe/Oslo' }); // Lagres i ISO-format i MongoDB
+  const sendtDato = new Date(); // Lagres i ISO-format i MongoDB
 
   const smsEntry = new SmsArchive({
     telefonnummer,
@@ -688,7 +688,7 @@ app.post('/services', async (req, res) => {
       Beskrivelse: req.body.Beskrivelse,
       status: req.body.status || 'Aktiv',
       ansatt: req.body.ansatt,
-      registrertDato: req.body.registrertDato,
+      registrertDato: req.body.registrertDato || new Date().toLocaleString(),
       kundeid: req.body.kundeid,
       KundeTelefon: req.body.KundeTelefon,
       serviceid: nextServiceId,
@@ -1059,7 +1059,7 @@ cron.schedule('45 21 * * *', async () => {
 // Remove expired and completed custom tasks every day at 21:45
 cron.schedule('45 21 * * *', async () => {
   try {
-    const today = new Date().toLocaleString('no-NO', { timeZone: 'Europe/Oslo' });
+    const today = new Date();
     await CustomTask.deleteMany({ dueDate: { $lt: today }, completed: true });
     console.log('Expired and completed custom tasks have been removed');
   } catch (error) {

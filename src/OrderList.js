@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
-import { format } from 'date-fns'; // Importer format-funksjonen fra date-fns
+import { format, parse } from 'date-fns'; // Importer format-funksjonen fra date-fns
 
 function OrderList() {
   const [orders, setOrders] = useState([]);
@@ -97,11 +97,28 @@ function OrderList() {
     navigate(`/order-details/${order._id}`);
   };
 
-  // Oppdatert funksjon for å formatere datoer
-  const formatDate = (dateString) => {
-    return format(new Date(dateString), 'dd.MM.yy, HH:mm'); // Bruk date-fns til å formatere datoen
-  };
+  // Funksjon for å parse datoformatet fra serveren og returnere en formatert dato
+const parseCustomDateString = (dateString) => {
+  // Prøver å parse streng med formatet 'd.M.yyyy, HH:mm:ss' (forventet format fra databasen)
+  const parsedDate = parse(dateString, 'd.M.yyyy, HH:mm:ss', new Date());
+  return isNaN(parsedDate) ? null : parsedDate;
+};
 
+const formatDate = (dateString) => {
+  // Hvis datoen er ugyldig eller ikke eksisterer, returner "Ukjent dato"
+  if (!dateString) {
+    return "Ukjent dato";
+  }
+
+  const parsedDate = parseCustomDateString(dateString);
+
+  if (!parsedDate) {
+    return "Ugyldig dato";
+  }
+
+  // Returner formatert dato i ønsket format
+  return format(parsedDate, 'd.M.yyyy HH:mm');
+};
   const renderSortIndicator = (key) => {
     if (sortConfig.key !== key) return null;
     return sortConfig.direction === 'ascending' ? ' 🔼' : ' 🔽';

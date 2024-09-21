@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom'; 
-import { format } from 'date-fns'; // Importer format-funksjonen fra date-fns
+import { format, parse } from 'date-fns'; // Importer format-funksjonen fra date-fns
 
 function OrderDetails() {
   const { id } = useParams(); // Henter _id fra URL (MongoDB ObjectId)
@@ -19,14 +19,29 @@ function OrderDetails() {
   const [employees, setEmployees] = useState([]); // For å holde ansatte data
   const [updateMessage, setUpdateMessage] = useState(''); // For å vise oppdateringsmelding
 
-  // Funksjon for å formatere datoen
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) {
-      return 'Ugyldig dato'; // Håndterer ugyldige datoer
-    }
-    return format(date, 'd.M.yyyy HH:mm'); // Format som viser 21.9.2024 19:02
-  };
+// Funksjon for å parse datoformatet fra serveren og returnere en formatert dato
+const parseCustomDateString = (dateString) => {
+  // Prøver å parse streng med formatet 'd.M.yyyy, HH:mm:ss' (forventet format fra databasen)
+  const parsedDate = parse(dateString, 'd.M.yyyy, HH:mm:ss', new Date());
+  return isNaN(parsedDate) ? null : parsedDate;
+};
+
+// Funksjon for å formatere datoen
+const formatDate = (dateString) => {
+  // Hvis datoen er ugyldig eller ikke eksisterer, returner "Ukjent dato"
+  if (!dateString) {
+    return "Ukjent dato";
+  }
+
+  const parsedDate = parseCustomDateString(dateString);
+
+  if (!parsedDate) {
+    return "Ugyldig dato";
+  }
+
+  // Returner formatert dato i ønsket format
+  return format(parsedDate, 'd.M.yyyy HH:mm');
+};
   
 
   // Hent ordredetaljer

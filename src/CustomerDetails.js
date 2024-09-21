@@ -1,8 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { format } from 'date-fns'; // Importer date-fns for formatering
-
+import { format, parse } from 'date-fns'; // Importer nødvendige funksjoner fra date-fns
 import Cookies from 'js-cookie'; // Importer Cookies for å hente butikkid
+
+// Funksjon for å parse datoformatet fra serveren og returnere en formatert dato
+const parseCustomDateString = (dateString) => {
+  const parsedDate = parse(dateString, 'd.M.yyyy, HH:mm:ss', new Date());
+  return isNaN(parsedDate) ? null : parsedDate;
+};
+
+// Funksjon for å formatere datoen
+const formatDate = (dateString) => {
+  if (!dateString) return "Ukjent dato";
+
+  const parsedDate = parseCustomDateString(dateString);
+  if (!parsedDate) return "Ugyldig dato";
+
+  return format(parsedDate, 'd.M.yyyy HH:mm'); // Formaterer dato til '21.9.2024 19:02'
+};
 
 function CustomerDetails() {
   const { id } = useParams(); // Dette vil nå referere til _id fra MongoDB
@@ -14,7 +29,6 @@ function CustomerDetails() {
   const [tooltipStyle, setTooltipStyle] = useState({}); // Style for tooltip plassering
   const navigate = useNavigate();
 
-  // Hent butikkid fra cookies
   const butikkid = Cookies.get('butikkid') || null;
 
   useEffect(() => {
@@ -94,32 +108,15 @@ function CustomerDetails() {
     fetchCustomer();
   }, [id, butikkid]);
 
-  // Resten av komponenten forblir den samme...
-
-
-  // Formaterer dato til "dd.MM.yy, HH:mm"
-  const formatDateTime = (dateString) => {
-    try {
-      if (!dateString) return 'Ukjent dato'; // Håndterer tomme eller ugyldige datoer
-      const date = new Date(dateString);
-      if (isNaN(date.getTime())) return 'Ugyldig dato'; // Håndterer ugyldige datoer
-      return format(date, 'dd.MM.yy, HH:mm'); // Formaterer gyldig dato
-    } catch (error) {
-      console.error('Feil ved formatering av dato:', error);
-      return 'Ukjent dato';
-    }
-  };
-  
-
   const handleMouseEnter = (order, event) => {
-    setHoveredOrder(order); // Sett hover til ordren som er hoveret over
+    setHoveredOrder(order);
     const tooltipX = event.clientX;
-    const tooltipY = event.clientY + window.scrollY; // Legg til scroll-offset for riktig plassering
+    const tooltipY = event.clientY + window.scrollY;
     setTooltipStyle({ left: tooltipX + 'px', top: tooltipY + 'px' });
   };
 
   const handleMouseLeave = () => {
-    setHoveredOrder(null); // Fjern hover når musen forlater
+    setHoveredOrder(null);
   };
 
   if (!customer) {
@@ -128,39 +125,35 @@ function CustomerDetails() {
 
   return (
     <div className="max-w-5xl mx-auto py-8 bg-white shadow-lg rounded-lg p-6 mb-4">
-    
-    <div className="bg-white p-6 shadow rounded-lg">
-      <h2 className="text-2xl font-bold mb-6 text-center">Kundedetaljer</h2>
-      <div className="space-y-4">
-        <div>
-          <span className="font-semibold">Navn: </span>
-          {customer.firstName} {customer.lastName}
+      <div className="bg-white p-6 shadow rounded-lg">
+        <h2 className="text-2xl font-bold mb-6 text-center">Kundedetaljer</h2>
+        <div className="space-y-4">
+          <div>
+            <span className="font-semibold">Navn: </span>
+            {customer.firstName} {customer.lastName}
+          </div>
+          <div>
+            <span className="font-semibold">Telefonnummer: </span>
+            {customer.phoneNumber}
+          </div>
+          <div>
+            <span className="font-semibold">Epost: </span>
+            {customer.email}
+          </div>
+          <div>
+            <span className="font-semibold">Registrert dato: </span>
+            {formatDate(customer.registrationDate)}
+            {customer.lastModified && (
+              <span className="text-gray-600">
+                {' '}({formatDate(customer.lastModified)})
+              </span>
+            )}
+          </div>
         </div>
-        <div>
-          <span className="font-semibold">Telefonnummer: </span>
-          {customer.phoneNumber}
-        </div>
-        <div>
-          <span className="font-semibold">Epost: </span>
-          {customer.email}
-        </div>
-        <div>
-          <span className="font-semibold">Registrert dato: </span>
-          {formatDateTime(customer.registrationDate)}
-          {customer.lastModified && (
-            <span className="text-gray-600">
-              {' '}({formatDateTime(customer.lastModified)})
-            </span>
-          )}
-        </div>
+        <Link to={`/edit-customer/${customer._id}`} className="text-blue-500 mt-4 block hover:underline">
+          Endre Kunde
+        </Link>
       </div>
-      <Link
-        to={`/edit-customer/${customer._id}`}
-        className="text-blue-500 mt-4 block hover:underline"
-      >
-        Endre Kunde
-      </Link>
-    </div>
 
     {/* Knappene plassert med mer plass over */}
     <div className="flex justify-between items-center mt-8 mb-6">
@@ -206,7 +199,7 @@ function CustomerDetails() {
                 .map((sms) => (
                   <tr key={sms._id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{sms.meldingstekst}</td>
-                    <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{formatDateTime(sms.sendtDato)}</td>
+                    <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{formatDate(sms.sendtDato)}</td>
                   </tr>
                 ))}
             </tbody>
@@ -247,7 +240,7 @@ function CustomerDetails() {
                   <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{order.Størrelse}</td>
                   <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{order.Farge}</td>
                   <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{order.Status}</td>
-                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{formatDateTime(order.RegistrertDato)}</td>
+                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{formatDate(order.RegistrertDato)}</td>
                 </tr>
               ))}
             </tbody>
@@ -290,7 +283,7 @@ function CustomerDetails() {
                   <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{service.Størrelse}</td>
                   <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{service.Farge}</td>
                   <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{service.status}</td>
-                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{formatDateTime(service.registrertDato)}</td>
+                  <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{formatDate(service.registrertDato)}</td>
                 </tr>
               ))}
             </tbody>
