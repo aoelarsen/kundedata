@@ -94,7 +94,7 @@ function CreateService() {
       ...formData,
       serviceid: formData.serviceid, // Forsikre at serviceid er inkludert
       butikkid: Cookies.get('butikkid') || formData.butikkid,  // Inkluder butikkid i tjenesten
-      registrertDato: new Date().toISOString(), // Bruker ISO-format for dato
+      registrertDato: new Date().toLocaleString('no-NO', { timeZone: 'Europe/Oslo' }), // Bruker lokal tid
       status: 'Aktiv', // Sett standard status
       endretdato: '', // Sett endretdato som tom
       test: 'test' // Inkluder test-feltet

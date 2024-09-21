@@ -24,6 +24,8 @@ function NavBar() {
   }, []);
 
   useEffect(() => {
+    const currentTime = new Date().toLocaleString();  // Henter gjeldende tid i lokal tidssone
+    console.log("Gjeldende dato og tid:", currentTime);
     const fetchEmployees = async () => {
       try {
         const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/employees');

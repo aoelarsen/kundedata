@@ -48,7 +48,7 @@ function EditCustomer() {
 
     const updatedCustomer = {
       ...formData,
-      lastModified: new Date().toISOString(), // Bruker ISO-strengformat for dato når vi lagrer
+      lastModified: new Date().toLocaleString('no-NO', { timeZone: 'Europe/Oslo' }), // Bruker lokal tid
     };
 
     console.log("Oppdaterer kunde med ID:", id);

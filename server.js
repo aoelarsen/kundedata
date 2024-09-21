@@ -117,8 +117,8 @@ app.post('/orders', async (req, res) => {
       Status: req.body.Status || 'Aktiv',
       Kommentar: req.body.Kommentar,
       Ansatt: req.body.Ansatt,
-      Endretdato: req.body.Endretdato || '',
-      RegistrertDato: req.body.RegistrertDato || new Date().toLocaleString(),
+      Endretdato: req.body.Endretdato,
+      RegistrertDato: req.body.RegistrertDato || new Date().toLocaleString('no-NO', { timeZone: 'Europe/Oslo' }),
       kundeid: req.body.kundeid,
       KundeTelefon: req.body.KundeTelefon,
       ordreid: Number(nextOrderId), // Bruker inkrementert ordreid

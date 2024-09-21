@@ -21,8 +21,13 @@ function OrderDetails() {
 
   // Funksjon for å formatere datoen
   const formatDate = (dateString) => {
-    return format(new Date(dateString), 'dd.MM.yy, HH:mm');
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      return 'Ugyldig dato'; // Håndterer ugyldige datoer
+    }
+    return format(date, 'd.M.yyyy HH:mm'); // Format som viser 21.9.2024 19:02
   };
+  
 
   // Hent ordredetaljer
   useEffect(() => {
@@ -112,7 +117,7 @@ function OrderDetails() {
 
     const updatedOrder = {
       ...formData,
-      Endretdato: new Date().toISOString(), // Oppdaterer endret dato
+      Endretdato: new Date().toLocaleString('no-NO', { timeZone: 'Europe/Oslo' }), // Bruker lokal tid
     };
 
     try {
@@ -191,13 +196,13 @@ function OrderDetails() {
       <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Kundeordre</h2>
 {/* Vis registrert og endret dato */}
 {orderDetails && (
-        <div className="mb-6">
-          <p><strong>Registrert dato:</strong> {formatDate(orderDetails.RegistrertDato)}</p>
-          {orderDetails.Endretdato && (
-            <p><strong>Endret dato:</strong> {formatDate(orderDetails.Endretdato)}</p>
-          )}
-        </div>
-      )}
+  <div className="mb-6">
+    <p><strong>Registrert dato:</strong> {formatDate(orderDetails.RegistrertDato)}</p>
+    {orderDetails.Endretdato && (
+      <p><strong>Endret dato:</strong> {formatDate(orderDetails.Endretdato)}</p>
+    )}
+  </div>
+)}
 
       {customer && (
         <div className="bg-gray-100 p-6 rounded-lg mb-6 relative">

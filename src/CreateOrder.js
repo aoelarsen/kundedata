@@ -77,7 +77,7 @@ function CreateOrder() {
       ...formData,
       ordreid: formData.ordreid,
       butikkid: Cookies.get('butikkid') || formData.butikkid,
-      registrertDato: new Date().toISOString(), // Lagre i ISO-format
+      registrertDato: new Date().toLocaleString('no-NO', { timeZone: 'Europe/Oslo' }), // Bruker lokal tid
       status: 'Aktiv', 
       endretdato: '', 
     };

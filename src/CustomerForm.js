@@ -64,8 +64,8 @@ function CustomerForm({ addCustomer, customers, phoneNumber, setSearchQuery }) {
 
     const newCustomer = {
       ...formData,
-      registrationDate: new Date().toISOString(),  // Lagre som ISO-streng
-      lastModified: new Date().toISOString() // Lagre som ISO-streng
+      registrationDate: new Date().toLocaleString('no-NO', { timeZone: 'Europe/Oslo' }), // Bruker lokal tid
+      lastModified: new Date().toLocaleString('no-NO', { timeZone: 'Europe/Oslo' }), // Bruker lokal tid
     };
 
     try {

@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
+import { format, parse } from 'date-fns';
+
 
 function ServiceList() {
   const [services, setServices] = useState([]);
@@ -67,13 +69,28 @@ function ServiceList() {
     setHoveredService(null);
   };
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-    return `${day}.${month}.${year}`;
-  };
+// Funksjon for å parse datoformatet fra serveren og returnere en formatert dato
+const parseCustomDateString = (dateString) => {
+  // Prøver å parse streng med formatet 'd.M.yyyy, HH:mm:ss' (forventet format fra databasen)
+  const parsedDate = parse(dateString, 'd.M.yyyy, HH:mm:ss', new Date());
+  return isNaN(parsedDate) ? null : parsedDate;
+};
+
+const formatDate = (dateString) => {
+  // Hvis datoen er ugyldig eller ikke eksisterer, returner "Ukjent dato"
+  if (!dateString) {
+    return "Ukjent dato";
+  }
+
+  const parsedDate = parseCustomDateString(dateString);
+
+  if (!parsedDate) {
+    return "Ugyldig dato";
+  }
+
+  // Returner formatert dato i ønsket format
+  return format(parsedDate, 'd.M.yyyy HH:mm');
+};
 
   return (
     <div className="max-w-5xl mx-auto py-8 bg-white shadow-lg rounded-lg p-6 mb-4">
