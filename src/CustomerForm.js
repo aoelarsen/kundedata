@@ -65,7 +65,7 @@ function CustomerForm({ addCustomer, customers, phoneNumber, setSearchQuery }) {
     const newCustomer = {
       ...formData,
       registrationDate: new Date().toLocaleString('no-NO', { timeZone: 'Europe/Oslo' }), // Bruker lokal tid
-      lastModified: new Date().toLocaleString('no-NO', { timeZone: 'Europe/Oslo' }), // Bruker lokal tid
+      lastModified: '', // Bruker lokal tid
     };
 
     try {
