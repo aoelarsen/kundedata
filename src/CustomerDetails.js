@@ -119,6 +119,14 @@ function CustomerDetails() {
     setHoveredOrder(null);
   };
 
+  const formatDateTime = (dateString) => {
+    try {
+      return format(new Date(dateString), 'dd.MM.yyyy HH:mm');
+    } catch (error) {
+      return 'Ukjent dato';
+    }
+  };
+
   if (!customer) {
     return <p className="text-red-500 text-center mt-4">Kunde ikke funnet</p>;
   }
@@ -199,7 +207,7 @@ function CustomerDetails() {
                 .map((sms) => (
                   <tr key={sms._id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{sms.meldingstekst}</td>
-                    <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{formatDate(sms.sendtDato)}</td>
+                    <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{formatDateTime(sms.sendtDato)}</td>
                   </tr>
                 ))}
             </tbody>
