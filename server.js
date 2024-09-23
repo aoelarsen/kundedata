@@ -1046,21 +1046,28 @@ app.patch('/customtasks/:id', async (req, res) => {
 
 const cron = require('node-cron');
 
-// Kjører hver time på minutt 0 (f.eks. 01:00, 02:00 osv.)
+// Kjører hver 5. minutt
 cron.schedule('*/5 * * * *', async () => {
   try {
-    const today = new Date(); // Dette er et faktisk Date-objekt
-        console.log('Starter sletting av fullførte oppgaver hver time');
+    const today = new Date();
+    console.log('Starter sletting av fullførte oppgaver hver 5. minutt');
 
-    await CustomTask.deleteMany({ completed: true, dueDate: { $lt: today } });
-    
-    
-    
+    // Finn og logg oppgavene som er fullført og har blitt fullført før i dag
+    const tasksToDelete = await CustomTask.find({ completed: true, dateCompleted: { $lt: today } });
+
+    console.log('Oppgaver som skal slettes:', tasksToDelete);
+
+    // Slett oppgavene som er fullført og har en fullføringsdato eldre enn dagens dato
+    const deleteResult = await CustomTask.deleteMany({ completed: true, dateCompleted: { $lt: today } });
+
+    console.log('Antall slettede oppgaver:', deleteResult.deletedCount);
+
     console.log('Fullførte oppgaver er slettet');
   } catch (error) {
     console.error('Feil ved sletting av fullførte oppgaver:', error);
   }
 });
+
 
 
 
