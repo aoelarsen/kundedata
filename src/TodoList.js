@@ -161,13 +161,6 @@ const handleCompleteCustomTask = async (taskId, taskDescription, dueDate) => {
   };
 
   try {
-    // Oppdater completedtasks
-    await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(bodyData),
-    });
-
     // Oppdater customtasks med fullføringsdato
     const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks/${taskId}`, {
       method: 'PATCH',
@@ -178,7 +171,7 @@ const handleCompleteCustomTask = async (taskId, taskDescription, dueDate) => {
     if (response.ok) {
       setCustomTasks((prevTasks) =>
         prevTasks.map((task) =>
-          task._id === taskId ? { ...task, completed: true, completedBy: employee } : task
+          task._id === taskId ? { ...task, completed: true, completedBy: employee, dateCompleted: new Date() } : task
         )
       );
     }
@@ -186,6 +179,7 @@ const handleCompleteCustomTask = async (taskId, taskDescription, dueDate) => {
     console.error('Feil ved oppdatering av egendefinert oppgave:', error);
   }
 };
+
 
 
 

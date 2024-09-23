@@ -1040,12 +1040,17 @@ app.patch('/customtasks/:id', async (req, res) => {
       task.completedBy = req.body.completedBy;
     }
 
+    if (req.body.dateCompleted != null) {
+      task.dateCompleted = req.body.dateCompleted; // Setter fullføringsdato
+    }
+
     const updatedTask = await task.save();
     res.json(updatedTask);
   } catch (error) {
     res.status(400).json({ message: 'Feil ved oppdatering av egendefinert oppgave', error });
   }
 });
+
 
 const cron = require('node-cron');
 
