@@ -1045,7 +1045,6 @@ app.patch('/customtasks/:id', async (req, res) => {
 });
 
 const cron = require('node-cron');
-const CustomTask = require('./models/CustomTask'); // Sørg for at du har importert din CustomTask-modell
 
 // Kjører hver time på minutt 0 (f.eks. 01:00, 02:00 osv.)
 cron.schedule('0 * * * *', async () => {
