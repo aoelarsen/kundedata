@@ -1047,7 +1047,7 @@ app.patch('/customtasks/:id', async (req, res) => {
 const cron = require('node-cron');
 
 // Kjører hver time på minutt 0 (f.eks. 01:00, 02:00 osv.)
-cron.schedule('0 * * * *', async () => {
+cron.schedule('*/5 * * * *', async () => {
   try {
     const today = new Date().toLocaleString('no-NO', { timeZone: 'Europe/Oslo' });
     console.log('Starter sletting av fullførte oppgaver hver time');
