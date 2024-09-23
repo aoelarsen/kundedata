@@ -839,11 +839,14 @@ const DailyTask = mongoose.model('DailyTask', dailyTaskSchema);
 
 // Modell for egendefinerte oppgaver
 const customTaskSchema = new mongoose.Schema({
-  task: { type: String, required: true },
-  dueDate: { type: Date, required: true },
+  task: { type: String, required: true }, // Beskrivelse av oppgaven
+  dueDate: { type: Date, required: true }, // Når oppgaven skal være ferdig
+  completed: { type: Boolean, default: false }, // Om oppgaven er fullført eller ikke
+  dateCompleted: { type: Date } // Datoen når oppgaven ble fullført
 });
 
 const CustomTask = mongoose.model('CustomTask', customTaskSchema);
+
 
 // Hent alle daglige oppgaver
 app.get('/dailytasks', async (req, res) => {
