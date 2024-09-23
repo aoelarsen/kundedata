@@ -55,29 +55,30 @@ function TodoList() {
    };
  
    const fetchCustomTasks = async () => {
-     try {
-       const [customTasksResponse, completedTasksResponse] = await Promise.all([
-         fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks'),
-         fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks?taskType=custom')
-       ]);
-   
-       const customTasksData = await customTasksResponse.json();
-       const completedTasksData = await completedTasksResponse.json();
-   
-       const today = new Date();
-   
-       const updatedCustomTasks = customTasksData
-         .filter(task => new Date(task.dueDate) >= today || !task.completed)
-         .map(task => {
-           const completedTask = completedTasksData.find(ct => ct.task === task.task);
-           return completedTask ? { ...task, completed: true, completedBy: completedTask.employee } : task;
-         });
-   
-       setCustomTasks(updatedCustomTasks);
-     } catch (error) {
-       console.error('Feil ved henting av egendefinerte oppgaver:', error);
-     }
-   };
+    try {
+      const [customTasksResponse, completedTasksResponse] = await Promise.all([
+        fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks'),
+        fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks?taskType=custom')
+      ]);
+  
+      const customTasksData = await customTasksResponse.json();
+      const completedTasksData = await completedTasksResponse.json();
+  
+      const today = new Date();
+  
+      const updatedCustomTasks = customTasksData
+        .filter(task => new Date(task.dueDate) >= today || !task.completed) // Filtrer ut fullførte oppgaver som er over forfallsdato
+        .map(task => {
+          const completedTask = completedTasksData.find(ct => ct.task === task.task);
+          return completedTask ? { ...task, completed: true, completedBy: completedTask.employee } : task;
+        });
+  
+      setCustomTasks(updatedCustomTasks);
+    } catch (error) {
+      console.error('Feil ved henting av egendefinerte oppgaver:', error);
+    }
+  };
+  
  
    // Funksjon for å legge til en ny egendefinert oppgave
    const handleAddCustomTask = async () => {
@@ -185,6 +186,7 @@ const handleCompleteCustomTask = async (taskId, taskDescription, dueDate) => {
     console.error('Feil ved oppdatering av egendefinert oppgave:', error);
   }
 };
+
 
 
  

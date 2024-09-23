@@ -1053,6 +1053,8 @@ const cron = require('node-cron');
 cron.schedule('*/5 * * * *', async () => {
   try {
     const today = new Date();
+    today.setHours(0, 0, 0, 0); // Setter tiden til starten av dagen for å sammenligne med oppgavenes datoer
+
     console.log('Starter sletting av fullførte oppgaver hver 5. minutt');
 
     // Finn og logg oppgavene som er fullført og har blitt fullført før i dag
@@ -1070,6 +1072,7 @@ cron.schedule('*/5 * * * *', async () => {
     console.error('Feil ved sletting av fullførte oppgaver:', error);
   }
 });
+
 
 
 
