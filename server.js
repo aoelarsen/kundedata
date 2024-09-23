@@ -1049,10 +1049,12 @@ const cron = require('node-cron');
 // Kjører hver time på minutt 0 (f.eks. 01:00, 02:00 osv.)
 cron.schedule('*/5 * * * *', async () => {
   try {
-    const today = new Date().toLocaleString('no-NO', { timeZone: 'Europe/Oslo' });
-    console.log('Starter sletting av fullførte oppgaver hver time');
-    
+    const today = new Date(); // Dette er et faktisk Date-objekt
+        console.log('Starter sletting av fullførte oppgaver hver time');
+
     await CustomTask.deleteMany({ completed: true, dueDate: { $lt: today } });
+    
+    
     
     console.log('Fullførte oppgaver er slettet');
   } catch (error) {
