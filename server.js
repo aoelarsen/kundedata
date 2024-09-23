@@ -1044,6 +1044,22 @@ app.patch('/customtasks/:id', async (req, res) => {
   }
 });
 
+const cron = require('node-cron');
+const CustomTask = require('./models/CustomTask'); // Sørg for at du har importert din CustomTask-modell
+
+// Kjører hver time på minutt 0 (f.eks. 01:00, 02:00 osv.)
+cron.schedule('0 * * * *', async () => {
+  try {
+    const today = new Date().toLocaleString('no-NO', { timeZone: 'Europe/Oslo' });
+    console.log('Starter sletting av fullførte oppgaver hver time');
+    
+    await CustomTask.deleteMany({ completed: true, dueDate: { $lt: today } });
+    
+    console.log('Fullførte oppgaver er slettet');
+  } catch (error) {
+    console.error('Feil ved sletting av fullførte oppgaver:', error);
+  }
+});
 
 
 
