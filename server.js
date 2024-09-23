@@ -1045,27 +1045,23 @@ app.patch('/customtasks/:id', async (req, res) => {
 });
 
 const cron = require('node-cron');
+const CustomTask = require('./models/CustomTask'); // Sørg for at du har importert din CustomTask-modell
 
-// Reset daily tasks every day at 21:45
-cron.schedule('45 21 * * *', async () => {
+// Denne cron-jobben kjører hver dag ved midnatt (00:00)
+cron.schedule('0 0 * * *', async () => {
   try {
-    await DailyTask.updateMany({}, { $set: { completed: false, completedBy: null } });
-    console.log('Daily tasks have been reset');
+    const today = new Date().toLocaleString('no-NO', { timeZone: 'Europe/Oslo' });
+    console.log('Starter sletting av fullførte oppgaver');
+    
+    // Sletter alle fullførte custom oppgaver
+    await CustomTask.deleteMany({ completed: true, dueDate: { $lt: today } });
+    
+    console.log('Fullførte oppgaver er slettet');
   } catch (error) {
-    console.error('Error resetting daily tasks:', error);
+    console.error('Feil ved sletting av fullførte oppgaver:', error);
   }
 });
 
-// Remove expired and completed custom tasks every day at 21:45
-cron.schedule('45 21 * * *', async () => {
-  try {
-    const today = new Date();
-    await CustomTask.deleteMany({ dueDate: { $lt: today }, completed: true });
-    console.log('Expired and completed custom tasks have been removed');
-  } catch (error) {
-    console.error('Error deleting expired custom tasks:', error);
-  }
-});
 
 
 
