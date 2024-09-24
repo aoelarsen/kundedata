@@ -1057,8 +1057,8 @@ app.patch('/customtasks/:id', async (req, res) => {
 
 const cron = require('node-cron');
 
-// Kjører hver 5. minutt
-cron.schedule('*/5 * * * *', async () => {
+// Kjører hvert minutt
+cron.schedule('* * * * *', async () => {
   try {
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Setter tiden til starten av dagen for å sammenligne med oppgavenes datoer
