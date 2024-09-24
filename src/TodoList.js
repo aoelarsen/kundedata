@@ -193,16 +193,21 @@ function TodoList() {
         <ul>
           {dailyTasks.map((task) => (
             <li key={task._id} className="flex justify-between items-center mb-2">
-              <span>{task.task}</span>
-              {task.completed ? (
-                <span>Oppgave utført av: {task.completedBy}</span>
-              ) : (
+              <span>
+                {task.task}
+                {task.completed && (
+                  <span className="ml-2 text-green-600">(Utført av: {task.completedBy})</span>
+                )}
+              </span>
+              {!task.completed ? (
                 <button
                   onClick={() => handleCompleteDailyTask(task._id, task.task)}
                   className="bg-green-500 text-white px-4 py-1 rounded"
                 >
                   Merk som utført
                 </button>
+              ) : (
+                <span className="text-gray-500">Utført</span>
               )}
             </li>
           ))}

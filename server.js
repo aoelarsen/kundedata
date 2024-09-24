@@ -832,10 +832,14 @@ app.delete('/statuses/:id', async (req, res) => {
 
 // Modell for daglige oppgaver
 const dailyTaskSchema = new mongoose.Schema({
-  task: { type: String, required: true },
+  task: { type: String, required: true }, // Beskrivelse av oppgaven
+  completed: { type: Boolean, default: false }, // Om oppgaven er fullført eller ikke
+  completedBy: { type: String }, // Ansatt som fullførte oppgaven
+  dateCompleted: { type: Date } // Datoen når oppgaven ble fullført
 });
 
 const DailyTask = mongoose.model('DailyTask', dailyTaskSchema);
+
 
 // Modell for egendefinerte oppgaver
 const customTaskSchema = new mongoose.Schema({
@@ -1080,20 +1084,20 @@ cron.schedule('* * * * *', async () => {
   }
 });
 
-// Cron job som kjører hvert minutt (for testing)
+// Kjører hvert minutt for testing (du kan endre til hver dag ved midnatt for produksjon)
 cron.schedule('* * * * *', async () => {
   try {
-    console.log('Sjekker etter fullførte faste oppgaver for tilbakestilling');
+    console.log('Tilbakestiller fullførte daglige oppgaver');
 
-    // Finn alle daglige oppgaver som er fullført
+    // Hent alle oppgaver som er markert som fullført
     const tasksToReset = await DailyTask.find({ completed: true });
 
     console.log('Oppgaver som skal tilbakestilles:', tasksToReset);
 
-    // Tilbakestill alle oppgaver ved å sette completed til false
+    // Tilbakestill fullførte oppgaver
     const resetResult = await DailyTask.updateMany(
       { completed: true },
-      { $set: { completed: false, completedBy: null } } // Setter completedBy til null eller blank
+      { $set: { completed: false, completedBy: null, dateCompleted: null } }
     );
 
     console.log('Antall tilbakestilte oppgaver:', resetResult.modifiedCount);
