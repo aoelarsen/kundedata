@@ -1063,23 +1063,21 @@ cron.schedule('*/5 * * * *', async () => {
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Setter tiden til starten av dagen for å sammenligne med oppgavenes datoer
 
-    console.log('Starter sletting av fullførte oppgaver hver 5. minutt');
+    console.log('Sjekker etter oppgaver som er fullført før i dag:', today);
 
-    // Finn og logg oppgavene som er fullført og har blitt fullført før i dag
     const tasksToDelete = await CustomTask.find({ completed: true, dateCompleted: { $lt: today } });
 
     console.log('Oppgaver som skal slettes:', tasksToDelete);
 
-    // Slett oppgavene som er fullført og har en fullføringsdato eldre enn dagens dato
     const deleteResult = await CustomTask.deleteMany({ completed: true, dateCompleted: { $lt: today } });
 
     console.log('Antall slettede oppgaver:', deleteResult.deletedCount);
-
-    console.log('Fullførte oppgaver er slettet');
   } catch (error) {
     console.error('Feil ved sletting av fullførte oppgaver:', error);
   }
 });
+
+
 
 
 
