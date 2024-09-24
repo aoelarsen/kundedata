@@ -29,7 +29,7 @@ mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
   .catch(err => console.error('Error connecting to MongoDB Atlas:', err));
 
 
-  
+
 // Schema and Model for Customers
 const customerSchema = new mongoose.Schema({
   firstName: String,
@@ -281,7 +281,7 @@ app.post('/customers', async (req, res) => {
     });
 
     console.log('Lagrer kunde med følgende data:', customer); // Logging for å inspisere data før lagring
-    
+
     const newCustomer = await customer.save();
     res.status(201).json(newCustomer);
   } catch (err) {
@@ -842,10 +842,12 @@ const customTaskSchema = new mongoose.Schema({
   task: { type: String, required: true }, // Beskrivelse av oppgaven
   dueDate: { type: Date, required: true }, // Når oppgaven skal være ferdig
   completed: { type: Boolean, default: false }, // Om oppgaven er fullført eller ikke
-  dateCompleted: { type: Date } // Datoen når oppgaven ble fullført
+  dateCompleted: { type: Date }, // Datoen når oppgaven ble fullført
+  completedBy: { type: String }, // Ansatt som fullførte oppgaven
 });
 
 const CustomTask = mongoose.model('CustomTask', customTaskSchema);
+
 
 
 // Hent alle daglige oppgaver
@@ -1037,11 +1039,11 @@ app.patch('/customtasks/:id', async (req, res) => {
     }
 
     if (req.body.completedBy != null) {
-      task.completedBy = req.body.completedBy;
+      task.completedBy = req.body.completedBy; // Lagre ansatt som fullførte oppgaven
     }
 
     if (req.body.dateCompleted != null) {
-      task.dateCompleted = req.body.dateCompleted; // Setter fullføringsdato
+      task.dateCompleted = req.body.dateCompleted; // Lagre fullføringsdato
     }
 
     const updatedTask = await task.save();
@@ -1050,6 +1052,7 @@ app.patch('/customtasks/:id', async (req, res) => {
     res.status(400).json({ message: 'Feil ved oppdatering av egendefinert oppgave', error });
   }
 });
+
 
 
 const cron = require('node-cron');
