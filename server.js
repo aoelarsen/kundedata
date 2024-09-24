@@ -834,25 +834,21 @@ app.delete('/statuses/:id', async (req, res) => {
 const dailyTaskSchema = new mongoose.Schema({
   task: { type: String, required: true },
   completed: { type: Boolean, default: false },
-  completedBy: { type: String },
-  dateCompleted: { type: Date },
-  store: { type: String, required: true }, // Legg til butikk-ID
+  completedBy: { type: String }, // Sørg for at dette kan ta imot strenger
+  dateCompleted: { type: Date }, // Sørg for at dette kan ta imot datoverdier
 });
-
 
 const DailyTask = mongoose.model('DailyTask', dailyTaskSchema);
 
 
 // Modell for egendefinerte oppgaver
 const customTaskSchema = new mongoose.Schema({
-  task: { type: String, required: true },
-  dueDate: { type: Date, required: true },
-  completed: { type: Boolean, default: false },
-  dateCompleted: { type: Date },
-  completedBy: { type: String },
-  store: { type: String, required: true }, // Legg til butikk-ID
+  task: { type: String, required: true }, // Beskrivelse av oppgaven
+  dueDate: { type: Date, required: true }, // Når oppgaven skal være ferdig
+  completed: { type: Boolean, default: false }, // Om oppgaven er fullført eller ikke
+  dateCompleted: { type: Date }, // Datoen når oppgaven ble fullført
+  completedBy: { type: String }, // Ansatt som fullførte oppgaven
 });
-
 
 const CustomTask = mongoose.model('CustomTask', customTaskSchema);
 
@@ -860,26 +856,24 @@ const CustomTask = mongoose.model('CustomTask', customTaskSchema);
 
 // Hent alle daglige oppgaver
 app.get('/dailytasks', async (req, res) => {
-  const { store } = req.query; // Hent butikk-ID fra query
   try {
-    const tasks = await DailyTask.find({ store }); // Filtrer på butikk-ID
+    const tasks = await DailyTask.find();
     res.status(200).json(tasks);
   } catch (error) {
     res.status(500).json({ message: 'Feil ved henting av daglige oppgaver', error });
   }
 });
 
-
 // Legg til en ny daglig oppgave
 app.post('/dailytasks', async (req, res) => {
-  const { task, store } = req.body; // Inkluder butikk-ID
+  const { task } = req.body;
 
-  if (!task || !store) {
-    return res.status(400).json({ message: 'Oppgaven og butikk-ID er påkrevd' });
+  if (!task) {
+    return res.status(400).json({ message: 'Oppgaven er påkrevd' });
   }
 
   try {
-    const newTask = new DailyTask({ task, store });
+    const newTask = new DailyTask({ task });
     await newTask.save();
     res.status(201).json(newTask);
   } catch (error) {
@@ -887,36 +881,32 @@ app.post('/dailytasks', async (req, res) => {
   }
 });
 
-
 // Hent alle egendefinerte oppgaver
 app.get('/customtasks', async (req, res) => {
-  const { store } = req.query; // Hent butikk-ID fra query
   try {
-    const tasks = await CustomTask.find({ store }); // Filtrer på butikk-ID
+    const tasks = await CustomTask.find();
     res.status(200).json(tasks);
   } catch (error) {
     res.status(500).json({ message: 'Feil ved henting av egendefinerte oppgaver', error });
   }
 });
 
-
 // Legg til en ny egendefinert oppgave
 app.post('/customtasks', async (req, res) => {
-  const { task, dueDate, store } = req.body; // Inkluder butikk-ID
+  const { task, dueDate } = req.body;
 
-  if (!task || !dueDate || !store) {
-    return res.status(400).json({ message: 'Oppgaven, datoen og butikk-ID er påkrevd' });
+  if (!task || !dueDate) {
+    return res.status(400).json({ message: 'Oppgaven og datoen er påkrevd' });
   }
 
   try {
-    const newTask = new CustomTask({ task, dueDate, store });
+    const newTask = new CustomTask({ task, dueDate });
     await newTask.save();
     res.status(201).json(newTask);
   } catch (error) {
     res.status(500).json({ message: 'Feil ved opprettelse av egendefinert oppgave', error });
   }
 });
-
 
 const fetchDailyTasks = async () => {
   try {
@@ -940,52 +930,66 @@ const fetchCustomTasks = async () => {
 
 // Modell for fullførte oppgaver
 const completedTaskSchema = new mongoose.Schema({
-  taskId: { type: mongoose.Schema.Types.ObjectId },
+  taskId: { type: mongoose.Schema.Types.ObjectId }, // Fjern required hvis det ikke er nødvendig
   task: { type: String, required: true },
-  taskType: { type: String, required: true },
-  dueDate: { type: Date },
+  taskType: { type: String, required: true }, // daily eller custom
+  dueDate: { type: Date }, // Valgfritt for custom tasks
   employee: { type: String, required: true },
   dateCompleted: { type: Date, required: true },
-  store: { type: String, required: true }, // Legg til butikk-ID
+  store: { type: String, required: true } // Butikk-ID
 });
-
 
 
 const CompletedTask = mongoose.model('CompletedTask', completedTaskSchema);
 
 // Legg til en fullført oppgave
 app.post('/completedtasks', async (req, res) => {
+  console.log('Mottatt request body:', req.body); // Log request body for inspeksjon
+
   const { task, taskType, dueDate, dateCompleted, employee, store } = req.body;
 
   if (!task || !dateCompleted || !employee || !taskType || !store) {
+    console.error('Feil: Manglende felt i request body');
     return res.status(400).json({ message: 'Alle felt er påkrevd' });
   }
 
   try {
-    const completedTask = new CompletedTask({ task, taskType, dueDate, dateCompleted, employee, store });
+    const completedTask = new CompletedTask({
+      task,
+      taskType,
+      dueDate,
+      dateCompleted,
+      employee,
+      store // Legg til butikk-ID her
+    });
     await completedTask.save();
+    console.log('Fullført oppgave lagret:', completedTask); // Bekreft at oppgaven er lagret
     res.status(201).json(completedTask);
   } catch (error) {
+    console.error('Feil ved registrering av fullført oppgave:', error); // Log feilen
     res.status(500).json({ message: 'Feil ved registrering av fullført oppgave', error });
   }
 });
 
 
 
-
 // Hent alle fullførte oppgaver, med mulighet for å filtrere på butikk, ansatt eller dato
 app.get('/completedtasks', async (req, res) => {
   const { store, employee, fromDate, toDate } = req.query;
+
   const filter = {};
 
+  // Filtrer på butikk-ID hvis den er angitt
   if (store) {
-    filter.store = store; // Filtrer på butikk-ID
+    filter.store = store;
   }
 
+  // Filtrer på ansatt hvis den er angitt
   if (employee) {
     filter.employee = employee;
   }
 
+  // Filtrer på dato for fullføring (mellom fromDate og toDate hvis de er angitt)
   if (fromDate && toDate) {
     filter.dateCompleted = { $gte: new Date(fromDate), $lte: new Date(toDate) };
   } else if (fromDate) {
@@ -998,10 +1002,10 @@ app.get('/completedtasks', async (req, res) => {
     const completedTasks = await CompletedTask.find(filter);
     res.status(200).json(completedTasks);
   } catch (error) {
+    console.error('Feil ved henting av fullførte oppgaver:', error);
     res.status(500).json({ message: 'Feil ved henting av fullførte oppgaver', error });
   }
 });
-
 
 // Oppdater en daglig oppgave
 app.patch('/dailytasks/:id', async (req, res) => {
@@ -1123,5 +1127,5 @@ cron.schedule('0 0 * * *', async () => {
 
 // Start the server
 app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+  console.log(Server is running on port ${port});
 });
