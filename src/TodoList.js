@@ -111,6 +111,9 @@ const handleAddCustomTask = async () => {
     return;
   }
 
+  // Hent storeId fra cookies
+  const storeId = Cookies.get('selectedStoreId'); // Sørg for at 'selectedStoreId' er butikk-ID og ikke butikknavnet
+
   try {
     const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks', {
       method: 'POST',
@@ -120,7 +123,7 @@ const handleAddCustomTask = async () => {
       body: JSON.stringify({
         task: newCustomTask,
         dueDate: customTaskDate,
-        store // Legg til butikkid her som hentes fra cookies
+        store: storeId // Legg til storeId her for å lagre butikk-ID
       }),
     });
 
@@ -136,6 +139,9 @@ const handleAddCustomTask = async () => {
     console.error('Feil ved kommunikasjon med serveren:', error);
   }
 };
+
+
+
 
 
   // Funksjon for å markere en daglig oppgave som fullført og lagre til databasen

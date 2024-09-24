@@ -848,7 +848,7 @@ const customTaskSchema = new mongoose.Schema({
   completed: { type: Boolean, default: false }, // Om oppgaven er fullført eller ikke
   dateCompleted: { type: Date }, // Datoen når oppgaven ble fullført
   completedBy: { type: String }, // Ansatt som fullførte oppgaven
-  store: { type: String, required: true } // Butikk-ID for å knytte oppgaven til riktig butikk
+  store: { type: Number, required: true } // Butikk-ID for å knytte oppgaven til riktig butikk, endret til Number
 });
 
 const CustomTask = mongoose.model('CustomTask', customTaskSchema);
@@ -908,6 +908,7 @@ app.post('/customtasks', async (req, res) => {
     res.status(500).json({ message: 'Feil ved opprettelse av egendefinert oppgave', error });
   }
 });
+
 
 
 const fetchDailyTasks = async () => {
