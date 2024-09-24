@@ -64,20 +64,19 @@ function TodoList() {
       const customTasksData = await customTasksResponse.json();
       const completedTasksData = await completedTasksResponse.json();
   
-      const today = new Date();
-  
-      const updatedCustomTasks = customTasksData
-        .filter(task => new Date(task.dueDate) >= today || !task.completed) // Filtrer ut fullførte oppgaver som er over forfallsdato
-        .map(task => {
-          const completedTask = completedTasksData.find(ct => ct.task === task.task);
-          return completedTask ? { ...task, completed: true, completedBy: completedTask.employee } : task;
-        });
+      const updatedCustomTasks = customTasksData.map(task => {
+        const completedTask = completedTasksData.find(ct => ct.task === task.task);
+        return completedTask 
+          ? { ...task, completed: true, completedBy: completedTask.employee, dateCompleted: completedTask.dateCompleted }
+          : task;
+      });
   
       setCustomTasks(updatedCustomTasks);
     } catch (error) {
       console.error('Feil ved henting av egendefinerte oppgaver:', error);
     }
   };
+  
   
  
    // Funksjon for å legge til en ny egendefinert oppgave
@@ -210,24 +209,29 @@ const handleCompleteCustomTask = async (taskId, taskDescription, dueDate) => {
        </div>
  
        <div className="mt-8">
-         <h3 className="text-2xl font-bold mb-4">Dagens oppgaver</h3>
-         <ul>
-         {customTasks.map((task) => (
-           <li key={task._id} className="flex justify-between items-center mb-2">
-             <span>{task.task} - {new Date(task.dueDate).toLocaleDateString()}</span>
-             {task.completed ? (
-               <span>Oppgave utført av: {task.completedBy}</span>
-             ) : (
-               <button
-                 onClick={() => handleCompleteCustomTask(task._id, task.task, task.dueDate)}
-                 className="bg-green-500 text-white px-4 py-1 rounded"
-               >
-                 Merk som utført
-               </button>
-             )}
-           </li>
-         ))}
-         </ul>
+       <h3 className="text-2xl font-bold mb-4">Dagens oppgaver</h3>
+  <ul>
+    {customTasks.map((task) => (
+      <li key={task._id} className="flex justify-between items-center mb-2">
+        <span>
+          {task.task} - {new Date(task.dueDate).toLocaleDateString()}
+          {task.completed && (
+            <span className="ml-2 text-green-600">(Utført av: {task.completedBy})</span>
+          )}
+        </span>
+        {!task.completed ? (
+          <button
+            onClick={() => handleCompleteCustomTask(task._id, task.task, task.dueDate)}
+            className="bg-green-500 text-white px-4 py-1 rounded"
+          >
+            Merk som utført
+          </button>
+        ) : (
+          <span className="text-gray-500">Utført</span>
+        )}
+      </li>
+    ))}
+  </ul>
  
          <div className="mt-6">
            <input
