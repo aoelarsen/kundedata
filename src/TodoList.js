@@ -138,10 +138,12 @@ function TodoList() {
 
   // Funksjon for å markere en daglig oppgave som fullført og lagre til databasen
   const handleCompleteDailyTask = async (taskId, taskDescription) => {
+    const now = new Date();
+now.setHours(now.getHours() + 2);  // Legger til 2 timer
     const bodyData = {
       task: taskDescription,
       taskType: 'daily',
-      dateCompleted: new Date().toLocaleString('no-NO', { timeZone: 'Europe/Oslo' }),
+      dateCompleted: now.toISOString(),  // Bruk ISO-format,
       employee,
       store,
     };
@@ -180,11 +182,13 @@ function TodoList() {
 
   // Funksjon for å markere en egendefinert oppgave som fullført
 const handleCompleteCustomTask = async (taskId, taskDescription, dueDate) => {
+  const now = new Date();
+now.setHours(now.getHours() + 2);  // Legger til 2 timer
   const bodyData = {
     task: taskDescription,
     taskType: 'custom',
     dueDate,
-    dateCompleted: new Date().toLocaleString('no-NO', { timeZone: 'Europe/Oslo' }), // Sørger for at fullføringsdato blir satt
+    dateCompleted: now.toISOString(),  // Bruk ISO-format, // Sørger for at fullføringsdato blir satt
     employee, // Ansatt som fullfører oppgaven
     store,
   };
