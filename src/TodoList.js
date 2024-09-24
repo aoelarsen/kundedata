@@ -28,8 +28,8 @@ function TodoList() {
   const fetchDailyTasks = async () => {
     try {
       const [dailyTasksResponse, completedTasksResponse] = await Promise.all([
-        fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/dailytasks?store=${store}`),  // Legg til butikkfilter
-        fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks?taskType=daily&store=${store}`) // Legg til butikkfilter
+        fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/dailytasks'),
+        fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks?taskType=daily')
       ]);
 
       const dailyTasksData = await dailyTasksResponse.json();
@@ -74,8 +74,8 @@ function TodoList() {
   const fetchCustomTasks = async () => {
     try {
       const [customTasksResponse, completedTasksResponse] = await Promise.all([
-        fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks?store=${store}`),  // Legg til butikkfilter
-        fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks?taskType=custom&store=${store}`) // Legg til butikkfilter
+        fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks'),
+        fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks?taskType=custom')
       ]);
 
       const customTasksData = await customTasksResponse.json();
@@ -110,7 +110,7 @@ function TodoList() {
       alert('Oppgaven og dato må fylles ut.');
       return;
     }
-  
+
     try {
       const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks', {
         method: 'POST',
@@ -120,10 +120,9 @@ function TodoList() {
         body: JSON.stringify({
           task: newCustomTask,
           dueDate: customTaskDate,
-          store, // Legg til butikk-ID her
         }),
       });
-  
+
       if (response.ok) {
         const addedTask = await response.json();
         setCustomTasks((prevTasks) => [...prevTasks, addedTask]);
@@ -136,42 +135,42 @@ function TodoList() {
       console.error('Feil ved kommunikasjon med serveren:', error);
     }
   };
-  
 
   // Funksjon for å markere en daglig oppgave som fullført og lagre til databasen
   const handleCompleteDailyTask = async (taskId, taskDescription) => {
     const now = new Date();
-    now.setHours(now.getHours());  // Legger til 2 timer
+now.setHours(now.getHours());  // Legger til 2 timer
     const bodyData = {
       task: taskDescription,
       taskType: 'daily',
-      dateCompleted: now.toISOString(),
+      dateCompleted: now.toISOString(),  // Bruk ISO-format,
       employee,
-      store,  // Legg til butikk-ID
+      store,
     };
-  
+
     try {
+      // Oppdater completedtasks
       await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(bodyData),
       });
-  
+
+      // Oppdater dailytasks
       const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/dailytasks/${taskId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           completed: true,
           completedBy: employee,
-          dateCompleted: now.toISOString(),
-          store  // Legg til butikk-ID her
+          dateCompleted: new Date().toISOString() // Legg til fullføringsdato
         }),
       });
-  
+
       if (response.ok) {
         setDailyTasks((prevTasks) =>
           prevTasks.map((task) =>
-            task._id === taskId ? { ...task, completed: true, completedBy: employee, dateCompleted: now } : task
+            task._id === taskId ? { ...task, completed: true, completedBy: employee, dateCompleted: new Date() } : task
           )
         );
       }
@@ -179,7 +178,7 @@ function TodoList() {
       console.error('Feil ved oppdatering av daglig oppgave:', error);
     }
   };
-  
+
 
   // Funksjon for å markere en egendefinert oppgave som fullført
 const handleCompleteCustomTask = async (taskId, taskDescription, dueDate) => {
