@@ -117,9 +117,10 @@ function TodoList() {
       task: taskDescription,
       taskType: 'daily',
       dateCompleted: new Date().toISOString(),
-      employee,
-      store,
+      employee,  // Sørg for at employee har en gyldig verdi
+      store,     // Sørg for at store har en gyldig verdi
     };
+
 
     try {
       // Oppdater completedtasks

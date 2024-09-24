@@ -832,10 +832,10 @@ app.delete('/statuses/:id', async (req, res) => {
 
 // Modell for daglige oppgaver
 const dailyTaskSchema = new mongoose.Schema({
-  task: { type: String, required: true }, // Beskrivelse av oppgaven
-  completed: { type: Boolean, default: false }, // Om oppgaven er fullført eller ikke
-  completedBy: { type: String }, // Ansatt som fullførte oppgaven
-  dateCompleted: { type: Date } // Datoen når oppgaven ble fullført
+  task: { type: String, required: true },
+  completed: { type: Boolean, default: false },
+  completedBy: { type: String }, // Sørg for at dette kan ta imot strenger
+  dateCompleted: { type: Date }, // Sørg for at dette kan ta imot datoverdier
 });
 
 const DailyTask = mongoose.model('DailyTask', dailyTaskSchema);
@@ -1020,7 +1020,11 @@ app.patch('/dailytasks/:id', async (req, res) => {
     }
 
     if (req.body.completedBy != null) {
-      task.completedBy = req.body.completedBy;
+      task.completedBy = req.body.completedBy; // Sørg for at dette feltet er satt korrekt
+    }
+
+    if (req.body.dateCompleted != null) {
+      task.dateCompleted = req.body.dateCompleted; // Sørg for at datoen blir satt korrekt
     }
 
     const updatedTask = await task.save();
@@ -1029,6 +1033,7 @@ app.patch('/dailytasks/:id', async (req, res) => {
     res.status(400).json({ message: 'Feil ved oppdatering av daglig oppgave', error });
   }
 });
+
 
 // Oppdater en egendefinert oppgave
 app.patch('/customtasks/:id', async (req, res) => {
