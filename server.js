@@ -1081,12 +1081,6 @@ cron.schedule('* * * * *', async () => {
 });
 
 
-console.log('Antall slettede oppgaver:', deleteResult.deletedCount);
-  } catch (error) {
-  console.error('Feil ved sletting av fullførte oppgaver:', error);
-}
-});
-
 
 
 
