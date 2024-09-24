@@ -259,26 +259,27 @@ return (
     <div className="mt-8">
       <h3 className="text-2xl font-bold mb-4">Dagens oppgaver</h3>
       <ul>
-        {customTasks.map((task) => (
-          <li key={task._id} className="flex justify-between items-center mb-2">
-            <span>
-              {task.task} - {new Date(task.dueDate).toLocaleDateString()}
-              {task.completed && (
-                <span className="ml-2 text-green-600">(Utført av: {task.completedBy})</span>
-              )}
-            </span>
-            {!task.completed ? (
-              <button
-                onClick={() => handleCompleteCustomTask(task._id, task.task, task.dueDate)}
-                className="bg-green-500 text-white px-4 py-1 rounded"
-              >
-                Merk som utført
-              </button>
-            ) : (
-              <span className="text-gray-500">Utført</span>
-            )}
-          </li>
-        ))}
+      {customTasks.map((task) => (
+  <li key={task._id} className="flex justify-between items-center mb-2">
+    <span>
+      {task.task} - {new Date(task.dueDate).toLocaleDateString()}
+      {task.completed && (
+        <span className="ml-2 text-green-600">(Utført av: {task.completedBy})</span>
+      )}
+    </span>
+    {!task.completed ? (
+      <button
+        onClick={() => handleCompleteCustomTask(task._id, task.task, task.dueDate)}
+        className="bg-green-500 text-white px-4 py-1 rounded"
+      >
+        Merk som utført
+      </button>
+    ) : (
+      <span className="text-gray-500">Utført</span>
+    )}
+  </li>
+))}
+
       </ul>
 
       <div className="mt-6">
