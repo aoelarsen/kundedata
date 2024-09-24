@@ -1,28 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
 
-
-
 function TodoList() {
   const [dailyTasks, setDailyTasks] = useState([]);
   const [customTasks, setCustomTasks] = useState([]);
   const [newCustomTask, setNewCustomTask] = useState('');
-  const [completedTasks, setCompletedTasks] = useState([]); // Ny state for fullførte oppgaver
-
+  const [completedTasks, setCompletedTasks] = useState([]);
+  
+  // Hent butikk-ID fra cookies som i OrderList
+  const butikkid = parseInt(Cookies.get('butikkid'), 10) || null; // Konverterer til heltall, eller null hvis ikke tilgjengelig
 
   // Hent dagens dato i formatet yyyy-mm-dd for input type="date"
   const today = new Date().toISOString().split('T')[0];
 
-  // Sett dagens dato som standard
   const [customTaskDate, setCustomTaskDate] = useState(today);
-  const [employee] = useState(Cookies.get('selectedEmployee') || ''); // Ansatt hentet fra cookie
-  const [store] = useState(Cookies.get('selectedStore') || ''); // Butikk hentet fra cookie
+  const [employee] = useState(Cookies.get('selectedEmployee') || ''); // Hent ansatt fra cookies
 
   useEffect(() => {
+    console.log('Butikk-ID ved oppdatering:', butikkid); // Logg butikk-ID for å verifisere at den hentes korrekt
     fetchDailyTasks();
     fetchCustomTasks();
-    fetchCompletedTasks(); // Hent fullførte oppgaver når komponenten laster
-  }, []);
+    fetchCompletedTasks();
+  }, [butikkid]);
+  
 
   // Hent daglige oppgaver fra serveren
   const fetchDailyTasks = async () => {
@@ -106,15 +106,18 @@ function TodoList() {
 
 // Funksjon for å legge til en ny egendefinert oppgave
 const handleAddCustomTask = async () => {
-  if (!newCustomTask || !customTaskDate) {
-    alert('Oppgaven og dato må fylles ut.');
+  if (!newCustomTask || !customTaskDate || !butikkid) {
+    alert('Oppgaven, dato og butikk-ID må fylles ut.');
     return;
   }
 
-  // Hent storeId fra cookies
-  const storeId = Cookies.get('selectedStoreId'); // Sørg for at 'selectedStoreId' er butikk-ID og ikke butikknavnet
-
   try {
+    console.log('Sender data til server:', {
+      task: newCustomTask,
+      dueDate: customTaskDate,
+      store: butikkid,
+    });
+
     const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks', {
       method: 'POST',
       headers: {
@@ -123,22 +126,25 @@ const handleAddCustomTask = async () => {
       body: JSON.stringify({
         task: newCustomTask,
         dueDate: customTaskDate,
-        store: storeId // Legg til storeId her for å lagre butikk-ID
+        store: parseInt(butikkid, 10), // Pass på at storeId er i riktig format
       }),
     });
 
     if (response.ok) {
       const addedTask = await response.json();
       setCustomTasks((prevTasks) => [...prevTasks, addedTask]);
-      setNewCustomTask(''); // Tilbakestill oppgavetekst
-      setCustomTaskDate(today); // Tilbakestill til dagens dato
+      setNewCustomTask('');
+      setCustomTaskDate(today);
+      console.log('Oppgave lagret:', addedTask);
     } else {
-      console.error('Feil ved lagring av oppgave');
+      const errorData = await response.json();
+      console.error('Feil ved lagring av oppgave:', errorData.message);
     }
   } catch (error) {
     console.error('Feil ved kommunikasjon med serveren:', error);
   }
 };
+
 
 
 
@@ -153,7 +159,6 @@ now.setHours(now.getHours());  // Legger til 2 timer
       taskType: 'daily',
       dateCompleted: now.toISOString(),  // Bruk ISO-format,
       employee,
-      store,
     };
 
     try {
@@ -198,7 +203,6 @@ now.setHours(now.getHours());  // Legger til 2 timer
     dueDate,
     dateCompleted: now.toISOString(),  // Bruk ISO-format, // Sørger for at fullføringsdato blir satt
     employee, // Ansatt som fullfører oppgaven
-    store,
   };
 
   try {
