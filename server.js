@@ -1037,9 +1037,11 @@ app.patch('/dailytasks/:id', async (req, res) => {
 
 // Oppdater en egendefinert oppgave
 app.patch('/customtasks/:id', async (req, res) => {
+  console.log('Mottok PATCH-forespørsel for customtask:', req.params.id, req.body);
   try {
     const task = await CustomTask.findById(req.params.id);
     if (!task) {
+      console.log('Custom task ikke funnet:', req.params.id);
       return res.status(404).json({ message: 'Egendefinert oppgave ikke funnet' });
     }
 
@@ -1048,19 +1050,22 @@ app.patch('/customtasks/:id', async (req, res) => {
     }
 
     if (req.body.completedBy != null) {
-      task.completedBy = req.body.completedBy; // Lagre ansatt som fullførte oppgaven
+      task.completedBy = req.body.completedBy;
     }
 
     if (req.body.dateCompleted != null) {
-      task.dateCompleted = req.body.dateCompleted; // Lagre fullføringsdato
+      task.dateCompleted = req.body.dateCompleted;
     }
 
     const updatedTask = await task.save();
+    console.log('Custom task oppdatert:', updatedTask);
     res.json(updatedTask);
   } catch (error) {
-    res.status(400).json({ message: 'Feil ved oppdatering av egendefinert oppgave', error });
+    console.error('Feil ved oppdatering av egendefinert oppgave:', error);
+    res.status(400).json({ message: 'Feil ved oppdatering av egendefinert oppgave' });
   }
 });
+
 
 
 
