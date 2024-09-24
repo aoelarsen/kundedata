@@ -1060,33 +1060,31 @@ const cron = require('node-cron');
 // Kjører hvert minutt
 cron.schedule('* * * * *', async () => {
   try {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // Sett tidspunktet til midnatt for å sammenligne datoene
+    console.log('Sjekker etter oppgaver som er fullført');
 
-    console.log('Sjekker etter oppgaver som er fullført før i dag:', today);
-
-    // Hent alle oppgaver som er fullført før i dag
+    // Hent alle oppgaver som er markert som fullført
     const tasksToDelete = await CustomTask.find({
-      completed: true,
-      dateCompleted: {
-        $lt: today // Sammenligner kun datoen
-      }
+      completed: true
     });
 
     console.log('Oppgaver som skal slettes:', tasksToDelete);
 
-    // Slett de oppgavene som ble fullført før i dag
+    // Slett alle oppgaver som er fullført
     const deleteResult = await CustomTask.deleteMany({
-      completed: true,
-      dateCompleted: {
-        $lt: today // Sammenligner kun datoen
-      }
+      completed: true
     });
 
     console.log('Antall slettede oppgaver:', deleteResult.deletedCount);
   } catch (error) {
     console.error('Feil ved sletting av fullførte oppgaver:', error);
   }
+});
+
+
+console.log('Antall slettede oppgaver:', deleteResult.deletedCount);
+  } catch (error) {
+  console.error('Feil ved sletting av fullførte oppgaver:', error);
+}
 });
 
 
