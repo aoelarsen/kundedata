@@ -848,6 +848,7 @@ const customTaskSchema = new mongoose.Schema({
   completed: { type: Boolean, default: false }, // Om oppgaven er fullført eller ikke
   dateCompleted: { type: Date }, // Datoen når oppgaven ble fullført
   completedBy: { type: String }, // Ansatt som fullførte oppgaven
+  store: { type: String, required: true } // Butikk-ID for å knytte oppgaven til riktig butikk
 });
 
 const CustomTask = mongoose.model('CustomTask', customTaskSchema);
