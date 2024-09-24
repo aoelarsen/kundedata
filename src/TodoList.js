@@ -141,7 +141,7 @@ function TodoList() {
     const bodyData = {
       task: taskDescription,
       taskType: 'daily',
-      dateCompleted: new Date().toISOString(),
+      dateCompleted: new Date().toLocaleString('no-NO', { timeZone: 'Europe/Oslo' }),
       employee,
       store,
     };
@@ -179,35 +179,43 @@ function TodoList() {
 
 
   // Funksjon for å markere en egendefinert oppgave som fullført
-  const handleCompleteCustomTask = async (taskId, taskDescription, dueDate) => {
-    const bodyData = {
-      task: taskDescription,
-      taskType: 'custom',
-      dueDate,
-      dateCompleted: new Date().toISOString(), // Sørger for at fullføringsdato blir satt
-      employee, // Ansatt som fullfører oppgaven
-      store,
-    };
-
-    try {
-      // Oppdater customtasks med fullføringsdato og ansatt
-      const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks/${taskId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ completed: true, completedBy: employee, dateCompleted: new Date().toISOString() }),
-      });
-
-      if (response.ok) {
-        setCustomTasks((prevTasks) =>
-          prevTasks.map((task) =>
-            task._id === taskId ? { ...task, completed: true, completedBy: employee, dateCompleted: new Date() } : task
-          )
-        );
-      }
-    } catch (error) {
-      console.error('Feil ved oppdatering av egendefinert oppgave:', error);
-    }
+const handleCompleteCustomTask = async (taskId, taskDescription, dueDate) => {
+  const bodyData = {
+    task: taskDescription,
+    taskType: 'custom',
+    dueDate,
+    dateCompleted: new Date().toLocaleString('no-NO', { timeZone: 'Europe/Oslo' }), // Sørger for at fullføringsdato blir satt
+    employee, // Ansatt som fullfører oppgaven
+    store,
   };
+
+  try {
+    // Oppdater completedtasks
+    await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(bodyData),
+    });
+
+    // Oppdater customtasks med fullføringsdato og ansatt
+    const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks/${taskId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ completed: true, completedBy: employee, dateCompleted: new Date().toISOString() }),
+    });
+
+    if (response.ok) {
+      setCustomTasks((prevTasks) =>
+        prevTasks.map((task) =>
+          task._id === taskId ? { ...task, completed: true, completedBy: employee, dateCompleted: new Date() } : task
+        )
+      );
+    }
+  } catch (error) {
+    console.error('Feil ved oppdatering av egendefinert oppgave:', error);
+  }
+};
+
 
 
 

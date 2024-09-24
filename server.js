@@ -1066,8 +1066,8 @@ app.patch('/customtasks/:id', async (req, res) => {
 
 const cron = require('node-cron');
 
-// Kjører hvert minutt
-cron.schedule('* * * * *', async () => {
+// Kjører hvert 5. minutt
+cron.schedule('*/5 * * * *', async () => {
   try {
     console.log('Sjekker etter oppgaver som er fullført');
 
