@@ -1094,6 +1094,9 @@ cron.schedule('0 0 * * *', async () => {
   }
 });
 
+const cron = require('node-cron');
+
+
 // Kjører hvert minutt for testing (du kan endre til hver dag ved midnatt for produksjon)
 cron.schedule('* * * * *', async () => {
   try {
