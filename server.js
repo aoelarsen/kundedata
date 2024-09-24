@@ -1080,7 +1080,27 @@ cron.schedule('* * * * *', async () => {
   }
 });
 
+// Cron job som kjører hvert minutt (for testing)
+cron.schedule('* * * * *', async () => {
+  try {
+    console.log('Sjekker etter fullførte faste oppgaver for tilbakestilling');
 
+    // Finn alle daglige oppgaver som er fullført
+    const tasksToReset = await DailyTask.find({ completed: true });
+
+    console.log('Oppgaver som skal tilbakestilles:', tasksToReset);
+
+    // Tilbakestill alle oppgaver ved å sette completed til false
+    const resetResult = await DailyTask.updateMany(
+      { completed: true },
+      { $set: { completed: false, completedBy: null } } // Setter completedBy til null eller blank
+    );
+
+    console.log('Antall tilbakestilte oppgaver:', resetResult.modifiedCount);
+  } catch (error) {
+    console.error('Feil ved tilbakestilling av daglige oppgaver:', error);
+  }
+});
 
 
 
