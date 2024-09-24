@@ -104,37 +104,39 @@ function TodoList() {
     }
   };
 
-  // Funksjon for å legge til en ny egendefinert oppgave
-  const handleAddCustomTask = async () => {
-    if (!newCustomTask || !customTaskDate) {
-      alert('Oppgaven og dato må fylles ut.');
-      return;
-    }
+// Funksjon for å legge til en ny egendefinert oppgave
+const handleAddCustomTask = async () => {
+  if (!newCustomTask || !customTaskDate) {
+    alert('Oppgaven og dato må fylles ut.');
+    return;
+  }
 
-    try {
-      const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          task: newCustomTask,
-          dueDate: customTaskDate,
-        }),
-      });
+  try {
+    const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        task: newCustomTask,
+        dueDate: customTaskDate,
+        store // Legg til butikkid her som hentes fra cookies
+      }),
+    });
 
-      if (response.ok) {
-        const addedTask = await response.json();
-        setCustomTasks((prevTasks) => [...prevTasks, addedTask]);
-        setNewCustomTask('');
-        setCustomTaskDate(today); // Tilbakestill til dagens dato
-      } else {
-        console.error('Feil ved lagring av oppgave');
-      }
-    } catch (error) {
-      console.error('Feil ved kommunikasjon med serveren:', error);
+    if (response.ok) {
+      const addedTask = await response.json();
+      setCustomTasks((prevTasks) => [...prevTasks, addedTask]);
+      setNewCustomTask(''); // Tilbakestill oppgavetekst
+      setCustomTaskDate(today); // Tilbakestill til dagens dato
+    } else {
+      console.error('Feil ved lagring av oppgave');
     }
-  };
+  } catch (error) {
+    console.error('Feil ved kommunikasjon med serveren:', error);
+  }
+};
+
 
   // Funksjon for å markere en daglig oppgave som fullført og lagre til databasen
   const handleCompleteDailyTask = async (taskId, taskDescription) => {

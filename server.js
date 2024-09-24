@@ -894,20 +894,21 @@ app.get('/customtasks', async (req, res) => {
 
 // Legg til en ny egendefinert oppgave
 app.post('/customtasks', async (req, res) => {
-  const { task, dueDate } = req.body;
+  const { task, dueDate, store } = req.body; // Inkluder butikk-ID fra request body
 
-  if (!task || !dueDate) {
-    return res.status(400).json({ message: 'Oppgaven og datoen er påkrevd' });
+  if (!task || !dueDate || !store) {
+    return res.status(400).json({ message: 'Oppgaven, datoen og butikk-ID er påkrevd' });
   }
 
   try {
-    const newTask = new CustomTask({ task, dueDate });
+    const newTask = new CustomTask({ task, dueDate, store }); // Lagre oppgave med butikk-ID
     await newTask.save();
     res.status(201).json(newTask);
   } catch (error) {
     res.status(500).json({ message: 'Feil ved opprettelse av egendefinert oppgave', error });
   }
 });
+
 
 const fetchDailyTasks = async () => {
   try {
