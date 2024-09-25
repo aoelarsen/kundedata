@@ -3,29 +3,26 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie'; // For å håndtere cookies
 
 function CreateService() {
-  const { customerNumber } = useParams(); // Hent customerNumber fra URL
+  const { customerNumber } = useParams();
   const navigate = useNavigate();
 
-  // State for å lagre ansatte
   const [employees, setEmployees] = useState([]);
-
-  console.log('Butikkid fra cookies:', Cookies.get('butikkid'));
-
-  // State for å lagre servicedetaljer inkludert valgt ansatt og butikkid
+  const [serviceTypes, setServiceTypes] = useState([]); // Ny state for tjenestetyper
   const [formData, setFormData] = useState({
+    type: '', // Nytt felt for tjenestetype
     Varemerke: '',
     Produkt: '',
     Størrelse: '',
     Farge: '',
     Beskrivelse: '',
-    ansatt: Cookies.get('selectedEmployee') || '', // Sett valgt ansatt fra cookies hvis tilgjengelig
-    butikkid: Cookies.get('butikkid') || '', // Hent butikkid fra cookies
-    kundeid: parseInt(customerNumber, 10), // Konverter customerNumber til et tall
-    serviceid: '', // Nytt felt for service ID
-    test: 'test' // Inkluder test-feltet
+    ansatt: Cookies.get('selectedEmployee') || '',
+    butikkid: Cookies.get('butikkid') || '',
+    kundeid: parseInt(customerNumber, 10),
+    serviceid: '',
+    test: 'test'
   });
 
-  // Hent siste service-ID når komponenten laster inn
+  // Hent siste service-ID og ansatte når komponenten laster inn
   useEffect(() => {
     const fetchLastServiceId = async () => {
       try {
@@ -36,14 +33,13 @@ function CreateService() {
 
         setFormData(prevData => ({
           ...prevData,
-          serviceid: nextServiceId // Lagre servicenummer i serviceid
+          serviceid: nextServiceId
         }));
       } catch (error) {
         console.error('Feil ved henting av siste service-ID:', error);
       }
     };
 
-    // Hent liste over ansatte fra API
     const fetchEmployees = async () => {
       try {
         const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/employees');
@@ -54,25 +50,32 @@ function CreateService() {
       }
     };
 
+    const fetchServiceTypes = async () => {
+      try {
+        const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/services/types');
+        const data = await response.json();
+        setServiceTypes(data); // Sett tjenestetyper fra API-et
+      } catch (error) {
+        console.error('Feil ved henting av tjenestetyper:', error);
+      }
+    };
+
     fetchLastServiceId();
     fetchEmployees();
+    fetchServiceTypes(); // Hent tjenestetyper
   }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // Hent butikkid basert på valgt ansatt
     if (name === 'ansatt') {
       const selectedEmployee = employees.find(emp => emp.navn === value);
-
-      // Oppdater formData med valgt ansatt og butikkid
       setFormData({
         ...formData,
         [name]: value,
-        butikkid: selectedEmployee ? selectedEmployee.butikkid : '' // Sett butikkid basert på valgt ansatt
+        butikkid: selectedEmployee ? selectedEmployee.butikkid : ''
       });
 
-      // Oppdater cookies med valgt ansatt og butikkid
       Cookies.set('selectedEmployee', value);
       if (selectedEmployee && selectedEmployee.butikkid) {
         Cookies.set('butikkid', selectedEmployee.butikkid);
@@ -85,28 +88,23 @@ function CreateService() {
     }
   };
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Sjekk at ansatt er valgt
     if (!formData.ansatt) {
       console.error('Ansatt er ikke valgt. Tjenesten kan ikke registreres uten ansatt.');
       return;
     }
 
-    // Formater registrert dato
     const newService = {
       ...formData,
-      serviceid: formData.serviceid, // Forsikre at serviceid er inkludert
-      butikkid: Cookies.get('butikkid') || formData.butikkid,  // Inkluder butikkid i tjenesten
-      registrertDato: new Date().toLocaleString('no-NO', { timeZone: 'Europe/Oslo' }), // Bruker lokal tid
-      status: 'Aktiv', // Sett standard status
-      endretdato: '', // Sett endretdato som tom
-      test: 'test' // Inkluder test-feltet
+      serviceid: formData.serviceid,
+      butikkid: Cookies.get('butikkid') || formData.butikkid,
+      registrertDato: new Date().toLocaleString('no-NO', { timeZone: 'Europe/Oslo' }),
+      status: 'Aktiv',
+      endretdato: '',
+      test: 'test'
     };
-
-    console.log('Sender servicedata til server:', newService);
 
     try {
       const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/services', {
@@ -119,8 +117,7 @@ function CreateService() {
 
       if (response.ok) {
         const addedService = await response.json();
-        console.log('Suksess! Tjeneste lagt til:', addedService);
-        navigate(`/service-details/${addedService._id}`); // Naviger til service-details med riktig ID
+        navigate(`/service-details/${addedService._id}`);
       } else {
         const responseText = await response.text();
         console.error('Feil ved registrering av tjeneste:', response.statusText, responseText);
@@ -134,6 +131,23 @@ function CreateService() {
     <div className="max-w-5xl mx-auto py-8 bg-white shadow-lg rounded-lg p-6 mb-4">
       <h2 className="text-2xl font-bold mb-4">Registrer ny tjeneste</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Type tjeneste</label>
+          <select
+            name="type"
+            value={formData.type}
+            onChange={handleChange}
+            required
+            className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+          >
+            <option value="">Velg en tjeneste</option>
+            {serviceTypes.map(serviceType => (
+              <option key={serviceType._id} value={serviceType.type}>
+                {serviceType.type}
+              </option>
+            ))}
+          </select>
+        </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">Varemerke</label>
           <input

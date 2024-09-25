@@ -1071,6 +1071,17 @@ app.patch('/customtasks/:id', async (req, res) => {
 });
 
 
+// Hent tjenestetyper fra "tjenester"-samlingen
+app.get('/services/types', async (req, res) => {
+  try {
+    const serviceTypes = await ServiceType.find({ status: 'active' }); // Hent kun aktive tjenester
+    res.status(200).json(serviceTypes);
+  } catch (error) {
+    console.error('Feil ved henting av tjenestetyper:', error);
+    res.status(500).json({ message: 'Feil ved henting av tjenestetyper' });
+  }
+});
+
 
 
 const cron = require('node-cron');
@@ -1127,7 +1138,6 @@ cron.schedule('0 3 * * *', async () => {
     console.error('Feil ved tilbakestilling av daglige oppgaver:', error);
   }
 });
-
 
 
 
