@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import ProtectedRoute from './ProtectedRoute';  // Importer ProtectedRoute
 import CustomerForm from './CustomerForm';
 import CustomerDetails from './CustomerDetails';
 import EditCustomer from './EditCustomer';
@@ -19,17 +20,11 @@ import CreateService from './CreateService';
 import SmsTemplateList from './SmsTemplateList';
 import SmsTemplateForm from './SmsTemplateForm';
 import SmsTemplateChange from './SmsTemplateChange';
-import SendSMS from './SendSMS'; // Import SendSMS
+import SendSMS from './SendSMS';
 import StatusForm from './StatusForm';
 import StatusList from './StatusList';
 import StatusChange from './StatusChange';
 import TodoList from './TodoList';
-
-
-
-
-
-
 
 function App() {
   const [customers, setCustomers] = useState([]);
@@ -39,7 +34,6 @@ function App() {
   const [filteredCustomers, setFilteredCustomers] = useState([]);
   const [phoneNumber, setPhoneNumber] = useState('');
 
-  // Bruk miljøvariabelen direkte
   const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
   useEffect(() => {
@@ -81,7 +75,7 @@ function App() {
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/Services`);
+        const response = await fetch(`${API_BASE_URL}/services`);
         if (response.ok) {
           const servicesData = await response.json();
           setServices(servicesData);
@@ -179,28 +173,33 @@ function App() {
               path="/service-details/:id"
               element={<ServiceDetails />}
             />
-<Route path="/service" element={<ServiceList services={services} />} />
+            <Route path="/service" element={<ServiceList services={services} />} />
 
-            <Route
-              path="/hjelpemidler"
-              element={<Calculator />}
-            />
+            <Route path="/hjelpemidler" element={<Calculator />} />
             <Route path="/sms-template-change/:id" element={<SmsTemplateChange />} />
 
-        <Route path="/sms-templates" element={<SmsTemplateList />} />
-        <Route path="/sms-template-form" element={<SmsTemplateForm />} />
+            <Route path="/sms-templates" element={<SmsTemplateList />} />
+            <Route path="/sms-template-form" element={<SmsTemplateForm />} />
             <Route path="/employees" element={<EmployeeList />} />
             <Route path="/employee-list" element={<EmployeeList />} />
             <Route path="/employee-change/:id" element={<EmployeeChange />} />
             <Route path="/employee-form" element={<EmployeeForm />} />
-            <Route path="/create-order/:customerNumber" element={<CreateOrder />} />
-            <Route path="/create-service/:customerNumber" element={<CreateService />} />
+
+            {/* Protected routes for CreateOrder and CreateService */}
+            <Route
+              path="/create-order/:customerNumber"
+              element={<ProtectedRoute element={<CreateOrder />} />}
+            />
+            <Route
+              path="/create-service/:customerNumber"
+              element={<ProtectedRoute element={<CreateService />} />}
+            />
+
             <Route path="/status-form" element={<StatusForm />} />
             <Route path="/status-list" element={<StatusList />} />
             <Route path="/status-change/:id" element={<StatusChange />} />
             <Route path="/sendsms" element={<SendSMS />} />
             <Route path="/todo" element={<TodoList />} />
-
           </Routes>
         </div>
       </div>

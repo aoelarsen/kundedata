@@ -5,10 +5,10 @@ import Cookies from 'js-cookie'; // For å håndtere cookies
 function CreateService() {
   const { customerNumber } = useParams(); // Hent customerNumber fra URL
   const navigate = useNavigate();
-  
+
   // State for å lagre ansatte
   const [employees, setEmployees] = useState([]);
-  
+
   console.log('Butikkid fra cookies:', Cookies.get('butikkid'));
 
   // State for å lagre servicedetaljer inkludert valgt ansatt og butikkid
@@ -64,14 +64,19 @@ function CreateService() {
     // Hent butikkid basert på valgt ansatt
     if (name === 'ansatt') {
       const selectedEmployee = employees.find(emp => emp.navn === value);
-      console.log('Selected Employee:', selectedEmployee); // Logg den valgte ansatte
-      console.log('ButikkID fra valgt ansatt:', selectedEmployee ? selectedEmployee.butikkid : 'Ingen butikkid funnet'); // Logg butikkid
 
+      // Oppdater formData med valgt ansatt og butikkid
       setFormData({
         ...formData,
         [name]: value,
         butikkid: selectedEmployee ? selectedEmployee.butikkid : '' // Sett butikkid basert på valgt ansatt
       });
+
+      // Oppdater cookies med valgt ansatt og butikkid
+      Cookies.set('selectedEmployee', value);
+      if (selectedEmployee && selectedEmployee.butikkid) {
+        Cookies.set('butikkid', selectedEmployee.butikkid);
+      }
     } else {
       setFormData({
         ...formData,
@@ -80,15 +85,16 @@ function CreateService() {
     }
   };
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     // Sjekk at ansatt er valgt
     if (!formData.ansatt) {
       console.error('Ansatt er ikke valgt. Tjenesten kan ikke registreres uten ansatt.');
       return;
     }
-  
+
     // Formater registrert dato
     const newService = {
       ...formData,
@@ -99,9 +105,9 @@ function CreateService() {
       endretdato: '', // Sett endretdato som tom
       test: 'test' // Inkluder test-feltet
     };
-  
+
     console.log('Sender servicedata til server:', newService);
-  
+
     try {
       const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/services', {
         method: 'POST',
@@ -110,7 +116,7 @@ function CreateService() {
         },
         body: JSON.stringify(newService),
       });
-  
+
       if (response.ok) {
         const addedService = await response.json();
         console.log('Suksess! Tjeneste lagt til:', addedService);
@@ -123,7 +129,7 @@ function CreateService() {
       console.error('Feil ved kommunikasjon med serveren:', error);
     }
   };
-  
+
   return (
     <div className="max-w-5xl mx-auto py-8 bg-white shadow-lg rounded-lg p-6 mb-4">
       <h2 className="text-2xl font-bold mb-4">Registrer ny tjeneste</h2>

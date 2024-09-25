@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import Cookies from 'js-cookie'; 
+import Cookies from 'js-cookie';
 
 function CreateOrder() {
-  const { customerNumber } = useParams(); 
+  const { customerNumber } = useParams();
   const navigate = useNavigate();
-  
+
   const [employees, setEmployees] = useState([]);
 
   // State for å lagre ordredetaljer inkludert valgt ansatt og butikkid
@@ -15,10 +15,10 @@ function CreateOrder() {
     Størrelse: '',
     Farge: '',
     Kommentar: '',
-    Ansatt: Cookies.get('selectedEmployee') || '', 
-    butikkid: Cookies.get('butikkid') || '', 
-    kundeid: parseInt(customerNumber, 10), 
-    ordreid: '', 
+    Ansatt: Cookies.get('selectedEmployee') || '',
+    butikkid: Cookies.get('butikkid') || '',
+    kundeid: parseInt(customerNumber, 10),
+    ordreid: '',
   });
 
   useEffect(() => {
@@ -31,7 +31,7 @@ function CreateOrder() {
 
         setFormData(prevData => ({
           ...prevData,
-          ordreid: nextOrderId 
+          ordreid: nextOrderId
         }));
       } catch (error) {
         console.error('Feil ved henting av siste ordre-ID:', error);
@@ -57,11 +57,19 @@ function CreateOrder() {
 
     if (name === 'Ansatt') {
       const selectedEmployee = employees.find(emp => emp.navn === value);
+
+      // Oppdater valgt ansatt i state og i cookies
       setFormData({
         ...formData,
         [name]: value,
-        butikkid: selectedEmployee ? selectedEmployee.butikkid : '' 
+        butikkid: selectedEmployee ? selectedEmployee.butikkid : ''
       });
+
+      // Oppdater cookies med valgt ansatt og butikkid
+      Cookies.set('selectedEmployee', value);
+      if (selectedEmployee && selectedEmployee.butikkid) {
+        Cookies.set('butikkid', selectedEmployee.butikkid);
+      }
     } else {
       setFormData({
         ...formData,
@@ -69,6 +77,7 @@ function CreateOrder() {
       });
     }
   };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -78,8 +87,8 @@ function CreateOrder() {
       ordreid: formData.ordreid,
       butikkid: Cookies.get('butikkid') || formData.butikkid,
       registrertDato: new Date().toLocaleString('no-NO', { timeZone: 'Europe/Oslo' }), // Bruker lokal tid
-      status: 'Aktiv', 
-      endretdato: '', 
+      status: 'Aktiv',
+      endretdato: '',
     };
 
     console.log('Sender ordredata til server:', newOrder);
@@ -96,7 +105,7 @@ function CreateOrder() {
       if (response.ok) {
         const addedOrder = await response.json();
         console.log('Suksess! Ordre lagt til:', addedOrder);
-        navigate(`/order-details/${addedOrder._id}`); 
+        navigate(`/order-details/${addedOrder._id}`);
       } else {
         const responseText = await response.text();
         console.error('Feil ved registrering av ordre:', response.statusText, responseText);

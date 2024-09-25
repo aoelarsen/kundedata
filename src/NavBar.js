@@ -50,6 +50,16 @@ function NavBar() {
     fetchStores();
   }, []);
 
+  const handleNavigation = (e, path) => {
+    if (!selectedEmployee) {
+      e.preventDefault(); // Hindre navigasjon
+      setIsEmployeeModalOpen(true); // Åpne modal for å velge ansatt
+    } else {
+      window.location.href = path; // Fortsett navigasjon
+    }
+  };
+
+
   const handleStoreChange = (event) => {
     const selectedStoreName = event.target.value;
     const selectedStoreObject = stores.find(store => store.butikknavn === selectedStoreName);
@@ -109,7 +119,9 @@ function NavBar() {
     <nav className="bg-gray-800 p-4">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <Link to="/" className="text-white text-lg font-semibold">Søk/Registrer</Link>
+          <Link to="/" className="text-white text-lg font-semibold" onClick={(e) => handleNavigation(e, '/customer-list')}>Søk/Registrer</Link>
+
+
 
           {/* Employee dropdown */}
           <select
@@ -128,10 +140,10 @@ function NavBar() {
         </div>
 
         <div className="hidden md:flex items-center space-x-4">
-          <Link to="/customer-list" className="text-white text-lg font-semibold">KUNDER</Link>
-          <Link to="/ordre" className="text-white text-lg font-semibold">ORDRE</Link>
-          <Link to="/service" className="text-white text-lg font-semibold">SERVICE</Link>
-          <Link to="/todo" className="text-white text-lg font-semibold">TO DO</Link>
+          <Link to="/customer-list" className="text-white text-lg font-semibold" onClick={(e) => handleNavigation(e, '/customer-list')}>KUNDER</Link>
+          <Link to="/ordre" className="text-white text-lg font-semibold" onClick={(e) => handleNavigation(e, '/ordre')}>ORDRE</Link>
+          <Link to="/service" className="text-white text-lg font-semibold" onClick={(e) => handleNavigation(e, '/service')}>SERVICE</Link>
+          <Link to="/todo" className="text-white text-lg font-semibold" onClick={(e) => handleNavigation(e, '/todo')}>TO DO</Link>
           {selectedStore && (
             <span className="text-white ml-4">Butikk: {selectedStore}</span>
           )}
