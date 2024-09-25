@@ -3,18 +3,20 @@ import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import { format, parse } from 'date-fns';
 
-
 function ServiceList() {
+  const [serviceTypes, setServiceTypes] = useState([]); // State for tjenestetyper
+  const [serviceTypeFilter, setServiceTypeFilter] = useState(Cookies.get('serviceTypeFilter') || ''); // Hent serviceType fra cookies eller sett default til ''
   const [services, setServices] = useState([]);
   const [filteredServices, setFilteredServices] = useState([]); // State for filtrerte tjenester
   const [hoveredService, setHoveredService] = useState(null); // For å holde hover til beskrivelse
   const [tooltipStyle, setTooltipStyle] = useState({});
   const [searchQuery, setSearchQuery] = useState(''); // Søkefelt
-  const [statusFilter, setStatusFilter] = useState('Aktiv'); // Status-filter
+  const [statusFilter, setStatusFilter] = useState(Cookies.get('statusFilter') || 'Aktiv'); // Hent status fra cookies eller sett default til 'Aktiv'
   const navigate = useNavigate();
   const butikkid = parseInt(Cookies.get('butikkid'), 10) || null;
   const tableRef = useRef();
 
+  // Hent tjenester fra API og filtrer basert på status og servicetype
   useEffect(() => {
     const fetchServices = async () => {
       try {
@@ -22,8 +24,12 @@ function ServiceList() {
         if (response.ok) {
           const data = await response.json();
 
-          // Filtrer tjenester basert på butikkid og status
-          const filteredData = data.filter(service => service.butikkid === butikkid && service.status === statusFilter);
+          // Filtrer tjenester basert på butikkid, status og servicetype
+          const filteredData = data.filter(service =>
+            service.butikkid === butikkid &&
+            service.status === statusFilter &&
+            (serviceTypeFilter === '' || service.servicetype === serviceTypeFilter) // Filtrering for servicetype
+          );
           setServices(filteredData);
           setFilteredServices(filteredData);
         } else {
@@ -34,7 +40,39 @@ function ServiceList() {
       }
     };
     fetchServices();
-  }, [butikkid, statusFilter]);
+  }, [butikkid, statusFilter, serviceTypeFilter]); // Legg til serviceTypeFilter som avhengighet
+
+  // Hent tilgjengelige servicetyper fra API-et
+  useEffect(() => {
+    const fetchServiceTypes = async () => {
+      try {
+        const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/servicetypes');
+        if (response.ok) {
+          const data = await response.json();
+          setServiceTypes(data); // Sett tjenestetyper fra API-et
+        } else {
+          console.error('Feil ved henting av tjenestetyper:', response.statusText);
+        }
+      } catch (error) {
+        console.error('Feil ved kommunikasjon med serveren:', error);
+      }
+    };
+    fetchServiceTypes();
+  }, []);
+
+  // Håndter endring av status og lagre i cookies
+  const handleStatusFilterChange = (e) => {
+    const newStatus = e.target.value;
+    setStatusFilter(newStatus);
+    Cookies.set('statusFilter', newStatus); // Lagre valget i cookies
+  };
+
+  // Håndter endring av servicetype og lagre i cookies
+  const handleServiceTypeFilterChange = (e) => {
+    const newServiceType = e.target.value;
+    setServiceTypeFilter(newServiceType);
+    Cookies.set('serviceTypeFilter', newServiceType); // Lagre valget i cookies
+  };
 
   // Funksjon for å håndtere søk
   const handleSearch = (e) => {
@@ -47,7 +85,8 @@ function ServiceList() {
       service.Produkt.toLowerCase().includes(query) ||
       service.Størrelse?.toLowerCase().includes(query) ||
       service.Farge?.toLowerCase().includes(query) ||
-      service.beskrivelse?.toLowerCase().includes(query)
+      service.beskrivelse?.toLowerCase().includes(query) &&
+      (serviceTypeFilter === '' || service.servicetype === serviceTypeFilter) // Inkluder servicetype-filter
     );
 
     setFilteredServices(filtered);
@@ -69,41 +108,48 @@ function ServiceList() {
     setHoveredService(null);
   };
 
-// Funksjon for å parse datoformatet fra serveren og returnere en formatert dato
-const parseCustomDateString = (dateString) => {
-  // Prøver å parse streng med formatet 'd.M.yyyy, HH:mm:ss' (forventet format fra databasen)
-  const parsedDate = parse(dateString, 'd.M.yyyy, HH:mm:ss', new Date());
-  return isNaN(parsedDate) ? null : parsedDate;
-};
+  // Funksjon for å parse datoformatet fra serveren og returnere en formatert dato
+  const parseCustomDateString = (dateString) => {
+    const parsedDate = parse(dateString, 'd.M.yyyy, HH:mm:ss', new Date());
+    return isNaN(parsedDate) ? null : parsedDate;
+  };
 
-const formatDate = (dateString) => {
-  // Hvis datoen er ugyldig eller ikke eksisterer, returner "Ukjent dato"
-  if (!dateString) {
-    return "Ukjent dato";
-  }
-
-  const parsedDate = parseCustomDateString(dateString);
-
-  if (!parsedDate) {
-    return "Ugyldig dato";
-  }
-
-  // Returner formatert dato i ønsket format
-  return format(parsedDate, 'd.M.yyyy HH:mm');
-};
+  const formatDate = (dateString) => {
+    if (!dateString) return "Ukjent dato";
+    const parsedDate = parseCustomDateString(dateString);
+    return parsedDate ? format(parsedDate, 'd.M.yyyy HH:mm') : "Ugyldig dato";
+  };
 
   return (
     <div className="max-w-5xl mx-auto py-8 bg-white shadow-lg rounded-lg p-6 mb-4">
-      <div className="flex justify-between mb-4">
+      <div className="flex justify-between items-center mb-4 space-x-4">
         <h3 className="text-2xl font-semibold text-gray-800">Tjenester</h3>
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="p-2 border border-gray-300 rounded-md"
-        >
-          <option value="Aktiv">Aktiv</option>
-          <option value="Avsluttet">Avsluttet</option>
-        </select>
+
+        <div className="ml-auto flex space-x-4"> {/* Flex container for servicetype og status */}
+          {/* Service-type-filter */}
+          <select
+            value={serviceTypeFilter}
+            onChange={handleServiceTypeFilterChange}
+            className="p-2 border border-gray-300 rounded-md"
+          >
+            <option value="">Viser alle tjenester</option>
+            {serviceTypes.map((serviceType) => (
+              <option key={serviceType._id} value={serviceType.type}>
+                {serviceType.type}
+              </option>
+            ))}
+          </select>
+
+          {/* Status-filter */}
+          <select
+            value={statusFilter}
+            onChange={handleStatusFilterChange}
+            className="p-2 border border-gray-300 rounded-md"
+          >
+            <option value="Aktiv">Aktiv</option>
+            <option value="Avsluttet">Avsluttet</option>
+          </select>
+        </div>
       </div>
 
       {/* Søkefelt */}
@@ -162,6 +208,7 @@ const formatDate = (dateString) => {
       </div>
     </div>
   );
+
 }
 
 export default ServiceList;
