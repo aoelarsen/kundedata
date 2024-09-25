@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Cookies from 'js-cookie';
 
 function TodoList() {
@@ -8,24 +8,16 @@ function TodoList() {
   const [completedTasks, setCompletedTasks] = useState([]);
 
   // Hent butikk-ID fra cookies som i OrderList
-  const butikkid = parseInt(Cookies.get('butikkid'), 10) || null; // Konverterer til heltall, eller null hvis ikke tilgjengelig
+  const butikkid = parseInt(Cookies.get('butikkid'), 10) || null;
 
   // Hent dagens dato i formatet yyyy-mm-dd for input type="date"
   const today = new Date().toISOString().split('T')[0];
 
   const [customTaskDate, setCustomTaskDate] = useState(today);
-  const [employee] = useState(Cookies.get('selectedEmployee') || ''); // Hent ansatt fra cookies
+  const [employee] = useState(Cookies.get('selectedEmployee') || '');
 
-  useEffect(() => {
-    console.log('Butikk-ID ved oppdatering:', butikkid); // Logg butikk-ID for å verifisere at den hentes korrekt
-    fetchDailyTasks();
-    fetchCustomTasks();
-    fetchCompletedTasks();
-  }, [butikkid]);
-
-
-  // Hent daglige oppgaver fra serveren
-  const fetchDailyTasks = async () => {
+  // Hent daglige oppgaver
+  const fetchDailyTasks = useCallback(async () => {
     try {
       const [dailyTasksResponse, completedTasksResponse] = await Promise.all([
         fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/dailytasks'),
@@ -38,14 +30,11 @@ function TodoList() {
       // Filtrer oppgaver relatert til butikkID
       const filteredDailyTasks = dailyTasksData.filter(task => task.store === butikkid);
 
-      const today = new Date().toISOString().split('T')[0];
       const updatedDailyTasks = await Promise.all(
         filteredDailyTasks.map(async (task) => {
           const completedTask = completedTasksData.find(ct => ct.task === task.task && ct.store === butikkid);
-
           if (completedTask) {
             const completedDate = new Date(completedTask.dateCompleted).toISOString().split('T')[0];
-
             if (completedDate === today) {
               return { ...task, completed: true, completedBy: completedTask.employee };
             } else {
@@ -66,11 +55,10 @@ function TodoList() {
     } catch (error) {
       console.error('Feil ved henting av faste oppgaver:', error);
     }
-  };
+  }, [butikkid, today]);
 
-
-
-  const fetchCustomTasks = async () => {
+  // Hent egendefinerte oppgaver
+  const fetchCustomTasks = useCallback(async () => {
     try {
       const [customTasksResponse, completedTasksResponse] = await Promise.all([
         fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks'),
@@ -80,7 +68,6 @@ function TodoList() {
       const customTasksData = await customTasksResponse.json();
       const completedTasksData = await completedTasksResponse.json();
 
-      // Filtrer oppgaver relatert til butikkID
       const filteredCustomTasks = customTasksData.filter(task => task.store === butikkid);
 
       const updatedCustomTasks = filteredCustomTasks.map(task => {
@@ -94,23 +81,27 @@ function TodoList() {
     } catch (error) {
       console.error('Feil ved henting av egendefinerte oppgaver:', error);
     }
-  };
+  }, [butikkid]);
 
-
-  const fetchCompletedTasks = async () => {
+  // Hent fullførte oppgaver
+  const fetchCompletedTasks = useCallback(async () => {
     try {
       const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks');
       const data = await response.json();
 
-      // Filtrer completedTasks basert på butikknummer
       const filteredTasks = data.filter(task => task.store === butikkid);
 
       setCompletedTasks(filteredTasks.slice(-10).reverse()); // Hent de siste 10 oppgavene og sorter nyeste først
     } catch (error) {
       console.error('Feil ved henting av fullførte oppgaver:', error);
     }
-  };
+  }, [butikkid]);
 
+  useEffect(() => {
+    fetchDailyTasks();
+    fetchCustomTasks();
+    fetchCompletedTasks();
+  }, [fetchDailyTasks, fetchCustomTasks, fetchCompletedTasks]);
 
   // Funksjon for å legge til en ny egendefinert oppgave
   const handleAddCustomTask = async () => {
@@ -120,12 +111,6 @@ function TodoList() {
     }
 
     try {
-      console.log('Sender data til server:', {
-        task: newCustomTask,
-        dueDate: customTaskDate,
-        store: butikkid,
-      });
-
       const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks', {
         method: 'POST',
         headers: {
@@ -134,7 +119,7 @@ function TodoList() {
         body: JSON.stringify({
           task: newCustomTask,
           dueDate: customTaskDate,
-          store: parseInt(butikkid, 10), // Pass på at storeId er i riktig format
+          store: butikkid,
         }),
       });
 
@@ -143,51 +128,35 @@ function TodoList() {
         setCustomTasks((prevTasks) => [...prevTasks, addedTask]);
         setNewCustomTask('');
         setCustomTaskDate(today);
-        console.log('Oppgave lagret:', addedTask);
       } else {
-        const errorData = await response.json();
-        console.error('Feil ved lagring av oppgave:', errorData.message);
+        console.error('Feil ved lagring av oppgave');
       }
     } catch (error) {
       console.error('Feil ved kommunikasjon med serveren:', error);
     }
   };
 
-
-
-
-
-
-  // Funksjon for å markere en daglig oppgave som fullført og lagre til databasen
+  // Funksjon for å markere en daglig oppgave som fullført
   const handleCompleteDailyTask = async (taskId, taskDescription) => {
-    const now = new Date();
-    now.setHours(now.getHours());  // Legger til 2 timer
     const bodyData = {
       task: taskDescription,
       taskType: 'daily',
-      dateCompleted: now.toISOString(),  // Bruk ISO-format,
+      dateCompleted: new Date().toISOString(),
       employee,
-      store: butikkid, // Legger til butikk-ID fra cookie
-
+      store: butikkid,
     };
 
     try {
-      // Oppdater completedtasks
       await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(bodyData),
       });
 
-      // Oppdater dailytasks
       const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/dailytasks/${taskId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          completed: true,
-          completedBy: employee,
-          dateCompleted: new Date().toISOString() // Legg til fullføringsdato
-        }),
+        body: JSON.stringify({ completed: true, completedBy: employee, dateCompleted: new Date().toISOString() }),
       });
 
       if (response.ok) {
@@ -202,29 +171,24 @@ function TodoList() {
     }
   };
 
-
   // Funksjon for å markere en egendefinert oppgave som fullført
   const handleCompleteCustomTask = async (taskId, taskDescription, dueDate) => {
-    const now = new Date();
-    now.setHours(now.getHours());  // Legger til 2 timer
     const bodyData = {
       task: taskDescription,
       taskType: 'custom',
       dueDate,
-      dateCompleted: now.toISOString(),  // Sørger for at fullføringsdato blir satt
-      employee, // Ansatt som fullfører oppgaven
-      store: butikkid, // Legger til butikk-ID fra cookie
+      dateCompleted: new Date().toISOString(),
+      employee,
+      store: butikkid,
     };
 
     try {
-      // Oppdater completedtasks med fullføringsdato, ansatt og butikkid
       await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(bodyData),
       });
 
-      // Oppdater customtasks med fullføringsdato, ansatt og butikkid
       const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks/${taskId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -242,13 +206,6 @@ function TodoList() {
       console.error('Feil ved oppdatering av egendefinert oppgave:', error);
     }
   };
-
-
-
-
-
-
-
 
   return (
     <div className="max-w-5xl mx-auto py-8 bg-white shadow-lg rounded-lg p-6 mb-4">
@@ -303,7 +260,6 @@ function TodoList() {
               )}
             </li>
           ))}
-
         </ul>
 
         <div className="mt-6">
