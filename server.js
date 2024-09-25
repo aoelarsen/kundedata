@@ -706,13 +706,6 @@ app.post('/services', async (req, res) => {
 });
 
 
-const newService = await service.save();
-res.status(201).json(newService);
-  } catch (err) {
-  res.status(400).json({ message: err.message });
-}
-});
-
 // Update a service
 app.patch('/services/:id', async (req, res) => {
   try {
