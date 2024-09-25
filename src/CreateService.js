@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import Cookies from 'js-cookie'; // For å håndtere cookies
+import Cookies from 'js-cookie';
 
 function CreateService() {
   const { customerNumber } = useParams();
   const navigate = useNavigate();
 
   const [employees, setEmployees] = useState([]);
-  const [serviceTypes, setServiceTypes] = useState([]); // Ny state for tjenestetyper
+  const [serviceTypes, setServiceTypes] = useState([]); // State for tjenestetyper
   const [formData, setFormData] = useState({
-    type: '', // Nytt felt for tjenestetype
+    type: '',
     Varemerke: '',
     Produkt: '',
     Størrelse: '',
@@ -22,7 +22,7 @@ function CreateService() {
     test: 'test'
   });
 
-  // Hent siste service-ID og ansatte når komponenten laster inn
+  // Hent siste service-ID, ansatte og tjenestetyper når komponenten laster inn
   useEffect(() => {
     const fetchLastServiceId = async () => {
       try {
@@ -52,7 +52,7 @@ function CreateService() {
 
     const fetchServiceTypes = async () => {
       try {
-        const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/services/types');
+        const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/servicetypes');
         const data = await response.json();
         setServiceTypes(data); // Sett tjenestetyper fra API-et
       } catch (error) {
@@ -96,6 +96,11 @@ function CreateService() {
       return;
     }
 
+    if (!formData.type) {
+      console.error('Tjenestetype er ikke valgt. Tjenesten kan ikke registreres uten tjenestetype.');
+      return;
+    }
+
     const newService = {
       ...formData,
       serviceid: formData.serviceid,
@@ -103,7 +108,7 @@ function CreateService() {
       registrertDato: new Date().toLocaleString('no-NO', { timeZone: 'Europe/Oslo' }),
       status: 'Aktiv',
       endretdato: '',
-      test: 'test'
+      servicetype: formData.type // Sender tjenestetype til serveren
     };
 
     try {
@@ -127,6 +132,7 @@ function CreateService() {
     }
   };
 
+
   return (
     <div className="max-w-5xl mx-auto py-8 bg-white shadow-lg rounded-lg p-6 mb-4">
       <h2 className="text-2xl font-bold mb-4">Registrer ny tjeneste</h2>
@@ -141,7 +147,7 @@ function CreateService() {
             className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
           >
             <option value="">Velg en tjeneste</option>
-            {serviceTypes.map(serviceType => (
+            {serviceTypes.length > 0 && serviceTypes.map(serviceType => (
               <option key={serviceType._id} value={serviceType.type}>
                 {serviceType.type}
               </option>

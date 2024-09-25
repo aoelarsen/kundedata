@@ -79,8 +79,10 @@ const serviceSchema = new mongoose.Schema({
   kundeid: Number,
   KundeTelefon: String,
   serviceid: Number,
-  butikkid: Number
+  butikkid: Number,
+  servicetype: String // Nytt felt for tjenestetype
 });
+
 
 const Service = mongoose.model('Service', serviceSchema);
 
@@ -692,7 +694,8 @@ app.post('/services', async (req, res) => {
       kundeid: req.body.kundeid,
       KundeTelefon: req.body.KundeTelefon,
       serviceid: nextServiceId,
-      butikkid: req.body.butikkid
+      butikkid: req.body.butikkid,
+      servicetype: req.body.servicetype // Lagrer tjenestetype
     });
 
     const newService = await service.save();
@@ -700,6 +703,14 @@ app.post('/services', async (req, res) => {
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
+});
+
+
+const newService = await service.save();
+res.status(201).json(newService);
+  } catch (err) {
+  res.status(400).json({ message: err.message });
+}
 });
 
 // Update a service
