@@ -211,23 +211,26 @@ function TodoList() {
     <div className="max-w-5xl mx-auto py-8 bg-white shadow-lg rounded-lg p-6 mb-4">
       <h2 className="text-3xl font-bold mb-6 text-center">Todo-liste</h2>
 
+      {/* Faste oppgaver */}
       <div>
         <h3 className="text-2xl font-bold mb-4">Faste oppgaver</h3>
         <ul>
           {dailyTasks.map((task) => (
-            <li key={task._id} className="flex justify-between items-center mb-2">
-              <span>
+            <li key={task._id} className="flex flex-row justify-between items-center mb-2">
+              <span className="flex-1">
                 {task.task}
                 {task.completed && (
-                  <span className="ml-2 text-green-600">(Utført av: {task.completedBy})</span>
+                  <div className="text-green-600 md:ml-4">(Utført av: {task.completedBy})</div>
                 )}
               </span>
               {!task.completed ? (
                 <button
                   onClick={() => handleCompleteDailyTask(task._id, task.task)}
-                  className="bg-green-500 text-white px-4 py-1 rounded"
+                  className="bg-green-500 text-white px-4 py-1 rounded md:ml-4"
                 >
-                  Merk som utført
+                  {/* Merk-knapp på mobil, Merk som utført på større skjermer */}
+                  <span className="block md:hidden">Merk</span>
+                  <span className="hidden md:block">Merk som utført</span>
                 </button>
               ) : (
                 <span className="text-gray-500">Utført</span>
@@ -237,23 +240,25 @@ function TodoList() {
         </ul>
       </div>
 
+      {/* Dagens oppgaver */}
       <div className="mt-8">
         <h3 className="text-2xl font-bold mb-4">Dagens oppgaver</h3>
         <ul>
           {customTasks.map((task) => (
-            <li key={task._id} className="flex justify-between items-center mb-2">
-              <span>
-                {task.task} - {new Date(task.dueDate).toLocaleDateString()}
+            <li key={task._id} className="flex flex-row justify-between items-center mb-2">
+              <span className="flex-1">
+                {task.task}
                 {task.completed && (
-                  <span className="ml-2 text-green-600">(Utført av: {task.completedBy})</span>
+                  <div className="text-green-600 md:ml-4">(Utført av: {task.completedBy})</div>
                 )}
               </span>
               {!task.completed ? (
                 <button
                   onClick={() => handleCompleteCustomTask(task._id, task.task, task.dueDate)}
-                  className="bg-green-500 text-white px-4 py-1 rounded"
+                  className="bg-green-500 text-white px-4 py-1 rounded md:ml-4"
                 >
-                  Merk som utført
+                  <span className="block md:hidden">Merk</span>
+                  <span className="hidden md:block">Merk som utført</span>
                 </button>
               ) : (
                 <span className="text-gray-500">Utført</span>
@@ -290,7 +295,7 @@ function TodoList() {
             <tr className="bg-gray-100">
               <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Oppgave</th>
               <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Utført av</th>
-              <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Dato</th>
+              <th className="hidden md:table-cell px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Dato</th>
             </tr>
           </thead>
           <tbody>
@@ -298,7 +303,7 @@ function TodoList() {
               <tr key={task._id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{task.task}</td>
                 <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{task.employee}</td>
-                <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">
+                <td className="hidden md:table-cell px-6 py-4 border-b border-gray-200 text-sm text-gray-700">
                   {new Date(task.dateCompleted).toLocaleDateString()} {new Date(task.dateCompleted).toLocaleTimeString()}
                 </td>
               </tr>
@@ -308,6 +313,9 @@ function TodoList() {
       </div>
     </div>
   );
+
+
+
 }
 
 export default TodoList;
