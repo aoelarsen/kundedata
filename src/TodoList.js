@@ -201,19 +201,20 @@ function TodoList() {
       task: taskDescription,
       taskType: 'custom',
       dueDate,
-      dateCompleted: now.toISOString(),  // Bruk ISO-format, // Sørger for at fullføringsdato blir satt
+      dateCompleted: now.toISOString(),  // Sørger for at fullføringsdato blir satt
       employee, // Ansatt som fullfører oppgaven
+      store: butikkid, // Legger til butikk-ID fra cookie
     };
 
     try {
-      // Oppdater completedtasks
+      // Oppdater completedtasks med fullføringsdato, ansatt og butikkid
       await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(bodyData),
       });
 
-      // Oppdater customtasks med fullføringsdato og ansatt
+      // Oppdater customtasks med fullføringsdato, ansatt og butikkid
       const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks/${taskId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -231,6 +232,7 @@ function TodoList() {
       console.error('Feil ved oppdatering av egendefinert oppgave:', error);
     }
   };
+
 
 
 

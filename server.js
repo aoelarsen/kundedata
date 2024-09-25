@@ -836,6 +836,7 @@ const dailyTaskSchema = new mongoose.Schema({
   completed: { type: Boolean, default: false },
   completedBy: { type: String }, // Sørg for at dette kan ta imot strenger
   dateCompleted: { type: Date }, // Sørg for at dette kan ta imot datoverdier
+
 });
 
 const DailyTask = mongoose.model('DailyTask', dailyTaskSchema);
