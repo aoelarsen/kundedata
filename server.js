@@ -939,7 +939,7 @@ const completedTaskSchema = new mongoose.Schema({
   dueDate: { type: Date }, // Valgfritt for custom tasks
   employee: { type: String, required: true },
   dateCompleted: { type: Date, required: true },
-  store: { type: String, required: true } // Butikk-ID
+  store: { type: Number, required: true } // Butikk-ID
 });
 
 
@@ -1075,7 +1075,7 @@ app.patch('/customtasks/:id', async (req, res) => {
 const cron = require('node-cron');
 
 // Kjører hver dag ved midnatt
-cron.schedule('0 0 * * *', async () => {
+cron.schedule('0 3 * * *', async () => {
   try {
     console.log('Sjekker etter oppgaver som er fullført og eldre enn dagens dato');
 
@@ -1106,7 +1106,7 @@ cron.schedule('0 0 * * *', async () => {
 
 
 // Kjører hvert minutt for testing (du kan endre til hver dag ved midnatt for produksjon)
-cron.schedule('0 0 * * *', async () => {
+cron.schedule('0 3 * * *', async () => {
   try {
     console.log('Tilbakestiller fullførte daglige oppgaver');
 
