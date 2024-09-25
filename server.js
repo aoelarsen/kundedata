@@ -1071,14 +1071,39 @@ app.patch('/customtasks/:id', async (req, res) => {
 });
 
 
-// Hent tjenestetyper fra "tjenester"-samlingen
-app.get('/services/types', async (req, res) => {
+// Schema for ServiceType
+const serviceTypeSchema = new mongoose.Schema({
+  type: { type: String, required: true },
+  status: { type: String, required: true }
+});
+
+// Model for ServiceType
+const ServiceType = mongoose.model('ServiceType', serviceTypeSchema);
+
+module.exports = ServiceType;
+
+
+
+// Endpoint to get all service types
+app.get('/servicetypes', async (req, res) => {
   try {
-    const serviceTypes = await ServiceType.find({ status: 'active' }); // Hent kun aktive tjenester
-    res.status(200).json(serviceTypes);
-  } catch (error) {
-    console.error('Feil ved henting av tjenestetyper:', error);
-    res.status(500).json({ message: 'Feil ved henting av tjenestetyper' });
+    const serviceTypes = await ServiceType.find(); // Henter alle tjenestetyper
+    res.json(serviceTypes);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Endpoint to get a single service type by ID
+app.get('/servicetypes/:id', async (req, res) => {
+  try {
+    const serviceType = await ServiceType.findById(req.params.id);
+    if (serviceType == null) {
+      return res.status(404).json({ message: 'Tjenestetype ikke funnet' });
+    }
+    res.json(serviceType);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 });
 
