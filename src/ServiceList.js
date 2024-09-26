@@ -80,13 +80,13 @@ function ServiceList() {
     setSearchQuery(query);
 
     const filtered = services.filter(service =>
-      service.serviceid.toString().includes(query) ||
-      service.Varemerke.toLowerCase().includes(query) ||
-      service.Produkt.toLowerCase().includes(query) ||
-      service.Størrelse?.toLowerCase().includes(query) ||
-      service.Farge?.toLowerCase().includes(query) ||
-      service.beskrivelse?.toLowerCase().includes(query) &&
-      (serviceTypeFilter === '' || service.servicetype === serviceTypeFilter) // Inkluder servicetype-filter
+      (service.serviceid.toString().includes(query) ||
+        service.Varemerke.toLowerCase().includes(query) ||
+        service.Produkt.toLowerCase().includes(query) ||
+        service.Størrelse?.toLowerCase().includes(query) ||
+        service.Farge?.toLowerCase().includes(query) ||
+        service.beskrivelse?.toLowerCase().includes(query)) && // Legg til parentes rundt hele OR-betingelsen
+      (serviceTypeFilter === '' || service.servicetype === serviceTypeFilter) // Legg til parentes rundt servicetype-filteret
     );
 
     setFilteredServices(filtered);
