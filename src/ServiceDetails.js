@@ -26,76 +26,63 @@ function ServiceDetails() {
   };
   
   const formatDateTime = (dateString) => {
-    // Hvis datoen er ugyldig eller ikke eksisterer, returner "Ukjent dato"
     if (!dateString) {
       return "Ukjent dato";
     }
-    
     const parsedDate = parseCustomDateString(dateString);
-    
     if (!parsedDate) {
       return "Ugyldig dato";
     }
-  
-    // Returner formatert dato i ønsket format
     return format(parsedDate, 'd.M.yyyy HH:mm');
   };
 
-// Hent servicedetaljer
-useEffect(() => {
-  const fetchService = async () => {
-    try {
-      const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/services/${id}`);
-      if (response.ok) {
-        const service = await response.json();
-        
-        // Legg inn console.log for å se om ansatt blir hentet
-        console.log('Service data:', service);
-        console.log('Ansatt fra service:', service.ansatt);
+  // Hent servicedetaljer
+  useEffect(() => {
+    const fetchService = async () => {
+      try {
+        const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/services/${id}`);
+        if (response.ok) {
+          const service = await response.json();
+          setServiceDetails(service); // Setter serviceDetails med data fra API
+          setFormData({
+            beskrivelse: service.Beskrivelse,
+            status: service.status || 'Aktiv',
+            ansatt: service.ansatt || '',
+            Varemerke: service.Varemerke,
+            Produkt: service.Produkt,
+            Størrelse: service.Størrelse,
+            Farge: service.Farge,
+          });
 
-        setServiceDetails(service);
-        setFormData({
-          beskrivelse: service.Beskrivelse,
-          status: service.status || 'Aktiv',
-          ansatt: service.ansatt || '', // Pass på at ansatt er riktig referert
-          Varemerke: service.Varemerke,
-          Produkt: service.Produkt,
-          Størrelse: service.Størrelse,
-          Farge: service.Farge,
-        });
-
-        if (service.kundeid) {
-          fetchCustomer(service.kundeid);
+          if (service.kundeid) {
+            fetchCustomer(service.kundeid);
+          }
+        } else {
+          console.error('Tjeneste ble ikke funnet');
         }
-      } else {
-        console.error('Tjeneste ble ikke funnet');
+      } catch (error) {
+        console.error('Feil ved henting av tjenesten:', error);
       }
-    } catch (error) {
-      console.error('Feil ved henting av tjenesten:', error);
-    }
-  };
+    };
 
-  const fetchCustomer = async (kundeid) => {
-    try {
-      const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customers?customerNumber`);
-      if (response.ok) {
-        const customerData = await response.json();
-        const customer = customerData.find(c => c.customerNumber === kundeid);
-        if (customer) {
-          setCustomer(customer);
+    const fetchCustomer = async (kundeid) => {
+      try {
+        const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customers?customerNumber`);
+        if (response.ok) {
+          const customerData = await response.json();
+          const customer = customerData.find(c => c.customerNumber === kundeid);
+          if (customer) {
+            setCustomer(customer);
+          }
         }
+      } catch (error) {
+        console.error('Feil ved henting av kunden:', error);
       }
-    } catch (error) {
-      console.error('Feil ved henting av kunden:', error);
-    }
-  };
+    };
 
-  fetchService();
-}, [id]);
+    fetchService();
+  }, [id]);
 
-
-
-  // Hent ansatte fra databasen
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
@@ -124,11 +111,8 @@ useEffect(() => {
   
     const updatedService = {
       ...formData,
-      endretdato: new Date().toLocaleString('no-NO', { timeZone: 'Europe/Oslo' }), // Bruker lokal tid
+      endretdato: new Date().toLocaleString('no-NO', { timeZone: 'Europe/Oslo' }),
     };
-  
-    // Legg til logging for å se hva som faktisk sendes
-    console.log('Oppdatert tjeneste som sendes til server:', updatedService);
   
     try {
       const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/services/${id}`, {
@@ -151,9 +135,7 @@ useEffect(() => {
       console.error('Feil ved kommunikasjon med serveren:', error);
     }
   };
-  
 
-  // Funksjon for å skrive ut labelen
   const handlePrintLabel = () => {
     if (customer && serviceDetails) {
       const printWindow = window.open('', '', 'width=500,height=300');
@@ -193,15 +175,16 @@ useEffect(() => {
     }
   };
 
-  // Funksjon for å navigere til SendSMS.js
   const handleSendSMS = () => {
     navigate('/sendsms', { state: { serviceDetails, customer } });
   };
-  
 
   return (
     <div className="max-w-5xl mx-auto py-8 bg-white shadow-lg rounded-lg p-6 mb-4">
-      <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Tjenestedetaljer</h2>
+      {/* Dynamisk tittel med servicetype */}
+      <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">
+        {serviceDetails?.servicetype ? `Tjenestedetaljer - ${serviceDetails.servicetype}` : 'Tjenestedetaljer'}
+      </h2>
 
       {/* Vis registrert dato og endret dato øverst */}
       {serviceDetails && (
@@ -233,7 +216,6 @@ useEffect(() => {
         </div>
       )}
 
-      {/* Legg til knapper for utskrift og SMS */}
       <div className="flex justify-between mb-6">
         <button
           onClick={handlePrintLabel}
@@ -250,7 +232,6 @@ useEffect(() => {
         </button>
       </div>
 
-      {/* Resten av skjemaet for tjenesteoppdatering */}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700">Varemerke:</label>
@@ -316,22 +297,21 @@ useEffect(() => {
           </select>
         </div>
         <div>
-  <label className="block text-sm font-medium text-gray-700">Ansatt:</label>
-  <select
-    name="ansatt"
-    value={formData.ansatt}
-    onChange={handleChange}
-    className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-  >
-    <option value="">Velg ansatt</option>
-    {employees.map((employee) => (
-      <option key={employee._id} value={employee.navn}>
-        {employee.navn}
-      </option>
-    ))}
-  </select>
-  {/* Legg til logging for å se valgte ansatt */}
-</div>
+          <label className="block text-sm font-medium text-gray-700">Ansatt:</label>
+          <select
+            name="ansatt"
+            value={formData.ansatt}
+            onChange={handleChange}
+            className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+          >
+            <option value="">Velg ansatt</option>
+            {employees.map((employee) => (
+              <option key={employee._id} value={employee.navn}>
+                {employee.navn}
+              </option>
+            ))}
+          </select>
+        </div>
 
         <div className="text-center mt-6">
           <button

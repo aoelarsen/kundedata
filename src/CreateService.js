@@ -177,7 +177,7 @@ function CreateService() {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">Størrelse</label>
+          <label className="block text-sm font-medium text-gray-700">Størrelse/lengde</label>
           <input
             type="text"
             name="Størrelse"
@@ -199,7 +199,7 @@ function CreateService() {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">Beskrivelse</label>
+          <label className="block text-sm font-medium text-gray-700">Beskrivelse av jobben som skal gjøres</label>
           <input
             type="text"
             name="Beskrivelse"
