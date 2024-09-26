@@ -267,23 +267,30 @@ function TodoList() {
           ))}
         </ul>
 
+        {/* Legg til ny oppgave - justert for to linjer på mobil */}
         <div className="mt-6">
-          <input
-            type="text"
-            placeholder="Ny oppgave"
-            value={newCustomTask}
-            onChange={(e) => setNewCustomTask(e.target.value)}
-            className="border p-2 rounded mr-2"
-          />
-          <input
-            type="date"
-            value={customTaskDate}
-            onChange={(e) => setCustomTaskDate(e.target.value)}
-            className="border p-2 rounded mr-2"
-          />
-          <button onClick={handleAddCustomTask} className="bg-blue-500 text-white px-4 py-1 rounded">
-            Legg til oppgave
-          </button>
+          <div className="flex flex-col space-y-2 md:space-y-0 md:flex-row md:space-x-2">
+            {/* Første linje - Oppgavefelt */}
+            <input
+              type="text"
+              placeholder="Ny oppgave"
+              value={newCustomTask}
+              onChange={(e) => setNewCustomTask(e.target.value)}
+              className="border p-2 rounded w-full"
+            />
+          </div>
+          <div className="flex flex-col space-y-2 md:space-y-0 md:flex-row md:space-x-2 mt-2">
+            {/* Andre linje - Dato og knapp */}
+            <input
+              type="date"
+              value={customTaskDate}
+              onChange={(e) => setCustomTaskDate(e.target.value)}
+              className="border p-2 rounded w-full md:w-auto"
+            />
+            <button onClick={handleAddCustomTask} className="bg-blue-500 text-white px-4 py-2 rounded w-full md:w-auto">
+              Legg til oppgave
+            </button>
+          </div>
         </div>
       </div>
 
@@ -313,6 +320,7 @@ function TodoList() {
       </div>
     </div>
   );
+
 
 
 
