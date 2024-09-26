@@ -1113,65 +1113,6 @@ app.get('/servicetypes/:id', async (req, res) => {
 
 
 
-const cron = require('node-cron');
-
-// Denne cron-jobben kjører en gang i timen (på hver hele time)
-cron.schedule('0 * * * *', async () => {
-  try {
-    console.log('Sjekker etter oppgaver som er fullført og eldre enn dagens dato');
-    
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // Sett til midnatt for dagens dato
-
-    // Hent alle egendefinerte oppgaver som er markert som fullført og har en fullføringsdato før i dag
-    const tasksToDelete = await CustomTask.find({
-      completed: true,
-      dateCompleted: { $lt: today }, // Filtrer for oppgaver der dateCompleted er før dagens dato
-    });
-
-    console.log('Oppgaver som skal slettes:', tasksToDelete);
-
-    // Slett alle oppgaver som er fullført og der dateCompleted er før i dag
-    const deleteResult = await CustomTask.deleteMany({
-      completed: true,
-      dateCompleted: { $lt: today }, // Sørg for at fullførte oppgaver med dato eldre enn i dag blir slettet
-    });
-
-    console.log('Antall slettede oppgaver:', deleteResult.deletedCount);
-  } catch (error) {
-    console.error('Feil ved sletting av fullførte oppgaver:', error);
-  }
-});
-
-
-
-// Denne cron-jobben kjører en gang i timen (hver hele time)
-cron.schedule('0 * * * *', async () => {
-  try {
-    console.log('Sjekker og tilbakestiller fullførte daglige oppgaver hvis de er eldre enn dagens dato');
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // Sett dagens dato til midnatt
-
-    // Hent alle daglige oppgaver som er markert som fullført og har en fullføringsdato før dagens dato
-    const tasksToReset = await DailyTask.find({
-      completed: true,
-      dateCompleted: { $lt: today } // Filtrer for oppgaver som ble fullført før dagens dato
-    });
-
-    console.log('Oppgaver som skal tilbakestilles:', tasksToReset);
-
-    // Tilbakestill fullførte daglige oppgaver
-    const resetResult = await DailyTask.updateMany(
-      { completed: true, dateCompleted: { $lt: today } }, // Bare de som ble fullført før i dag
-      { $set: { completed: false, completedBy: null, dateCompleted: null } } // Tilbakestill status
-    );
-
-    console.log('Antall tilbakestilte oppgaver:', resetResult.modifiedCount);
-  } catch (error) {
-    console.error('Feil ved tilbakestilling av daglige oppgaver:', error);
-  }
-});
 
 
 
