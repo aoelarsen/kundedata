@@ -7,16 +7,12 @@ function TodoList() {
   const [newCustomTask, setNewCustomTask] = useState('');
   const [completedTasks, setCompletedTasks] = useState([]);
 
-  // Hent butikk-ID fra cookies som i OrderList
   const butikkid = parseInt(Cookies.get('butikkid'), 10) || null;
-
-  // Hent dagens dato i formatet yyyy-mm-dd for input type="date"
   const today = new Date().toISOString().split('T')[0];
 
   const [customTaskDate, setCustomTaskDate] = useState(today);
   const [employee] = useState(Cookies.get('selectedEmployee') || '');
 
-  // Hent daglige oppgaver
   const fetchDailyTasks = useCallback(async () => {
     try {
       const [dailyTasksResponse, completedTasksResponse] = await Promise.all([
@@ -27,22 +23,19 @@ function TodoList() {
       const dailyTasksData = await dailyTasksResponse.json();
       const completedTasksData = await completedTasksResponse.json();
 
-      // Filtrer oppgaver relatert til butikkID
       const filteredDailyTasks = dailyTasksData.filter(task => task.store === butikkid);
 
       const updatedDailyTasks = filteredDailyTasks.map((task) => {
         const completedTask = completedTasksData.find(ct => ct.task === task.task && ct.store === butikkid);
 
-        // Hvis oppgaven er fullført, sjekk om den ble fullført i dag
         if (completedTask) {
           const completedDate = new Date(completedTask.dateCompleted).toISOString().split('T')[0];
 
-          // Hvis fullføringsdatoen er dagens dato, behold den som fullført
           if (completedDate === today) {
             return { ...task, completed: true, completedBy: completedTask.employee, dateCompleted: completedTask.dateCompleted };
           }
         }
-        return task; // Behold oppgaven som den er hvis ikke fullført i dag
+        return task;
       });
 
       setDailyTasks(updatedDailyTasks);
@@ -51,8 +44,6 @@ function TodoList() {
     }
   }, [butikkid, today]);
 
-
-  // Hent egendefinerte oppgaver
   const fetchCustomTasks = useCallback(async () => {
     try {
       const [customTasksResponse, completedTasksResponse] = await Promise.all([
@@ -69,38 +60,37 @@ function TodoList() {
 
           if (completedTask) {
             const completedDate = new Date(completedTask.dateCompleted).toISOString().split('T')[0];
+            
+            // Endret slettelogikk for å unngå umiddelbar sletting
+            const timeDifference = new Date(today) - new Date(completedDate);
+            const daysDifference = timeDifference / (1000 * 60 * 60 * 24);
 
-            // Hvis fullføringsdatoen er eldre enn dagens dato, slett oppgaven fra customTasks
-            if (completedDate !== today) {
+            if (daysDifference > 1) {  // Slett kun hvis oppgaven er mer enn en dag gammel
               await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks/${task._id}`, {
                 method: 'DELETE',
               });
-              return null;  // Returner null slik at vi kan filtrere bort denne oppgaven
+              return null;
             }
             return { ...task, completed: true, completedBy: completedTask.employee, dateCompleted: completedTask.dateCompleted };
           }
 
-          return task;  // Hvis ikke fullført, behold oppgaven
+          return task;
         })
       );
 
-      // Filtrer bort null-oppgaver
       setCustomTasks(filteredCustomTasks.filter(task => task !== null));
     } catch (error) {
       console.error('Feil ved henting av egendefinerte oppgaver:', error);
     }
   }, [butikkid, today]);
 
-
-  // Hent fullførte oppgaver
   const fetchCompletedTasks = useCallback(async () => {
     try {
       const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks');
       const data = await response.json();
 
       const filteredTasks = data.filter(task => task.store === butikkid);
-
-      setCompletedTasks(filteredTasks.slice(-10).reverse()); // Hent de siste 10 oppgavene og sorter nyeste først
+      setCompletedTasks(filteredTasks.slice(-10).reverse());
     } catch (error) {
       console.error('Feil ved henting av fullførte oppgaver:', error);
     }
@@ -112,7 +102,6 @@ function TodoList() {
     fetchCompletedTasks();
   }, [fetchDailyTasks, fetchCustomTasks, fetchCompletedTasks]);
 
-  // Funksjon for å legge til en ny egendefinert oppgave
   const handleAddCustomTask = async () => {
     if (!newCustomTask || !customTaskDate || !butikkid) {
       alert('Oppgaven, dato og butikk-ID må fylles ut.');
@@ -145,15 +134,8 @@ function TodoList() {
     }
   };
 
-  // Funksjon for å markere en daglig oppgave som fullført
-  // Funksjon for å markere en daglig oppgave som fullført
   const handleCompleteDailyTask = async (taskId, taskDescription) => {
-    const completionDate = new Date().toISOString(); // Fullføringsdato
-    const formattedToday = new Date().toISOString().split('T')[0]; // Dagens dato i formatet yyyy-mm-dd
-
-    console.log('Dagens dato:', formattedToday);
-    console.log('Oppgave fullført på dato:', completionDate.split('T')[0]);
-
+    const completionDate = new Date().toISOString();
     const bodyData = {
       task: taskDescription,
       taskType: 'daily',
@@ -163,14 +145,12 @@ function TodoList() {
     };
 
     try {
-      // Lagre fullført oppgave i completedTasks
       await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(bodyData),
       });
 
-      // Oppdater status for daglig oppgave i dailytasks
       const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/dailytasks/${taskId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -189,8 +169,6 @@ function TodoList() {
     }
   };
 
-
-  // Funksjon for å markere en egendefinert oppgave som fullført
   const handleCompleteCustomTask = async (taskId, taskDescription, dueDate) => {
     const bodyData = {
       task: taskDescription,
@@ -247,7 +225,6 @@ function TodoList() {
                   onClick={() => handleCompleteDailyTask(task._id, task.task)}
                   className="bg-green-500 text-white px-4 py-1 rounded md:ml-4"
                 >
-                  {/* Merk-knapp på mobil, Merk som utført på større skjermer */}
                   <span className="block md:hidden">Merk</span>
                   <span className="hidden md:block">Merk som utført</span>
                 </button>
@@ -332,9 +309,6 @@ function TodoList() {
       </div>
     </div>
   );
-
-
-
 }
 
 export default TodoList;
