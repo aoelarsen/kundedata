@@ -30,32 +30,27 @@ function TodoList() {
       // Filtrer oppgaver relatert til butikkID
       const filteredDailyTasks = dailyTasksData.filter(task => task.store === butikkid);
 
-      const updatedDailyTasks = await Promise.all(
-        filteredDailyTasks.map(async (task) => {
-          const completedTask = completedTasksData.find(ct => ct.task === task.task && ct.store === butikkid);
-          if (completedTask) {
-            const completedDate = new Date(completedTask.dateCompleted).toISOString().split('T')[0];
-            if (completedDate === today) {
-              return { ...task, completed: true, completedBy: completedTask.employee };
-            } else {
-              await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/dailytasks/${task._id}`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ completed: false, completedBy: null, dateCompleted: null }),
-              });
-              return { ...task, completed: false, completedBy: null };
-            }
-          } else {
-            return task;
+      const updatedDailyTasks = filteredDailyTasks.map((task) => {
+        const completedTask = completedTasksData.find(ct => ct.task === task.task && ct.store === butikkid);
+
+        // Hvis oppgaven er fullført, sjekk om den ble fullført i dag
+        if (completedTask) {
+          const completedDate = new Date(completedTask.dateCompleted).toISOString().split('T')[0];
+
+          // Hvis fullføringsdatoen er dagens dato, behold den som fullført
+          if (completedDate === today) {
+            return { ...task, completed: true, completedBy: completedTask.employee, dateCompleted: completedTask.dateCompleted };
           }
-        })
-      );
+        }
+        return task; // Behold oppgaven som den er hvis ikke fullført i dag
+      });
 
       setDailyTasks(updatedDailyTasks);
     } catch (error) {
       console.error('Feil ved henting av faste oppgaver:', error);
     }
   }, [butikkid, today]);
+
 
   // Hent egendefinerte oppgaver
   const fetchCustomTasks = useCallback(async () => {
@@ -68,20 +63,34 @@ function TodoList() {
       const customTasksData = await customTasksResponse.json();
       const completedTasksData = await completedTasksResponse.json();
 
-      const filteredCustomTasks = customTasksData.filter(task => task.store === butikkid);
+      const filteredCustomTasks = await Promise.all(
+        customTasksData.filter(task => task.store === butikkid).map(async (task) => {
+          const completedTask = completedTasksData.find(ct => ct.task === task.task && ct.store === butikkid);
 
-      const updatedCustomTasks = filteredCustomTasks.map(task => {
-        const completedTask = completedTasksData.find(ct => ct.task === task.task && ct.store === butikkid);
-        return completedTask
-          ? { ...task, completed: true, completedBy: completedTask.employee, dateCompleted: completedTask.dateCompleted }
-          : task;
-      });
+          if (completedTask) {
+            const completedDate = new Date(completedTask.dateCompleted).toISOString().split('T')[0];
 
-      setCustomTasks(updatedCustomTasks);
+            // Hvis fullføringsdatoen er eldre enn dagens dato, slett oppgaven fra customTasks
+            if (completedDate !== today) {
+              await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks/${task._id}`, {
+                method: 'DELETE',
+              });
+              return null;  // Returner null slik at vi kan filtrere bort denne oppgaven
+            }
+            return { ...task, completed: true, completedBy: completedTask.employee, dateCompleted: completedTask.dateCompleted };
+          }
+
+          return task;  // Hvis ikke fullført, behold oppgaven
+        })
+      );
+
+      // Filtrer bort null-oppgaver
+      setCustomTasks(filteredCustomTasks.filter(task => task !== null));
     } catch (error) {
       console.error('Feil ved henting av egendefinerte oppgaver:', error);
     }
-  }, [butikkid]);
+  }, [butikkid, today]);
+
 
   // Hent fullførte oppgaver
   const fetchCompletedTasks = useCallback(async () => {
@@ -137,32 +146,41 @@ function TodoList() {
   };
 
   // Funksjon for å markere en daglig oppgave som fullført
+  // Funksjon for å markere en daglig oppgave som fullført
   const handleCompleteDailyTask = async (taskId, taskDescription) => {
+    const completionDate = new Date().toISOString(); // Fullføringsdato
+    const formattedToday = new Date().toISOString().split('T')[0]; // Dagens dato i formatet yyyy-mm-dd
+
+    console.log('Dagens dato:', formattedToday);
+    console.log('Oppgave fullført på dato:', completionDate.split('T')[0]);
+
     const bodyData = {
       task: taskDescription,
       taskType: 'daily',
-      dateCompleted: new Date().toISOString(),
+      dateCompleted: completionDate,
       employee,
       store: butikkid,
     };
 
     try {
+      // Lagre fullført oppgave i completedTasks
       await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(bodyData),
       });
 
+      // Oppdater status for daglig oppgave i dailytasks
       const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/dailytasks/${taskId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ completed: true, completedBy: employee, dateCompleted: new Date().toISOString() }),
+        body: JSON.stringify({ completed: true, completedBy: employee, dateCompleted: completionDate }),
       });
 
       if (response.ok) {
         setDailyTasks((prevTasks) =>
           prevTasks.map((task) =>
-            task._id === taskId ? { ...task, completed: true, completedBy: employee, dateCompleted: new Date() } : task
+            task._id === taskId ? { ...task, completed: true, completedBy: employee, dateCompleted: completionDate } : task
           )
         );
       }
@@ -170,6 +188,7 @@ function TodoList() {
       console.error('Feil ved oppdatering av daglig oppgave:', error);
     }
   };
+
 
   // Funksjon for å markere en egendefinert oppgave som fullført
   const handleCompleteCustomTask = async (taskId, taskDescription, dueDate) => {
@@ -267,30 +286,23 @@ function TodoList() {
           ))}
         </ul>
 
-        {/* Legg til ny oppgave - justert for to linjer på mobil */}
         <div className="mt-6">
-          <div className="flex flex-col space-y-2 md:space-y-0 md:flex-row md:space-x-2">
-            {/* Første linje - Oppgavefelt */}
-            <input
-              type="text"
-              placeholder="Ny oppgave"
-              value={newCustomTask}
-              onChange={(e) => setNewCustomTask(e.target.value)}
-              className="border p-2 rounded w-full"
-            />
-          </div>
-          <div className="flex flex-col space-y-2 md:space-y-0 md:flex-row md:space-x-2 mt-2">
-            {/* Andre linje - Dato og knapp */}
-            <input
-              type="date"
-              value={customTaskDate}
-              onChange={(e) => setCustomTaskDate(e.target.value)}
-              className="border p-2 rounded w-full md:w-auto"
-            />
-            <button onClick={handleAddCustomTask} className="bg-blue-500 text-white px-4 py-2 rounded w-full md:w-auto">
-              Legg til oppgave
-            </button>
-          </div>
+          <input
+            type="text"
+            placeholder="Ny oppgave"
+            value={newCustomTask}
+            onChange={(e) => setNewCustomTask(e.target.value)}
+            className="border p-2 rounded mr-2"
+          />
+          <input
+            type="date"
+            value={customTaskDate}
+            onChange={(e) => setCustomTaskDate(e.target.value)}
+            className="border p-2 rounded mr-2"
+          />
+          <button onClick={handleAddCustomTask} className="bg-blue-500 text-white px-4 py-1 rounded">
+            Legg til oppgave
+          </button>
         </div>
       </div>
 
@@ -320,7 +332,6 @@ function TodoList() {
       </div>
     </div>
   );
-
 
 
 
