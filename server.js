@@ -86,6 +86,18 @@ const serviceSchema = new mongoose.Schema({
 
 const Service = mongoose.model('Service', serviceSchema);
 
+const todoSchema = new mongoose.Schema({
+  task: { type: String, required: true },
+  registeredDate: { type: Date, default: Date.now },
+  completed: { type: Boolean, default: false },
+  completedBy: { type: String },
+  dateCompleted: { type: Date },
+  store: { type: Number, required: true }
+});
+
+const Todo = mongoose.model('Todo', todoSchema);
+
+
 
 app.get('/orders/last-order-id', async (req, res) => {
   try {
@@ -1086,6 +1098,8 @@ const ServiceType = mongoose.model('ServiceType', serviceTypeSchema);
 
 module.exports = ServiceType;
 
+
+
 // Endpoint to get all service types
 app.get('/servicetypes', async (req, res) => {
   try {
@@ -1109,44 +1123,29 @@ app.get('/servicetypes/:id', async (req, res) => {
   }
 });
 
-app.use(cors());
-
-mongoose.connect('mongodb+srv://<username>:<password>@cluster.mongodb.net/todoApp', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-
-const taskSchema = new mongoose.Schema({
-  task: { type: String, required: true },
-  registeredDate: { type: Date, required: true },
-  store: { type: Number, required: true },
-  completed: { type: Boolean, default: false },
-  completedBy: { type: String },
-  dateCompleted: { type: Date },
-});
-
-const Task = mongoose.model('Task', taskSchema);
-
-// Endepunkt for å hente alle oppgaver
-app.get('/tasks', async (req, res) => {
+// Hent alle oppgaver
+app.get('/todos', async (req, res) => {
   try {
-    const tasks = await Task.find();
+    const tasks = await Todo.find();
     res.status(200).json(tasks);
   } catch (error) {
     res.status(500).json({ message: 'Feil ved henting av oppgaver', error });
   }
 });
 
-// Endepunkt for å legge til ny oppgave
-app.post('/tasks', async (req, res) => {
-  const { task, registeredDate, store } = req.body;
+// Legg til en ny oppgave
+app.post('/todos', async (req, res) => {
+  const { task, store } = req.body;
 
-  if (!task || !registeredDate || !store) {
-    return res.status(400).json({ message: 'Oppgave, dato og butikk-ID må fylles ut' });
+  if (!task || !store) {
+    return res.status(400).json({ message: 'Oppgaven og butikk-ID er påkrevd' });
   }
 
   try {
-    const newTask = new Task({ task, registeredDate, store });
+    const newTask = new Todo({
+      task,
+      store
+    });
     await newTask.save();
     res.status(201).json(newTask);
   } catch (error) {
@@ -1154,17 +1153,25 @@ app.post('/tasks', async (req, res) => {
   }
 });
 
-// Endepunkt for å markere oppgave som fullført
-app.patch('/tasks/:id', async (req, res) => {
+// Oppdater en oppgave som fullført
+app.patch('/todos/:id', async (req, res) => {
   try {
-    const task = await Task.findById(req.params.id);
+    const task = await Todo.findById(req.params.id);
     if (!task) {
       return res.status(404).json({ message: 'Oppgave ikke funnet' });
     }
 
-    task.completed = req.body.completed;
-    task.completedBy = req.body.completedBy;
-    task.dateCompleted = req.body.dateCompleted;
+    if (req.body.completed != null) {
+      task.completed = req.body.completed;
+    }
+
+    if (req.body.completedBy != null) {
+      task.completedBy = req.body.completedBy;
+    }
+
+    if (req.body.dateCompleted != null) {
+      task.dateCompleted = req.body.dateCompleted;
+    }
 
     const updatedTask = await task.save();
     res.json(updatedTask);
