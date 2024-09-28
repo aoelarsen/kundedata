@@ -60,28 +60,25 @@ function TodoList() {
   // Hent egendefinerte oppgaver
   const fetchCustomTasks = useCallback(async () => {
     try {
-      const [customTasksResponse, completedTasksResponse] = await Promise.all([
-        fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks'),
-        fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks?taskType=custom')
+      const [customTasksResponse] = await Promise.all([
+        fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks')
       ]);
-
+  
       const customTasksData = await customTasksResponse.json();
-      const completedTasksData = await completedTasksResponse.json();
-
       const filteredCustomTasks = customTasksData.filter(task => task.store === butikkid);
-
-      const updatedCustomTasks = filteredCustomTasks.map(task => {
-        const completedTask = completedTasksData.find(ct => ct.task === task.task && ct.store === butikkid);
-        return completedTask
-          ? { ...task, completed: true, completedBy: completedTask.employee, dateCompleted: completedTask.dateCompleted }
-          : task;
-      });
-
+  
+      // Sett oppgaver med dateCompleted og completedBy, men completed er fortsatt false
+      const updatedCustomTasks = filteredCustomTasks.map(task => ({
+        ...task,
+        completed: !!task.dateCompleted && !!task.completedBy // Markér som fullført hvis dateCompleted og completedBy finnes
+      }));
+  
       setCustomTasks(updatedCustomTasks);
     } catch (error) {
       console.error('Feil ved henting av egendefinerte oppgaver:', error);
     }
   }, [butikkid]);
+  
 
   // Hent fullførte oppgaver
   const fetchCompletedTasks = useCallback(async () => {
@@ -181,24 +178,28 @@ function TodoList() {
       employee,
       store: butikkid,
     };
-
+  
     try {
+      // Legg til oppgaven i 'completedtasks' collection
       await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(bodyData),
       });
-
+  
+      // Oppdater 'customtasks' med utførtdato og ansatt
       const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks/${taskId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ completed: true, completedBy: employee, dateCompleted: new Date().toISOString() }),
+        body: JSON.stringify({ completedBy: employee, dateCompleted: new Date().toISOString() }),
       });
-
+  
       if (response.ok) {
         setCustomTasks((prevTasks) =>
           prevTasks.map((task) =>
-            task._id === taskId ? { ...task, completed: true, completedBy: employee, dateCompleted: new Date() } : task
+            task._id === taskId
+              ? { ...task, completedBy: employee, dateCompleted: new Date(), completed: !!employee }
+              : task
           )
         );
       }
@@ -206,7 +207,9 @@ function TodoList() {
       console.error('Feil ved oppdatering av egendefinert oppgave:', error);
     }
   };
-
+  
+  
+  
   return (
     <div className="max-w-5xl mx-auto py-8 bg-white shadow-lg rounded-lg p-6 mb-4">
       <h2 className="text-3xl font-bold mb-6 text-center">Todo-liste</h2>
@@ -240,32 +243,33 @@ function TodoList() {
         </ul>
       </div>
 
-      {/* Dagens oppgaver */}
-      <div className="mt-8">
-        <h3 className="text-2xl font-bold mb-4">Dagens oppgaver</h3>
-        <ul>
-          {customTasks.map((task) => (
-            <li key={task._id} className="flex flex-row justify-between items-center mb-2">
-              <span className="flex-1">
-                {task.task}
-                {task.completed && (
-                  <div className="text-green-600 md:ml-4">(Utført av: {task.completedBy})</div>
-                )}
-              </span>
-              {!task.completed ? (
-                <button
-                  onClick={() => handleCompleteCustomTask(task._id, task.task, task.dueDate)}
-                  className="bg-green-500 text-white px-4 py-1 rounded md:ml-4"
-                >
-                  <span className="block md:hidden">Merk</span>
-                  <span className="hidden md:block">Merk som utført</span>
-                </button>
-              ) : (
-                <span className="text-gray-500">Utført</span>
-              )}
-            </li>
-          ))}
-        </ul>
+   {/* Dagens oppgaver */}
+<div className="mt-8">
+  <h3 className="text-2xl font-bold mb-4">Dagens oppgaver</h3>
+  <ul>
+    {customTasks.map((task) => (
+      <li key={task._id} className="flex flex-row justify-between items-center mb-2">
+        <span className="flex-1">
+          {task.task}
+          {task.dateCompleted && task.completedBy && (
+            <div className="text-green-600 md:ml-4">(Utført av: {task.completedBy}, {new Date(task.dateCompleted).toLocaleDateString()})</div>
+          )}
+        </span>
+        {!(task.dateCompleted && task.completedBy) ? (
+          <button
+            onClick={() => handleCompleteCustomTask(task._id, task.task, task.dueDate)}
+            className="bg-green-500 text-white px-4 py-1 rounded md:ml-4"
+          >
+            <span className="block md:hidden">Merk</span>
+            <span className="hidden md:block">Merk som utført</span>
+          </button>
+        ) : (
+          <span className="text-gray-500">Utført</span>
+        )}
+      </li>
+    ))}
+  </ul>
+
 
         {/* Legg til ny oppgave - justert for to linjer på mobil */}
         <div className="mt-6">
