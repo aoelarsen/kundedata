@@ -79,24 +79,10 @@ const serviceSchema = new mongoose.Schema({
   kundeid: Number,
   KundeTelefon: String,
   serviceid: Number,
-  butikkid: Number,
-  servicetype: String // Nytt felt for tjenestetype
+  butikkid: Number
 });
-
 
 const Service = mongoose.model('Service', serviceSchema);
-
-const todoSchema = new mongoose.Schema({
-  task: { type: String, required: true },
-  registeredDate: { type: Date, default: Date.now },
-  completed: { type: Boolean, default: false },
-  completedBy: { type: String },
-  dateCompleted: { type: Date },
-  store: { type: Number, required: true }
-});
-
-const Todo = mongoose.model('Todo', todoSchema);
-
 
 
 app.get('/orders/last-order-id', async (req, res) => {
@@ -706,8 +692,7 @@ app.post('/services', async (req, res) => {
       kundeid: req.body.kundeid,
       KundeTelefon: req.body.KundeTelefon,
       serviceid: nextServiceId,
-      butikkid: req.body.butikkid,
-      servicetype: req.body.servicetype // Lagrer tjenestetype
+      butikkid: req.body.butikkid
     });
 
     const newService = await service.save();
@@ -716,7 +701,6 @@ app.post('/services', async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 });
-
 
 // Update a service
 app.patch('/services/:id', async (req, res) => {
@@ -852,7 +836,6 @@ const dailyTaskSchema = new mongoose.Schema({
   completed: { type: Boolean, default: false },
   completedBy: { type: String }, // Sørg for at dette kan ta imot strenger
   dateCompleted: { type: Date }, // Sørg for at dette kan ta imot datoverdier
-
 });
 
 const DailyTask = mongoose.model('DailyTask', dailyTaskSchema);
@@ -956,7 +939,7 @@ const completedTaskSchema = new mongoose.Schema({
   dueDate: { type: Date }, // Valgfritt for custom tasks
   employee: { type: String, required: true },
   dateCompleted: { type: Date, required: true },
-  store: { type: Number, required: true } // Butikk-ID
+  store: { type: String, required: true } // Butikk-ID
 });
 
 
@@ -1087,105 +1070,68 @@ app.patch('/customtasks/:id', async (req, res) => {
 });
 
 
-// Schema for ServiceType
-const serviceTypeSchema = new mongoose.Schema({
-  type: { type: String, required: true },
-  status: { type: String, required: true }
-});
-
-// Model for ServiceType
-const ServiceType = mongoose.model('ServiceType', serviceTypeSchema);
-
-module.exports = ServiceType;
 
 
+const cron = require('node-cron');
 
-// Endpoint to get all service types
-app.get('/servicetypes', async (req, res) => {
+// Kjører hver dag ved midnatt
+cron.schedule('0 0 * * *', async () => {
   try {
-    const serviceTypes = await ServiceType.find(); // Henter alle tjenestetyper
-    res.json(serviceTypes);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
+    console.log('Sjekker etter oppgaver som er fullført og eldre enn dagens dato');
 
-// Endpoint to get a single service type by ID
-app.get('/servicetypes/:id', async (req, res) => {
-  try {
-    const serviceType = await ServiceType.findById(req.params.id);
-    if (serviceType == null) {
-      return res.status(404).json({ message: 'Tjenestetype ikke funnet' });
-    }
-    res.json(serviceType);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Sett til midnatt for dagens dato
 
-// Hent alle oppgaver
-app.get('/todos', async (req, res) => {
-  try {
-    console.log('GET /todos forespørsel mottatt');
-    const tasks = await Todo.find();
-    res.status(200).json(tasks);
-  } catch (error) {
-    console.error('Feil ved henting av oppgaver:', error);
-    res.status(500).json({ message: 'Feil ved henting av oppgaver', error });
-  }
-});
-
-// Legg til en ny oppgave
-app.post('/todos', async (req, res) => {
-  console.log('POST /todos forespørsel mottatt med body:', req.body);
-  const { task, store } = req.body;
-
-  if (!task || !store) {
-    console.error('Feil: Oppgaven og butikk-ID er påkrevd');
-    return res.status(400).json({ message: 'Oppgaven og butikk-ID er påkrevd' });
-  }
-
-  try {
-    const newTask = new Todo({
-      task,
-      store
+    // Hent alle egendefinerte oppgaver som er markert som fullført og har en fullføringsdato før i dag
+    const tasksToDelete = await CustomTask.find({
+      completed: true,
+      dateCompleted: { $lt: today }, // Filtrer for oppgaver der dateCompleted er mindre enn dagens dato
     });
-    await newTask.save();
-    console.log('Ny oppgave lagret:', newTask);
-    res.status(201).json(newTask);
+
+    console.log('Oppgaver som skal slettes:', tasksToDelete);
+
+    // Slett alle oppgaver som er fullført og der dateCompleted er før i dag
+    const deleteResult = await CustomTask.deleteMany({
+      completed: true,
+      dateCompleted: { $lt: today }, // Sørg for at fullførte oppgaver med dato eldre enn i dag blir slettet
+    });
+
+    console.log('Antall slettede oppgaver:', deleteResult.deletedCount);
   } catch (error) {
-    console.error('Feil ved opprettelse av oppgave:', error);
-    res.status(500).json({ message: 'Feil ved opprettelse av oppgave', error });
+    console.error('Feil ved sletting av fullførte oppgaver:', error);
   }
 });
 
 
-// Oppdater en oppgave som fullført
-app.patch('/todos/:id', async (req, res) => {
+
+
+// Kjører hvert minutt for testing (du kan endre til hver dag ved midnatt for produksjon)
+cron.schedule('0 0 * * *', async () => {
   try {
-    const task = await Todo.findById(req.params.id);
-    if (!task) {
-      return res.status(404).json({ message: 'Oppgave ikke funnet' });
-    }
+    console.log('Tilbakestiller fullførte daglige oppgaver');
 
-    if (req.body.completed != null) {
-      task.completed = req.body.completed;
-    }
+    // Hent alle oppgaver som er markert som fullført
+    const tasksToReset = await DailyTask.find({ completed: true });
 
-    if (req.body.completedBy != null) {
-      task.completedBy = req.body.completedBy;
-    }
+    console.log('Oppgaver som skal tilbakestilles:', tasksToReset);
 
-    if (req.body.dateCompleted != null) {
-      task.dateCompleted = req.body.dateCompleted;
-    }
+    // Tilbakestill fullførte oppgaver
+    const resetResult = await DailyTask.updateMany(
+      { completed: true },
+      { $set: { completed: false, completedBy: null, dateCompleted: null } }
+    );
 
-    const updatedTask = await task.save();
-    res.json(updatedTask);
+    console.log('Antall tilbakestilte oppgaver:', resetResult.modifiedCount);
   } catch (error) {
-    res.status(400).json({ message: 'Feil ved oppdatering av oppgave', error });
+    console.error('Feil ved tilbakestilling av daglige oppgaver:', error);
   }
 });
+
+
+
+
+
+
 
 
 // Start the server
