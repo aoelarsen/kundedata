@@ -1126,18 +1126,22 @@ app.get('/servicetypes/:id', async (req, res) => {
 // Hent alle oppgaver
 app.get('/todos', async (req, res) => {
   try {
+    console.log('GET /todos forespørsel mottatt');
     const tasks = await Todo.find();
     res.status(200).json(tasks);
   } catch (error) {
+    console.error('Feil ved henting av oppgaver:', error);
     res.status(500).json({ message: 'Feil ved henting av oppgaver', error });
   }
 });
 
 // Legg til en ny oppgave
 app.post('/todos', async (req, res) => {
+  console.log('POST /todos forespørsel mottatt med body:', req.body);
   const { task, store } = req.body;
 
   if (!task || !store) {
+    console.error('Feil: Oppgaven og butikk-ID er påkrevd');
     return res.status(400).json({ message: 'Oppgaven og butikk-ID er påkrevd' });
   }
 
@@ -1147,11 +1151,14 @@ app.post('/todos', async (req, res) => {
       store
     });
     await newTask.save();
+    console.log('Ny oppgave lagret:', newTask);
     res.status(201).json(newTask);
   } catch (error) {
+    console.error('Feil ved opprettelse av oppgave:', error);
     res.status(500).json({ message: 'Feil ved opprettelse av oppgave', error });
   }
 });
+
 
 // Oppdater en oppgave som fullført
 app.patch('/todos/:id', async (req, res) => {
