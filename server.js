@@ -1086,8 +1086,6 @@ const ServiceType = mongoose.model('ServiceType', serviceTypeSchema);
 
 module.exports = ServiceType;
 
-
-
 // Endpoint to get all service types
 app.get('/servicetypes', async (req, res) => {
   try {
@@ -1110,14 +1108,6 @@ app.get('/servicetypes/:id', async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
-
-
-
-
-
-
-
-
 
 
 // Start the server

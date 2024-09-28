@@ -72,13 +72,12 @@ const fetchCustomTasks = useCallback(async () => {
     // Oppdater filtreringslogikken for å bruke _id i stedet for oppgavebeskrivelse
     const filteredCustomTasks = customTasksData.filter(task => task.store === butikkid).map((task) => {
       const completedTask = completedTasksData.find(ct => ct.taskId === task._id && ct.store === butikkid);
-
       if (completedTask) {
         return { ...task, completed: true, completedBy: completedTask.employee, dateCompleted: completedTask.dateCompleted };
       }
-
       return task;
     });
+    
 
     setCustomTasks(filteredCustomTasks);
   } catch (error) {
