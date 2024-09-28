@@ -13,77 +13,81 @@ function TodoList() {
   const [customTaskDate, setCustomTaskDate] = useState(today);
   const [employee] = useState(Cookies.get('selectedEmployee') || '');
 
-  const fetchDailyTasks = useCallback(async () => {
-    try {
-      const [dailyTasksResponse, completedTasksResponse] = await Promise.all([
-        fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/dailytasks'),
-        fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks?taskType=daily')
-      ]);
+// Hent daglige oppgaver
+const fetchDailyTasks = useCallback(async () => {
+  try {
+    const [dailyTasksResponse, completedTasksResponse] = await Promise.all([
+      fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/dailytasks'),
+      fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks?taskType=daily')
+    ]);
 
-      const dailyTasksData = await dailyTasksResponse.json();
-      const completedTasksData = await completedTasksResponse.json();
+    // Logg svaret for å se dataene som kommer fra serveren
+    const dailyTasksData = await dailyTasksResponse.json();
+    const completedTasksData = await completedTasksResponse.json();
+    console.log('Hentede daglige oppgaver:', dailyTasksData);
+    console.log('Hentede fullførte oppgaver:', completedTasksData);
 
-      const filteredDailyTasks = dailyTasksData.filter(task => task.store === butikkid);
+    // Filtrerer oppgaver for riktig butikk
+    const filteredDailyTasks = dailyTasksData.filter(task => task.store === butikkid);
+    console.log('Filtrerte daglige oppgaver for butikk:', filteredDailyTasks);
 
-      const updatedDailyTasks = filteredDailyTasks.map((task) => {
-        const completedTask = completedTasksData.find(ct => ct.task === task.task && ct.store === butikkid);
+    // Oppdater oppgavene basert på om de er fullført i dag
+    const updatedDailyTasks = filteredDailyTasks.map((task) => {
+      const completedTask = completedTasksData.find(ct => ct.task === task.task && ct.store === butikkid);
 
-        if (completedTask) {
-          const completedDate = new Date(completedTask.dateCompleted).toISOString().split('T')[0];
-
-          if (completedDate === today) {
-            return { ...task, completed: true, completedBy: completedTask.employee, dateCompleted: completedTask.dateCompleted };
-          }
+      if (completedTask) {
+        const completedDate = new Date(completedTask.dateCompleted).toISOString().split('T')[0];
+        console.log('Sammenligning - Fullført dato:', completedDate, 'Dagens dato:', today);
+        if (completedDate === today) {
+          console.log('Oppgaven er fullført i dag:', task);
+          return { ...task, completed: true, completedBy: completedTask.employee, dateCompleted: completedTask.dateCompleted };
         }
-        return task;
-      });
+      }
 
-      setDailyTasks(updatedDailyTasks);
-    } catch (error) {
-      console.error('Feil ved henting av faste oppgaver:', error);
-    }
-  }, [butikkid, today]);
+      // Hvis ikke fullført i dag, sett completed til false
+      return { ...task, completed: false };
+    });
 
-  const fetchCustomTasks = useCallback(async () => {
-    try {
-      const [customTasksResponse, completedTasksResponse] = await Promise.all([
-        fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks'),
-        fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks?taskType=custom')
-      ]);
+    // Logg oppdaterte oppgaver for å se endringene som gjøres
+    console.log('Oppdaterte daglige oppgaver:', updatedDailyTasks);
 
-      const customTasksData = await customTasksResponse.json();
-      const completedTasksData = await completedTasksResponse.json();
+    setDailyTasks(updatedDailyTasks);
+  } catch (error) {
+    console.error('Feil ved henting av faste oppgaver:', error);
+  }
+}, [butikkid, today]);
 
-      const filteredCustomTasks = await Promise.all(
-        customTasksData.filter(task => task.store === butikkid).map(async (task) => {
-          const completedTask = completedTasksData.find(ct => ct.task === task.task && ct.store === butikkid);
+  
+  // Hent egendefinerte oppgaver (inkluder fullførte oppgaver)
+const fetchCustomTasks = useCallback(async () => {
+  try {
+    const [customTasksResponse, completedTasksResponse] = await Promise.all([
+      fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks'),
+      fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks?taskType=custom')
+    ]);
 
-          if (completedTask) {
-            const completedDate = new Date(completedTask.dateCompleted).toISOString().split('T')[0];
-            
-            // Endret slettelogikk for å unngå umiddelbar sletting
-            const timeDifference = new Date(today) - new Date(completedDate);
-            const daysDifference = timeDifference / (1000 * 60 * 60 * 24);
+    const customTasksData = await customTasksResponse.json();
+    const completedTasksData = await completedTasksResponse.json();
 
-            if (daysDifference > 1) {  // Slett kun hvis oppgaven er mer enn en dag gammel
-              await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks/${task._id}`, {
-                method: 'DELETE',
-              });
-              return null;
-            }
-            return { ...task, completed: true, completedBy: completedTask.employee, dateCompleted: completedTask.dateCompleted };
-          }
+    // Oppdater filtreringslogikken for å bruke _id i stedet for oppgavebeskrivelse
+    const filteredCustomTasks = customTasksData.filter(task => task.store === butikkid).map((task) => {
+      const completedTask = completedTasksData.find(ct => ct.taskId === task._id && ct.store === butikkid);
 
-          return task;
-        })
-      );
+      if (completedTask) {
+        return { ...task, completed: true, completedBy: completedTask.employee, dateCompleted: completedTask.dateCompleted };
+      }
 
-      setCustomTasks(filteredCustomTasks.filter(task => task !== null));
-    } catch (error) {
-      console.error('Feil ved henting av egendefinerte oppgaver:', error);
-    }
-  }, [butikkid, today]);
+      return task;
+    });
 
+    setCustomTasks(filteredCustomTasks);
+  } catch (error) {
+    console.error('Feil ved henting av egendefinerte oppgaver:', error);
+  }
+}, [butikkid]);
+
+
+  // Hent fullførte oppgaver
   const fetchCompletedTasks = useCallback(async () => {
     try {
       const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks');
@@ -102,38 +106,43 @@ function TodoList() {
     fetchCompletedTasks();
   }, [fetchDailyTasks, fetchCustomTasks, fetchCompletedTasks]);
 
-  const handleAddCustomTask = async () => {
-    if (!newCustomTask || !customTaskDate || !butikkid) {
-      alert('Oppgaven, dato og butikk-ID må fylles ut.');
-      return;
+ // Legg til ny egendefinert oppgave
+const handleAddCustomTask = async () => {
+  if (!newCustomTask || !customTaskDate || !butikkid) {
+    alert('Oppgaven, dato og butikk-ID må fylles ut.');
+    return;
+  }
+
+  try {
+    const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        task: newCustomTask,
+        dueDate: customTaskDate,
+        store: butikkid,
+      }),
+    });
+
+    if (response.ok) {
+      const addedTask = await response.json();
+      setCustomTasks((prevTasks) => [...prevTasks, addedTask]);
+      setNewCustomTask('');
+      setCustomTaskDate(today);
+      
+      // Hent oppdaterte fullførte oppgaver
+      await fetchCompletedTasks();
+    } else {
+      console.error('Feil ved lagring av oppgave');
     }
+  } catch (error) {
+    console.error('Feil ved kommunikasjon med serveren:', error);
+  }
+};
 
-    try {
-      const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          task: newCustomTask,
-          dueDate: customTaskDate,
-          store: butikkid,
-        }),
-      });
-
-      if (response.ok) {
-        const addedTask = await response.json();
-        setCustomTasks((prevTasks) => [...prevTasks, addedTask]);
-        setNewCustomTask('');
-        setCustomTaskDate(today);
-      } else {
-        console.error('Feil ved lagring av oppgave');
-      }
-    } catch (error) {
-      console.error('Feil ved kommunikasjon med serveren:', error);
-    }
-  };
-
+  // Marker daglig oppgave som fullført
   const handleCompleteDailyTask = async (taskId, taskDescription) => {
     const completionDate = new Date().toISOString();
     const bodyData = {
@@ -170,39 +179,53 @@ function TodoList() {
   };
 
   const handleCompleteCustomTask = async (taskId, taskDescription, dueDate) => {
+    const completionDate = new Date().toISOString();
     const bodyData = {
+      taskId, // Inkluder oppgave-ID her
       task: taskDescription,
       taskType: 'custom',
       dueDate,
-      dateCompleted: new Date().toISOString(),
+      dateCompleted: completionDate,
       employee,
       store: butikkid,
     };
-
+  
     try {
-      await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks', {
+      // Send POST-forespørsel til backend for å registrere oppgaven som fullført
+      const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(bodyData),
       });
-
-      const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks/${taskId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ completed: true, completedBy: employee, dateCompleted: new Date().toISOString() }),
-      });
-
+  
       if (response.ok) {
-        setCustomTasks((prevTasks) =>
-          prevTasks.map((task) =>
-            task._id === taskId ? { ...task, completed: true, completedBy: employee, dateCompleted: new Date() } : task
-          )
-        );
+        // Oppdater oppgave som fullført i backend med en PATCH-forespørsel
+        const patchResponse = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks/${taskId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ completed: true, completedBy: employee, dateCompleted: completionDate }),
+        });
+  
+        if (patchResponse.ok) {
+          // Oppdater lokalt tilstanden av oppgaven som fullført
+          setCustomTasks((prevTasks) =>
+            prevTasks.map((task) =>
+              task._id === taskId ? { ...task, completed: true, completedBy: employee, dateCompleted: completionDate } : task
+            )
+          );
+        } else {
+          console.error('Feil ved oppdatering av egendefinert oppgave i backend');
+        }
+      } else {
+        console.error('Feil ved oppdatering av fullførte oppgaver i completedtasks');
       }
     } catch (error) {
       console.error('Feil ved oppdatering av egendefinert oppgave:', error);
     }
   };
+  
+  
+  
 
   return (
     <div className="max-w-5xl mx-auto py-8 bg-white shadow-lg rounded-lg p-6 mb-4">
