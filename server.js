@@ -79,8 +79,10 @@ const serviceSchema = new mongoose.Schema({
   kundeid: Number,
   KundeTelefon: String,
   serviceid: Number,
-  butikkid: Number
+  butikkid: Number,
+  servicetype: String // Nytt felt for tjenestetype
 });
+
 
 const Service = mongoose.model('Service', serviceSchema);
 
@@ -692,7 +694,8 @@ app.post('/services', async (req, res) => {
       kundeid: req.body.kundeid,
       KundeTelefon: req.body.KundeTelefon,
       serviceid: nextServiceId,
-      butikkid: req.body.butikkid
+      butikkid: req.body.butikkid,
+      servicetype: req.body.servicetype // Lagrer tjenestetype
     });
 
     const newService = await service.save();
@@ -701,6 +704,7 @@ app.post('/services', async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 });
+
 
 // Update a service
 app.patch('/services/:id', async (req, res) => {
@@ -836,6 +840,7 @@ const dailyTaskSchema = new mongoose.Schema({
   completed: { type: Boolean, default: false },
   completedBy: { type: String }, // Sørg for at dette kan ta imot strenger
   dateCompleted: { type: Date }, // Sørg for at dette kan ta imot datoverdier
+
 });
 
 const DailyTask = mongoose.model('DailyTask', dailyTaskSchema);
@@ -939,7 +944,7 @@ const completedTaskSchema = new mongoose.Schema({
   dueDate: { type: Date }, // Valgfritt for custom tasks
   employee: { type: String, required: true },
   dateCompleted: { type: Date, required: true },
-  store: { type: String, required: true } // Butikk-ID
+  store: { type: Number, required: true } // Butikk-ID
 });
 
 
@@ -1070,6 +1075,73 @@ app.patch('/customtasks/:id', async (req, res) => {
 });
 
 
+// Schema for ServiceType
+const serviceTypeSchema = new mongoose.Schema({
+  type: { type: String, required: true },
+  status: { type: String, required: true }
+});
+
+// Model for ServiceType
+const ServiceType = mongoose.model('ServiceType', serviceTypeSchema);
+
+module.exports = ServiceType;
+
+
+
+// Endpoint to get all service types
+app.get('/servicetypes', async (req, res) => {
+  try {
+    const serviceTypes = await ServiceType.find(); // Henter alle tjenestetyper
+    res.json(serviceTypes);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Endpoint to get a single service type by ID
+app.get('/servicetypes/:id', async (req, res) => {
+  try {
+    const serviceType = await ServiceType.findById(req.params.id);
+    if (serviceType == null) {
+      return res.status(404).json({ message: 'Tjenestetype ikke funnet' });
+    }
+    res.json(serviceType);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+
+
+const cron = require('node-cron');
+
+// Denne cron-jobben kjører en gang i timen (på hver hele time)
+cron.schedule('0 * * * *', async () => {
+  try {
+    console.log('Sjekker etter oppgaver som er fullført og eldre enn dagens dato');
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Sett til midnatt for dagens dato
+
+    // Hent alle egendefinerte oppgaver som er markert som fullført og har en fullføringsdato før i dag
+    const tasksToDelete = await CustomTask.find({
+      completed: true,
+      dateCompleted: { $lt: today }, // Filtrer for oppgaver der dateCompleted er før dagens dato
+    });
+
+    console.log('Oppgaver som skal slettes:', tasksToDelete);
+
+    // Slett alle oppgaver som er fullført og der dateCompleted er før i dag
+    const deleteResult = await CustomTask.deleteMany({
+      completed: true,
+      dateCompleted: { $lt: today }, // Sørg for at fullførte oppgaver med dato eldre enn i dag blir slettet
+    });
+
+    console.log('Antall slettede oppgaver:', deleteResult.deletedCount);
+  } catch (error) {
+    console.error('Feil ved sletting av fullførte oppgaver:', error);
+  }
+});
 
 
 
