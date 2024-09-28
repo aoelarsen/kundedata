@@ -1109,6 +1109,70 @@ app.get('/servicetypes/:id', async (req, res) => {
   }
 });
 
+app.use(cors());
+
+mongoose.connect('mongodb+srv://<username>:<password>@cluster.mongodb.net/todoApp', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+
+const taskSchema = new mongoose.Schema({
+  task: { type: String, required: true },
+  registeredDate: { type: Date, required: true },
+  store: { type: Number, required: true },
+  completed: { type: Boolean, default: false },
+  completedBy: { type: String },
+  dateCompleted: { type: Date },
+});
+
+const Task = mongoose.model('Task', taskSchema);
+
+// Endepunkt for å hente alle oppgaver
+app.get('/tasks', async (req, res) => {
+  try {
+    const tasks = await Task.find();
+    res.status(200).json(tasks);
+  } catch (error) {
+    res.status(500).json({ message: 'Feil ved henting av oppgaver', error });
+  }
+});
+
+// Endepunkt for å legge til ny oppgave
+app.post('/tasks', async (req, res) => {
+  const { task, registeredDate, store } = req.body;
+
+  if (!task || !registeredDate || !store) {
+    return res.status(400).json({ message: 'Oppgave, dato og butikk-ID må fylles ut' });
+  }
+
+  try {
+    const newTask = new Task({ task, registeredDate, store });
+    await newTask.save();
+    res.status(201).json(newTask);
+  } catch (error) {
+    res.status(500).json({ message: 'Feil ved opprettelse av oppgave', error });
+  }
+});
+
+// Endepunkt for å markere oppgave som fullført
+app.patch('/tasks/:id', async (req, res) => {
+  try {
+    const task = await Task.findById(req.params.id);
+    if (!task) {
+      return res.status(404).json({ message: 'Oppgave ikke funnet' });
+    }
+
+    task.completed = req.body.completed;
+    task.completedBy = req.body.completedBy;
+    task.dateCompleted = req.body.dateCompleted;
+
+    const updatedTask = await task.save();
+    res.json(updatedTask);
+  } catch (error) {
+    res.status(400).json({ message: 'Feil ved oppdatering av oppgave', error });
+  }
+});
+
 
 // Start the server
 app.listen(port, () => {
