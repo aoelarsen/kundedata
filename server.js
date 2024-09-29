@@ -1074,6 +1074,22 @@ app.patch('/customtasks/:id', async (req, res) => {
   }
 });
 
+// Slett en egendefinert oppgave
+app.delete('/customtasks/:id', async (req, res) => {
+  try {
+    const task = await CustomTask.findById(req.params.id);
+    if (!task) {
+      return res.status(404).json({ message: 'Egendefinert oppgave ikke funnet' });
+    }
+
+    await task.remove();
+    res.json({ message: 'Egendefinert oppgave slettet' });
+  } catch (error) {
+    res.status(500).json({ message: 'Feil ved sletting av egendefinert oppgave', error });
+  }
+});
+
+
 
 // Schema for ServiceType
 const serviceTypeSchema = new mongoose.Schema({
