@@ -16,7 +16,6 @@ function TodoList() {
   const [customTaskDate, setCustomTaskDate] = useState(today);
   const [employee] = useState(Cookies.get('selectedEmployee') || '');
 
-  // Hent daglige oppgaver
 // Hent daglige oppgaver
 const fetchDailyTasks = useCallback(async () => {
   try {
