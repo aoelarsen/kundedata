@@ -1076,18 +1076,23 @@ app.patch('/customtasks/:id', async (req, res) => {
 
 // Slett en egendefinert oppgave
 app.delete('/customtasks/:id', async (req, res) => {
+  console.log(`Mottok DELETE-forespørsel for customtask med id: ${req.params.id}`);
   try {
     const task = await CustomTask.findById(req.params.id);
     if (!task) {
+      console.log('Custom task ikke funnet:', req.params.id);
       return res.status(404).json({ message: 'Egendefinert oppgave ikke funnet' });
     }
 
     await task.remove();
+    console.log('Egendefinert oppgave slettet:', req.params.id);
     res.json({ message: 'Egendefinert oppgave slettet' });
   } catch (error) {
+    console.error('Feil ved sletting av egendefinert oppgave:', error);
     res.status(500).json({ message: 'Feil ved sletting av egendefinert oppgave', error });
   }
 });
+
 
 
 
