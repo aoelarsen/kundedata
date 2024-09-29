@@ -863,12 +863,13 @@ const CustomTask = mongoose.model('CustomTask', customTaskSchema);
 // Hent alle daglige oppgaver
 app.get('/dailytasks', async (req, res) => {
   try {
-    const tasks = await DailyTask.find();
+    const tasks = await DailyTask.find({}, '_id task completed completedBy dateCompleted');
     res.status(200).json(tasks);
   } catch (error) {
     res.status(500).json({ message: 'Feil ved henting av daglige oppgaver', error });
   }
 });
+
 
 // Legg til en ny daglig oppgave
 app.post('/dailytasks', async (req, res) => {
