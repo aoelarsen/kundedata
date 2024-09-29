@@ -17,52 +17,61 @@ function TodoList() {
   const [employee] = useState(Cookies.get('selectedEmployee') || '');
 
   // Hent daglige oppgaver
-  const fetchDailyTasks = useCallback(async () => {
-    try {
-      const [dailyTasksResponse, completedTasksResponse] = await Promise.all([
-        fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/dailytasks'),
-        fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks?taskType=daily')
-      ]);
+// Hent daglige oppgaver
+const fetchDailyTasks = useCallback(async () => {
+  try {
+    const [dailyTasksResponse, completedTasksResponse] = await Promise.all([
+      fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/dailytasks'),
+      fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks?taskType=daily')
+    ]);
 
-      const dailyTasksData = await dailyTasksResponse.json();
-      const completedTasksData = await completedTasksResponse.json();
+    const dailyTasksData = await dailyTasksResponse.json();
+    const completedTasksData = await completedTasksResponse.json();
 
-      // Filtrer oppgaver relatert til butikkID
-      const filteredDailyTasks = dailyTasksData.filter(task => task.store === butikkid);
+    // Filtrer oppgaver relatert til butikkID
+    const filteredDailyTasks = dailyTasksData.filter(task => task.store === butikkid);
 
-      const updatedDailyTasks = await Promise.all(
-        filteredDailyTasks.map(async (task) => {
-          const completedTask = completedTasksData.find(ct => ct.task === task.task && ct.store === butikkid);
-          if (completedTask) {
-            const completedDate = new Date(completedTask.dateCompleted).toISOString().split('T')[0];
-            if (completedDate === today) {
-              return { ...task, completed: true, completedBy: completedTask.employee };
-            } else {
-              await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/dailytasks/${task._id}`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ completed: false, completedBy: null, dateCompleted: null }),
-              });
-              return { ...task, completed: false, completedBy: null };
-            }
+    const updatedDailyTasks = await Promise.all(
+      filteredDailyTasks.map(async (task) => {
+        const completedTask = completedTasksData.find(ct => ct.task === task.task && ct.store === butikkid);
+        if (completedTask) {
+          const completedDate = new Date(completedTask.dateCompleted).toISOString().split('T')[0];
+
+          // Log datoene for debugging
+          console.log('completedTask.dateCompleted:', completedTask.dateCompleted);
+          console.log('completedDate:', completedDate);
+          console.log('today:', today);
+
+          if (completedDate === today) {
+            return { ...task, completed: true, completedBy: completedTask.employee };
           } else {
-            return task;
+            // Nullstill oppgaven hvis utført dato ikke samsvarer med dagens dato
+            await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/dailytasks/${task._id}`, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ completed: false, completedBy: null, dateCompleted: null }),
+            });
+            return { ...task, completed: false, completedBy: null };
           }
-        })
-      );
+        } else {
+          return task;
+        }
+      })
+    );
 
-      setDailyTasks(updatedDailyTasks);
-    } catch (error) {
-      console.error('Feil ved henting av faste oppgaver:', error);
-    }
-  }, [butikkid, today]);
+    setDailyTasks(updatedDailyTasks);
+  } catch (error) {
+    console.error('Feil ved henting av faste oppgaver:', error);
+  }
+}, [butikkid, today]);
+
+
 
  // Hent egendefinerte oppgaver
-const fetchCustomTasks = useCallback(async () => {
+ const fetchCustomTasks = useCallback(async () => {
   try {
     const customTasksResponse = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks');
     const customTasksData = await customTasksResponse.json();
-
     const filteredCustomTasks = customTasksData.filter(task => task.store === butikkid);
     const updatedCustomTasks = [];
 
@@ -70,18 +79,26 @@ const fetchCustomTasks = useCallback(async () => {
       if (task.dateCompleted) {
         const completedDate = new Date(task.dateCompleted).toISOString().split('T')[0];
         if (completedDate !== today) {
-          // Slett oppgaven fra customtasks hvis utførtdato ikke stemmer med dagens dato
+          // Oppdater oppgaven i customtasks hvis utførtdato ikke stemmer med dagens dato
           await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks/${task._id}`, {
-            method: 'DELETE',
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ completed: true }),
           });
-          console.log(`Oppgave med id ${task._id} slettet, da utførtdato ikke samsvarer med dagens dato.`);
-          continue; // Hopp over oppgaven
+          console.log(`Oppgave med id ${task._id} oppdatert til completed: true, da utførtdato ikke samsvarer med dagens dato.`);
+          updatedCustomTasks.push({
+            ...task,
+            completed: true, // Marker som fullført
+          });
+        } else {
+          updatedCustomTasks.push({
+            ...task,
+            completed: !!task.dateCompleted && !!task.completedBy, // Marker som fullført hvis dateCompleted og completedBy finnes
+          });
         }
+      } else {
+        updatedCustomTasks.push(task);
       }
-      updatedCustomTasks.push({
-        ...task,
-        completed: !!task.dateCompleted && !!task.completedBy, // Marker som fullført hvis dateCompleted og completedBy finnes
-      });
     }
 
     setCustomTasks(updatedCustomTasks);
@@ -89,6 +106,7 @@ const fetchCustomTasks = useCallback(async () => {
     console.error('Feil ved henting av egendefinerte oppgaver:', error);
   }
 }, [butikkid, today]);
+
 
   
 
