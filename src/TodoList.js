@@ -30,6 +30,13 @@ const fetchDailyTasks = useCallback(async () => {
     // Filtrer oppgaver relatert til butikkID
     const filteredDailyTasks = dailyTasksData.filter(task => task.store === butikkid);
 
+    console.log('Filtered Daily Tasks:', filteredDailyTasks);
+
+
+    filteredDailyTasks.forEach(task => {
+      console.log('Hentet oppgave-ID:', task._id);
+    });
+
     const updatedDailyTasks = await Promise.all(
       filteredDailyTasks.map(async (task) => {
         const completedTask = completedTasksData.find(ct => ct.task === task.task && ct.store === butikkid);
