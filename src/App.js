@@ -25,6 +25,11 @@ import StatusForm from './StatusForm';
 import StatusList from './StatusList';
 import StatusChange from './StatusChange';
 import TodoList from './TodoList';
+import ServiceDetailsBike from './ServiceDetailsBike';
+import ServiceDetailsSki from './ServiceDetailsSki';
+import ServiceDetailsClub from './ServiceDetailsClub';
+import ServiceDetailsSkate from './ServiceDetailsSkate';
+
 
 function App() {
   const [customers, setCustomers] = useState([]);
@@ -200,6 +205,12 @@ function App() {
             <Route path="/status-change/:id" element={<StatusChange />} />
             <Route path="/sendsms" element={<SendSMS />} />
             <Route path="/todo" element={<TodoList />} />
+
+            <Route path="/service-details-bike/:id" element={<ServiceDetailsBike />} />
+            <Route path="/service-details-ski/:id" element={<ServiceDetailsSki />} />
+            <Route path="/service-details-skate/:id" element={<ServiceDetailsSkate />} />
+            <Route path="/service-details-club/:id" element={<ServiceDetailsClub />} />
+
           </Routes>
         </div>
       </div>

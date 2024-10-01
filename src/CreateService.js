@@ -92,45 +92,60 @@ function CreateService() {
     e.preventDefault();
 
     if (!formData.ansatt) {
-      console.error('Ansatt er ikke valgt. Tjenesten kan ikke registreres uten ansatt.');
-      return;
+        console.error('Ansatt er ikke valgt. Tjenesten kan ikke registreres uten ansatt.');
+        return;
     }
 
     if (!formData.type) {
-      console.error('Tjenestetype er ikke valgt. Tjenesten kan ikke registreres uten tjenestetype.');
-      return;
+        console.error('Tjenestetype er ikke valgt. Tjenesten kan ikke registreres uten tjenestetype.');
+        return;
     }
 
     const newService = {
-      ...formData,
-      serviceid: formData.serviceid,
-      butikkid: Cookies.get('butikkid') || formData.butikkid,
-      registrertDato: new Date().toLocaleString('no-NO', { timeZone: 'Europe/Oslo' }),
-      status: 'Aktiv',
-      endretdato: '',
-      servicetype: formData.type // Sender tjenestetype til serveren
+        ...formData,
+        serviceid: formData.serviceid,
+        butikkid: Cookies.get('butikkid') || formData.butikkid,
+        registrertDato: new Date().toLocaleString('no-NO', { timeZone: 'Europe/Oslo' }),
+        status: 'Aktiv',
+        endretdato: '',
+        servicetype: formData.type // Sender tjenestetype til serveren
     };
 
     try {
-      const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/services', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newService),
-      });
+        const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/services', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newService),
+        });
 
-      if (response.ok) {
-        const addedService = await response.json();
-        navigate(`/service-details/${addedService._id}`);
-      } else {
-        const responseText = await response.text();
-        console.error('Feil ved registrering av tjeneste:', response.statusText, responseText);
-      }
+        if (response.ok) {
+            const addedService = await response.json();
+
+            // Avgjør hvilken side som skal åpnes basert på valgt tjenestetype
+            if (formData.type === 'Sykkelservice') {
+                navigate(`/service-details-bike/${addedService._id}`);
+            } else if (formData.type === 'Skiservice') {
+                navigate(`/service-details-ski/${addedService._id}`);
+            } else if (formData.type === 'Skøyteslip') {
+                navigate(`/service-details-skate/${addedService._id}`);
+              } else if (formData.type === 'Tekstiltrykking') {
+                navigate(`/service-details-club/${addedService._id}`);
+            } else {
+                // Standard detaljside for ukjente tjenestetyper
+                navigate(`/service-details/${addedService._id}`);
+            }
+        } else {
+            const responseText = await response.text();
+            console.error('Feil ved registrering av tjeneste:', response.statusText, responseText);
+        }
     } catch (error) {
-      console.error('Feil ved kommunikasjon med serveren:', error);
+        console.error('Feil ved kommunikasjon med serveren:', error);
     }
-  };
+};
+
+
 
 
   return (
