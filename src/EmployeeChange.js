@@ -8,6 +8,7 @@ function EmployeeChange() {
         telefon: '',
         epost: '',
         tilgang: '',
+        butikk: '', // Nytt felt for butikkvalg
     });
 
     const navigate = useNavigate();
@@ -107,6 +108,20 @@ function EmployeeChange() {
                     >
                         <option value="ansatt">Ansatt</option>
                         <option value="leder">Leder</option>
+                    </select>
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">Butikk</label>
+                    <select
+                        name="butikk"
+                        value={formData.butikk}
+                        onChange={handleChange}
+                        className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
+                    >
+                        <option value="">Velg butikk</option>
+                        <option value="Sport1 Røyken">Sport1 Røyken</option>
+                        <option value="Sport1 Slemmestad">Sport1 Slemmestad</option>
+                        <option value="Begge butikker">Begge butikker</option>
                     </select>
                 </div>
                 <div className="text-center">

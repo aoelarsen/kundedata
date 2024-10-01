@@ -7,6 +7,7 @@ function EmployeeForm() {
         telefon: '',
         epost: '',
         tilgang: 'ansatt', // Standard tilgangsnivå
+        butikk: '', // Nytt felt for butikk
     });
 
     const navigate = useNavigate();
@@ -32,7 +33,6 @@ function EmployeeForm() {
             });
     
             if (response.ok) {
-                // No need to assign 'newEmployee' if you are not using it
                 navigate('/employee-list'); // Navigerer tilbake til listen over ansatte
             } else {
                 console.error('Feil ved opprettelse av ansatt');
@@ -41,7 +41,6 @@ function EmployeeForm() {
             console.error('Feil ved kommunikasjon med serveren:', error);
         }
     };
-    
 
     return (
         <div className="max-w-5xl mx-auto py-8 bg-white shadow-lg rounded-lg p-6 mb-4">
@@ -90,6 +89,20 @@ function EmployeeForm() {
                     >
                         <option value="ansatt">Ansatt</option>
                         <option value="leder">Leder</option>
+                    </select>
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">Butikk</label>
+                    <select
+                        name="butikk"
+                        value={formData.butikk}
+                        onChange={handleChange}
+                        className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
+                    >
+                        <option value="">Velg butikk</option>
+                        <option value="Sport1 Røyken">Sport1 Røyken</option>
+                        <option value="Sport1 Slemmestad">Sport1 Slemmestad</option>
+                        <option value="Begge butikker">Begge butikker</option>
                     </select>
                 </div>
                 <div className="text-center">

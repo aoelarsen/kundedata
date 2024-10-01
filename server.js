@@ -153,6 +153,7 @@ const employeeSchema = new mongoose.Schema({
   navn: String,
   telefon: String,
   epost: String,
+  butikk: String,
   tilgang: String,
 });
 
@@ -187,6 +188,7 @@ app.post('/employees', async (req, res) => {
     navn: req.body.navn,
     telefon: req.body.telefon,
     epost: req.body.epost,
+    butikk: req.body.butikk, // Legg til butikk her
     tilgang: req.body.tilgang,
   });
 
@@ -197,6 +199,7 @@ app.post('/employees', async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 });
+
 
 // Endpoint to update an employee
 app.patch('/employees/:id', async (req, res) => {
@@ -214,6 +217,9 @@ app.patch('/employees/:id', async (req, res) => {
     }
     if (req.body.epost != null) {
       employee.epost = req.body.epost;
+    }    
+    if (req.body.butikk != null) {
+      employee.butikk = req.body.butikk; // Sørg for at dette feltet blir oppdatert
     }
     if (req.body.tilgang != null) {
       employee.tilgang = req.body.tilgang;
@@ -225,6 +231,7 @@ app.patch('/employees/:id', async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 });
+
 
 // Endpoint to delete an employee
 app.delete('/employees/:id', async (req, res) => {
