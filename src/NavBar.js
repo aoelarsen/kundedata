@@ -150,10 +150,10 @@ function NavBar() {
         </div>
 
         <div className="hidden md:flex items-center space-x-4">
-          <Link to="/customer-list" className="text-white text-lg font-semibold" onClick={(e) => handleNavigation(e, '/customer-list')}>KUNDER</Link>
+          <Link to="/customer-list" className="text-white text-lg font-semibold" onClick={(e) => handleNavigation(e, '/customer-list')}>KUNDE</Link>
           <Link to="/ordre" className="text-white text-lg font-semibold" onClick={(e) => handleNavigation(e, '/ordre')}>ORDRE</Link>
           <Link to="/service" className="text-white text-lg font-semibold" onClick={(e) => handleNavigation(e, '/service')}>SERVICE</Link>
-          <Link to="/todo" className="text-white text-lg font-semibold" onClick={(e) => handleNavigation(e, '/todo')}>TO DO</Link>
+          <Link to="/todo" className="text-white text-lg font-semibold" onClick={(e) => handleNavigation(e, '/todo')}>ToDo</Link>
           {selectedStore && (
             <span className="text-white ml-4">Butikk: {selectedStore}</span>
           )}
