@@ -1,0 +1,82 @@
+[
+    {
+        "EAN": 4524667126966,
+        "Varenummer": 200000512773.0,
+        "Varetekst": "Stoppmutter wire CJ-8S20/7S40",
+        "Str": 1,
+        "Veid_kost": 18.0,
+        "Utpris": 49.0
+    },
+    {
+        "EAN": 4524667437604,
+        "Varenummer": 200000515400.0,
+        "Varetekst": "Komponentsats Alfine 11",
+        "Str": 1,
+        "Veid_kost": 91.8,
+        "Utpris": 189.0
+    },
+    {
+        "EAN": 4524667236429,
+        "Varenummer": 200004504410.0,
+        "Varetekst": "Bakhjul WH-MT500 29\"",
+        "Str": 29,
+        "Veid_kost": 596.55,
+        "Utpris": 1299.0
+    },
+    {
+        "EAN": 4524667236504,
+        "Varenummer": 200004504211.0,
+        "Varetekst": "Bakhjul WH-MT500 29\"",
+        "Str": 29,
+        "Veid_kost": 596.55,
+        "Utpris": 1299.0
+    },
+    {
+        "EAN": 4524667501091,
+        "Varenummer": 200004504557.0,
+        "Varetekst": "Bakhjul WH-RS100",
+        "Str": 1,
+        "Veid_kost": 619.83,
+        "Utpris": 1399.0
+    },
+    {
+        "EAN": 4550170449612,
+        "Varenummer": 200004504768.0,
+        "Varetekst": "Bakhjul RS-171 11sp",
+        "Str": 1,
+        "Veid_kost": 723.62,
+        "Utpris": 1599.0
+    },
+    {
+        "EAN": 7070845480384,
+        "Varenummer": 200004207086.0,
+        "Varetekst": "Thru Axle Front Firm GRV",
+        "Str": 1,
+        "Veid_kost": 65.0,
+        "Utpris": 199.0
+    },
+    {
+        "EAN": 7024170163733,
+        "Varenummer": 200006849601.0,
+        "Varetekst": "BAKHJUL 27| Disc CENTERLOCK TX",
+        "Str": 1,
+        "Veid_kost": 231.0,
+        "Utpris": 699.0
+    },
+    {
+        "EAN": 7024160851862,
+        "Varenummer": 200006848204.0,
+        "Varetekst": "BAKHJUL 26| DISC 6 bolt KT/WEI",
+        "Str": 1,
+        "Veid_kost": 400.0,
+        "Utpris": 899.0
+    },
+    {
+        "EAN": 4026495622752,
+        "Varenummer": 200007800163.0,
+        "Varetekst": "High Pressure Rim Tape Twin  P",
+        "Str": "18-62",
+        "Veid_kost": 43.94,
+        "Utpris": 99.0
+    }
+]

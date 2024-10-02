@@ -7,6 +7,7 @@ function ServiceDetails() {
   const navigate = useNavigate(); // For navigering
   const [formData, setFormData] = useState({
     beskrivelse: '',
+    arbeid: '', // Legger til nytt felt 'arbeid'
     status: 'Aktiv',
     ansatt: '',
     Varemerke: '',
@@ -20,7 +21,6 @@ function ServiceDetails() {
   const [updateMessage, setUpdateMessage] = useState(''); // For å vise oppdateringsmelding
 
   const parseCustomDateString = (dateString) => {
-    // Prøver å parse streng med formatet 'd.M.yyyy, HH:mm:ss' (forventet format fra databasen)
     const parsedDate = parse(dateString, 'd.M.yyyy, HH:mm:ss', new Date());
     return isNaN(parsedDate) ? null : parsedDate;
   };
@@ -46,6 +46,7 @@ function ServiceDetails() {
           setServiceDetails(service);
           setFormData({
             beskrivelse: service.Beskrivelse || '',
+            arbeid: service.arbeid || '', // Sett 'arbeid' fra service-dataen
             status: service.status || 'Aktiv',
             ansatt: service.ansatt || '',
             Varemerke: service.Varemerke || '',
@@ -234,6 +235,17 @@ function ServiceDetails() {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
+          <label className="block text-sm font-medium text-gray-700">Beskrivelse:</label>
+          <textarea
+            name="beskrivelse"
+            value={formData.beskrivelse}
+            onChange={handleChange}
+            required
+            rows="3"
+            className="mt-1 block w-full p-2 border border-gray-300 rounded-md resize-y"
+          />
+        </div>
+        <div>
           <label className="block text-sm font-medium text-gray-700">Varemerke:</label>
           <input
             type="text"
@@ -274,14 +286,13 @@ function ServiceDetails() {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">Beskrivelse:</label>
-          <input
-            type="text"
-            name="beskrivelse"
-            value={formData.beskrivelse}
+          <label className="block text-sm font-medium text-gray-700">Utført arbeid:</label>
+          <textarea
+            name="arbeid"
+            value={formData.arbeid}
             onChange={handleChange}
-            required
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+            rows="3"
+            className="mt-1 block w-full p-2 border border-gray-300 rounded-md resize-y"
           />
         </div>
         <div>
