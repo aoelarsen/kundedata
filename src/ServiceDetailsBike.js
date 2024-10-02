@@ -7,7 +7,7 @@ function ServiceDetails() {
   const navigate = useNavigate(); // For navigering
   const [formData, setFormData] = useState({
     beskrivelse: '',
-    status: '',
+    status: 'Aktiv',
     ansatt: '',
     Varemerke: '',
     Produkt: '',
@@ -24,7 +24,7 @@ function ServiceDetails() {
     const parsedDate = parse(dateString, 'd.M.yyyy, HH:mm:ss', new Date());
     return isNaN(parsedDate) ? null : parsedDate;
   };
-  
+
   const formatDateTime = (dateString) => {
     if (!dateString) {
       return "Ukjent dato";
@@ -43,15 +43,15 @@ function ServiceDetails() {
         const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/services/${id}`);
         if (response.ok) {
           const service = await response.json();
-          setServiceDetails(service); // Setter serviceDetails med data fra API
+          setServiceDetails(service);
           setFormData({
-            beskrivelse: service.Beskrivelse,
+            beskrivelse: service.Beskrivelse || '',
             status: service.status || 'Aktiv',
             ansatt: service.ansatt || '',
-            Varemerke: service.Varemerke,
-            Produkt: service.Produkt,
-            Størrelse: service.Størrelse,
-            Farge: service.Farge,
+            Varemerke: service.Varemerke || '',
+            Produkt: service.Produkt || '',
+            Størrelse: service.Størrelse || '',
+            Farge: service.Farge || '',
           });
 
           if (service.kundeid) {
@@ -108,12 +108,12 @@ function ServiceDetails() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     const updatedService = {
       ...formData,
       endretdato: new Date().toLocaleString('no-NO', { timeZone: 'Europe/Oslo' }),
     };
-  
+
     try {
       const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/services/${id}`, {
         method: 'PATCH',
@@ -122,7 +122,7 @@ function ServiceDetails() {
         },
         body: JSON.stringify(updatedService),
       });
-  
+
       if (response.ok) {
         setUpdateMessage('Tjenesten er oppdatert');
         if (customer) {

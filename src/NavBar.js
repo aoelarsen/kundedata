@@ -24,13 +24,21 @@ function NavBar() {
   }, []);
 
   useEffect(() => {
-    const currentTime = new Date().toLocaleString();  // Henter gjeldende tid i lokal tidssone
-    console.log("Gjeldende dato og tid:", currentTime);
     const fetchEmployees = async () => {
       try {
         const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/employees');
         const data = await response.json();
-        setEmployees(data);
+
+        // Filtrer ansatte basert på butikk som er valgt i cookie
+        const selectedStore = Cookies.get('selectedStore');
+        const filteredEmployees = data.filter((employee) => {
+          return (
+            employee.butikk === 'Begge butikker' ||
+            employee.butikk === selectedStore
+          );
+        });
+
+        setEmployees(filteredEmployees);
       } catch (error) {
         console.error('Error fetching employees:', error);
       }
@@ -119,7 +127,9 @@ function NavBar() {
     <nav className="bg-gray-800 p-4">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <Link to="/" className="text-white text-lg font-semibold" onClick={(e) => handleNavigation(e, '/customer-list')}>Søk/Registrer</Link>
+          <Link to="/" className="text-white text-lg font-semibold" onClick={(e) => handleNavigation(e, '/')}>
+            Søk/Registrer
+          </Link>
 
 
 

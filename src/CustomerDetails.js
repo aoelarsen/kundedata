@@ -54,7 +54,7 @@ function CustomerDetails() {
         const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders?kundeid=${customerNumber}`);
         if (response.ok) {
           let ordersData = await response.json();
-          
+
           // Filtrer ordrer basert på butikkid
           if (butikkid) {
             ordersData = ordersData.filter(order => order.butikkid === parseInt(butikkid, 10));
@@ -115,6 +115,21 @@ function CustomerDetails() {
     setTooltipStyle({ left: tooltipX + 'px', top: tooltipY + 'px' });
   };
 
+  // Funksjon for å håndtere valg av tjeneste basert på servicetype
+  const handleSelectService = (service) => {
+    if (service.servicetype === 'Sykkelservice') {
+      navigate(`/service-details-bike/${service._id}`);
+    } else if (service.servicetype === 'Skiservice') {
+      navigate(`/service-details-ski/${service._id}`);
+    } else if (service.servicetype === 'Skøyteslip') {
+      navigate(`/service-details-skate/${service._id}`);
+    } else if (service.servicetype === 'Tekstiltrykking') {
+      navigate(`/service-details-club/${service._id}`);
+    } else {
+      navigate(`/service-details/${service._id}`);
+    }
+  };
+
   const handleMouseLeave = () => {
     setHoveredOrder(null);
   };
@@ -163,33 +178,33 @@ function CustomerDetails() {
         </Link>
       </div>
 
-    {/* Knappene plassert med mer plass over */}
-    <div className="flex justify-between items-center mt-8 mb-6">
-      <div className="flex space-x-4">
+      {/* Knappene plassert med mer plass over */}
+      <div className="flex justify-between items-center mt-8 mb-6">
+        <div className="flex space-x-4">
+          <Link
+            to={`/create-order/${customer.customerNumber}`}
+            className="inline-block bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-600"
+          >
+            Ny Ordre
+          </Link>
+          <Link
+            to={`/create-service/${customer.customerNumber}`}
+            className="inline-block bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-600"
+          >
+            Ny tjeneste
+          </Link>
+        </div>
         <Link
-          to={`/create-order/${customer.customerNumber}`}
+          to={{
+            pathname: '/sendsms',
+          }}
+          state={{ customer }} // Send customer data to SendSMS component
           className="inline-block bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-600"
         >
-          Ny Ordre
+          Send SMS
         </Link>
-        <Link
-          to={`/create-service/${customer.customerNumber}`}
-          className="inline-block bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-600"
-        >
-          Ny tjeneste
-        </Link>
-      </div>
-      <Link
-  to={{
-    pathname: '/sendsms',
-  }}
-  state={{ customer }} // Send customer data to SendSMS component
-  className="inline-block bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-600"
->
-  Send SMS
-</Link>
 
-    </div>
+      </div>
       {/* SMS Historikk */}
       <div className="mt-8">
         <h3 className="text-xl font-semibold mb-4">Sendte SMS-er</h3>
@@ -259,8 +274,7 @@ function CustomerDetails() {
       </div>
 
 
-
-      {/* Kundens Tjenester */}
+      {/* Oppdatert kode i return-delen for kundens tjenester */}
       <div className="mt-8">
         <h3 className="text-xl font-semibold mb-4">Kundens Tjenester</h3>
         {services.length > 0 ? (
@@ -281,7 +295,7 @@ function CustomerDetails() {
                 <tr
                   key={service._id}
                   className="hover:bg-gray-50 cursor-pointer"
-                  onClick={() => navigate(`/service-details/${service._id}`)}
+                  onClick={() => handleSelectService(service)}
                   onMouseEnter={(event) => handleMouseEnter(service, event, 'service')}
                   onMouseLeave={handleMouseLeave}
                 >

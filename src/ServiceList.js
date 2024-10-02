@@ -94,8 +94,21 @@ function ServiceList() {
 
   // Funksjon for å håndtere valg av tjeneste
   const handleSelectService = (service) => {
-    navigate(`/service-details/${service._id}`);
+    // Avgjør hvilken detaljside som skal åpnes basert på valgt tjenestetype
+    if (service.servicetype === 'Sykkelservice') {
+      navigate(`/service-details-bike/${service._id}`);
+    } else if (service.servicetype === 'Skiservice') {
+      navigate(`/service-details-ski/${service._id}`);
+    } else if (service.servicetype === 'Skøyteslip') {
+      navigate(`/service-details-skate/${service._id}`);
+    } else if (service.servicetype === 'Tekstiltrykking') {
+      navigate(`/service-details-club/${service._id}`);
+    } else {
+      // Standard detaljside for ukjente tjenestetyper
+      navigate(`/service-details/${service._id}`);
+    }
   };
+
 
   const handleMouseEnter = (service, event) => {
     setHoveredService(service);

@@ -29,6 +29,8 @@ import ServiceDetailsBike from './ServiceDetailsBike';
 import ServiceDetailsSki from './ServiceDetailsSki';
 import ServiceDetailsClub from './ServiceDetailsClub';
 import ServiceDetailsSkate from './ServiceDetailsSkate';
+import CompletedTasks from './CompletedTasks'; // Importer den nye komponenten
+
 
 
 function App() {
@@ -133,20 +135,23 @@ function App() {
             <Route
               path="/"
               element={
-                <>
-                  <SearchBar
-                    searchQuery={searchQuery}
-                    setSearchQuery={setSearchQuery}
-                    filteredCustomers={filteredCustomers}
-                    setPhoneNumber={setPhoneNumber}
-                  />
-                  <CustomerForm
-                    addCustomer={(newCustomer) => setCustomers([...customers, newCustomer])}
-                    customers={customers}
-                    phoneNumber={phoneNumber}
-                    setSearchQuery={setSearchQuery}
-                  />
-                </>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <SearchBar
+                      searchQuery={searchQuery}
+                      setSearchQuery={setSearchQuery}
+                      filteredCustomers={filteredCustomers}
+                      setPhoneNumber={setPhoneNumber}
+                    />
+                    <CustomerForm
+                      addCustomer={(newCustomer) => setCustomers([...customers, newCustomer])}
+                      customers={customers}
+                      phoneNumber={phoneNumber}
+                      setSearchQuery={setSearchQuery}
+                    />
+                  </div>
+                  <CompletedTasks />
+                </div>
               }
             />
             <Route
@@ -210,12 +215,12 @@ function App() {
             <Route path="/service-details-ski/:id" element={<ServiceDetailsSki />} />
             <Route path="/service-details-skate/:id" element={<ServiceDetailsSkate />} />
             <Route path="/service-details-club/:id" element={<ServiceDetailsClub />} />
-
           </Routes>
         </div>
       </div>
     </Router>
   );
+
 }
 
 export default App;
