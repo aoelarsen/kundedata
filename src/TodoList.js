@@ -16,105 +16,97 @@ function TodoList() {
   const [customTaskDate, setCustomTaskDate] = useState(today);
   const [employee] = useState(Cookies.get('selectedEmployee') || '');
 
-// Hent daglige oppgaver
-const fetchDailyTasks = useCallback(async () => {
-  try {
-    const [dailyTasksResponse, completedTasksResponse] = await Promise.all([
-      fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/dailytasks'),
-      fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks?taskType=daily')
-    ]);
+  // Hent daglige oppgaver
+  const fetchDailyTasks = useCallback(async () => {
+    try {
+      const [dailyTasksResponse, completedTasksResponse] = await Promise.all([
+        fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/dailytasks'),
+        fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks?taskType=daily')
+      ]);
 
-    const dailyTasksData = await dailyTasksResponse.json();
-    const completedTasksData = await completedTasksResponse.json();
+      const dailyTasksData = await dailyTasksResponse.json();
+      const completedTasksData = await completedTasksResponse.json();
 
-    // Filtrer oppgaver relatert til butikkID
-    const filteredDailyTasks = dailyTasksData.filter(task => task.store === butikkid);
+      // Logg begge datalisten for å bekrefte innholdet
+      console.log('Daily Tasks Data:', dailyTasksData);
+      console.log('Completed Tasks Data:', completedTasksData);
 
-    console.log('Filtered Daily Tasks:', filteredDailyTasks);
+
+      // Filtrer oppgaver relatert til butikkID
+      const filteredDailyTasks = dailyTasksData.filter(task => task.store === butikkid);
 
 
-    filteredDailyTasks.forEach(task => {
-      console.log('Hentet oppgave-ID:', task._id);
-    });
 
-    const updatedDailyTasks = await Promise.all(
-      filteredDailyTasks.map(async (task) => {
+      filteredDailyTasks.forEach(task => {
+      });
+
+      const updatedDailyTasks = [];
+      for (const task of filteredDailyTasks) {
         const completedTask = completedTasksData.find(ct => ct.task === task.task && ct.store === butikkid);
         if (completedTask) {
           const completedDate = new Date(completedTask.dateCompleted).toISOString().split('T')[0];
-
-          // Log datoene for debugging
-          console.log('completedTask.dateCompleted:', completedTask.dateCompleted);
-          console.log('completedDate:', completedDate);
-          console.log('today:', today);
-
           if (completedDate === today) {
-            return { ...task, completed: true, completedBy: completedTask.employee };
+            updatedDailyTasks.push({ ...task, completed: true, completedBy: completedTask.employee });
           } else {
-            // Nullstill oppgaven hvis utført dato ikke samsvarer med dagens dato
-            await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/dailytasks/${task._id}`, {
-              method: 'PATCH',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ completed: false, completedBy: null, dateCompleted: null }),
-            });
-            return { ...task, completed: false, completedBy: null };
+            updatedDailyTasks.push({ ...task, completed: false, completedBy: null });
           }
         } else {
-          return task;
+          updatedDailyTasks.push(task);
         }
-      })
-    );
-
-    setDailyTasks(updatedDailyTasks);
-  } catch (error) {
-    console.error('Feil ved henting av faste oppgaver:', error);
-  }
-}, [butikkid, today]);
-
-
-
- // Hent egendefinerte oppgaver
- const fetchCustomTasks = useCallback(async () => {
-  try {
-    const customTasksResponse = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks');
-    const customTasksData = await customTasksResponse.json();
-    const filteredCustomTasks = customTasksData.filter(task => task.store === butikkid);
-    const updatedCustomTasks = [];
-
-    for (const task of filteredCustomTasks) {
-      if (task.dateCompleted) {
-        const completedDate = new Date(task.dateCompleted).toISOString().split('T')[0];
-        if (completedDate !== today) {
-          // Oppdater oppgaven i customtasks hvis utførtdato ikke stemmer med dagens dato
-          await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks/${task._id}`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ completed: true }),
-          });
-          console.log(`Oppgave med id ${task._id} oppdatert til completed: true, da utførtdato ikke samsvarer med dagens dato.`);
-          updatedCustomTasks.push({
-            ...task,
-            completed: true, // Marker som fullført
-          });
-        } else {
-          updatedCustomTasks.push({
-            ...task,
-            completed: !!task.dateCompleted && !!task.completedBy, // Marker som fullført hvis dateCompleted og completedBy finnes
-          });
-        }
-      } else {
-        updatedCustomTasks.push(task);
       }
+      console.log('Updated Daily Tasks:', updatedDailyTasks);
+      setDailyTasks(updatedDailyTasks);
+
+
+    } catch (error) {
+      console.error('Feil ved henting av faste oppgaver:', error);
     }
-
-    setCustomTasks(updatedCustomTasks);
-  } catch (error) {
-    console.error('Feil ved henting av egendefinerte oppgaver:', error);
-  }
-}, [butikkid, today]);
+  }, [butikkid, today]);
 
 
-  
+
+  // Hent egendefinerte oppgaver
+  const fetchCustomTasks = useCallback(async () => {
+    try {
+      const customTasksResponse = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks');
+      const customTasksData = await customTasksResponse.json();
+      const filteredCustomTasks = customTasksData.filter(task => task.store === butikkid);
+      const updatedCustomTasks = [];
+
+      for (const task of filteredCustomTasks) {
+        if (task.dateCompleted) {
+          const completedDate = new Date(task.dateCompleted).toISOString().split('T')[0];
+          if (completedDate !== today) {
+            // Oppdater oppgaven i customtasks hvis utførtdato ikke stemmer med dagens dato
+            await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks/${task._id}`, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ completed: true }),
+            });
+
+            updatedCustomTasks.push({
+              ...task,
+              completed: true, // Marker som fullført
+            });
+          } else {
+            updatedCustomTasks.push({
+              ...task,
+              completed: !!task.dateCompleted && !!task.completedBy, // Marker som fullført hvis dateCompleted og completedBy finnes
+            });
+          }
+        } else {
+          updatedCustomTasks.push(task);
+        }
+      }
+
+      setCustomTasks(updatedCustomTasks);
+    } catch (error) {
+      console.error('Feil ved henting av egendefinerte oppgaver:', error);
+    }
+  }, [butikkid, today]);
+
+
+
 
   // Hent fullførte oppgaver
   const fetchCompletedTasks = useCallback(async () => {
@@ -135,6 +127,7 @@ const fetchDailyTasks = useCallback(async () => {
     fetchCustomTasks();
     fetchCompletedTasks();
   }, [fetchDailyTasks, fetchCustomTasks, fetchCompletedTasks]);
+
 
   // Funksjon for å legge til en ny egendefinert oppgave
   const handleAddCustomTask = async () => {
@@ -193,9 +186,11 @@ const fetchDailyTasks = useCallback(async () => {
       });
 
       if (response.ok) {
-        setDailyTasks((prevTasks) =>
-          prevTasks.map((task) =>
-            task._id === taskId ? { ...task, completed: true, completedBy: employee, dateCompleted: new Date() } : task
+        setDailyTasks(prevTasks =>
+          prevTasks.map(task =>
+            task._id === taskId
+              ? { ...task, completed: true, completedBy: employee, dateCompleted: new Date().toISOString().split('T')[0] }
+              : task
           )
         );
       }
@@ -203,6 +198,8 @@ const fetchDailyTasks = useCallback(async () => {
       console.error('Feil ved oppdatering av daglig oppgave:', error);
     }
   };
+
+
 
   // Funksjon for å markere en egendefinert oppgave som fullført
   const handleCompleteCustomTask = async (taskId, taskDescription, dueDate) => {
@@ -214,7 +211,7 @@ const fetchDailyTasks = useCallback(async () => {
       employee,
       store: butikkid,
     };
-  
+
     try {
       // Legg til oppgaven i 'completedtasks' collection
       await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks', {
@@ -222,14 +219,14 @@ const fetchDailyTasks = useCallback(async () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(bodyData),
       });
-  
+
       // Oppdater 'customtasks' med utførtdato og ansatt
       const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks/${taskId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ completedBy: employee, dateCompleted: new Date().toISOString() }),
       });
-  
+
       if (response.ok) {
         setCustomTasks((prevTasks) =>
           prevTasks.map((task) =>
@@ -243,9 +240,9 @@ const fetchDailyTasks = useCallback(async () => {
       console.error('Feil ved oppdatering av egendefinert oppgave:', error);
     }
   };
-  
-  
-  
+
+
+
   return (
     <div className="max-w-5xl mx-auto py-8 bg-white shadow-lg rounded-lg p-6 mb-4">
       <h2 className="text-3xl font-bold mb-6 text-center">Todo-liste</h2>
@@ -267,7 +264,6 @@ const fetchDailyTasks = useCallback(async () => {
                   onClick={() => handleCompleteDailyTask(task._id, task.task)}
                   className="bg-green-500 text-white px-4 py-1 rounded md:ml-4"
                 >
-                  {/* Merk-knapp på mobil, Merk som utført på større skjermer */}
                   <span className="block md:hidden">Merk</span>
                   <span className="hidden md:block">Merk som utført</span>
                 </button>
@@ -277,34 +273,35 @@ const fetchDailyTasks = useCallback(async () => {
             </li>
           ))}
         </ul>
+
       </div>
 
-   {/* Dagens oppgaver */}
-<div className="mt-8">
-  <h3 className="text-2xl font-bold mb-4">Dagens oppgaver</h3>
-  <ul>
-    {customTasks.map((task) => (
-      <li key={task._id} className="flex flex-row justify-between items-center mb-2">
-        <span className="flex-1">
-          {task.task}
-          {task.dateCompleted && task.completedBy && (
-            <div className="text-green-600 md:ml-4">(Utført av: {task.completedBy}, {new Date(task.dateCompleted).toLocaleDateString()})</div>
-          )}
-        </span>
-        {!(task.dateCompleted && task.completedBy) ? (
-          <button
-            onClick={() => handleCompleteCustomTask(task._id, task.task, task.dueDate)}
-            className="bg-green-500 text-white px-4 py-1 rounded md:ml-4"
-          >
-            <span className="block md:hidden">Merk</span>
-            <span className="hidden md:block">Merk som utført</span>
-          </button>
-        ) : (
-          <span className="text-gray-500">Utført</span>
-        )}
-      </li>
-    ))}
-  </ul>
+      {/* Dagens oppgaver */}
+      <div className="mt-8">
+        <h3 className="text-2xl font-bold mb-4">Dagens oppgaver</h3>
+        <ul>
+          {customTasks.map((task) => (
+            <li key={task._id} className="flex flex-row justify-between items-center mb-2">
+              <span className="flex-1">
+                {task.task}
+                {task.dateCompleted && task.completedBy && (
+                  <div className="text-green-600 md:ml-4">(Utført av: {task.completedBy}, {new Date(task.dateCompleted).toLocaleDateString()})</div>
+                )}
+              </span>
+              {!(task.dateCompleted && task.completedBy) ? (
+                <button
+                  onClick={() => handleCompleteCustomTask(task._id, task.task, task.dueDate)}
+                  className="bg-green-500 text-white px-4 py-1 rounded md:ml-4"
+                >
+                  <span className="block md:hidden">Merk</span>
+                  <span className="hidden md:block">Merk som utført</span>
+                </button>
+              ) : (
+                <span className="text-gray-500">Utført</span>
+              )}
+            </li>
+          ))}
+        </ul>
 
 
         {/* Legg til ny oppgave - justert for to linjer på mobil */}
