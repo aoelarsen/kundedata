@@ -1123,6 +1123,40 @@ app.get('/servicetypes/:id', async (req, res) => {
 });
 
 
+// Schema for fastpris
+const fixedPriceSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  price: { type: Number, required: true },
+  description: { type: String, required: true },
+  serviceType: { type: String, required: true },
+});
+
+// Modell for fastpris
+const FixedPrice = mongoose.model('FixedPrice', fixedPriceSchema);
+
+// Endpoint for å opprette ny fastpris
+app.post('/fixedprices', async (req, res) => {
+  const { title, price, description, serviceType } = req.body;
+
+  const newFixedPrice = new FixedPrice({ title, price, description, serviceType });
+
+  try {
+    const savedFixedPrice = await newFixedPrice.save();
+    res.status(201).json(savedFixedPrice);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+// Endpoint for å hente alle fastpriser
+app.get('/fixedprices', async (req, res) => {
+  try {
+    const fixedPrices = await FixedPrice.find();
+    res.status(200).json(fixedPrices);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
 
 
