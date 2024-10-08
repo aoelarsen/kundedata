@@ -20,7 +20,11 @@ function FixedPriceList() {
     }, []);
 
     const handleAddFixedPrice = () => {
-        navigate('/fixed-price-form'); // Naviger til FixedPriceForm for å legge til ny fastpris
+        navigate('/fixed-price-form'); // Naviger til skjema for å legge til ny fastpris
+    };
+
+    const handleEditFixedPrice = (id) => {
+        navigate(`/fixed-price-change/${id}`); // Naviger til siden for å endre fastpris
     };
 
     return (
@@ -46,9 +50,9 @@ function FixedPriceList() {
                     </thead>
                     <tbody>
                         {fixedPrices.map((price) => (
-                            <tr key={price._id} className="hover:bg-gray-50">
+                            <tr key={price._id} className="hover:bg-gray-50 cursor-pointer" onClick={() => handleEditFixedPrice(price._id)}>
                                 <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{price.title}</td>
-                                <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{price.price} NOK</td>
+                                <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{price.price}</td>
                                 <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{price.description}</td>
                                 <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{price.serviceType}</td>
                             </tr>
