@@ -1159,6 +1159,34 @@ app.get('/fixedprices', async (req, res) => {
 });
 
 
+// Endpoint for å oppdatere en fastpris
+app.patch('/fixedprices/:id', async (req, res) => {
+  try {
+    const fixedPrice = await FixedPrice.findById(req.params.id);
+    if (!fixedPrice) {
+      return res.status(404).json({ message: 'Fastpris ikke funnet' });
+    }
+
+    // Oppdater feltene dersom de er inkludert i forespørselen
+    if (req.body.title != null) {
+      fixedPrice.title = req.body.title;
+    }
+    if (req.body.price != null) {
+      fixedPrice.price = req.body.price;
+    }
+    if (req.body.description != null) {
+      fixedPrice.description = req.body.description;
+    }
+    if (req.body.serviceType != null) {
+      fixedPrice.serviceType = req.body.serviceType;
+    }
+
+    const updatedFixedPrice = await fixedPrice.save();
+    res.json(updatedFixedPrice);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
 
 
 

@@ -30,7 +30,9 @@ import ServiceDetailsSki from './ServiceDetailsSki';
 import ServiceDetailsClub from './ServiceDetailsClub';
 import ServiceDetailsSkate from './ServiceDetailsSkate';
 import CompletedTasks from './CompletedTasks'; // Importer den nye komponenten
-
+import FixedPriceForm from './FixedPriceForm';
+import FixedPriceList from './FixedPriceList';
+import FixedPriceChange from './FixedPriceChange';
 
 
 function App() {
@@ -215,6 +217,10 @@ function App() {
             <Route path="/service-details-ski/:id" element={<ServiceDetailsSki />} />
             <Route path="/service-details-skate/:id" element={<ServiceDetailsSkate />} />
             <Route path="/service-details-club/:id" element={<ServiceDetailsClub />} />
+            <Route path="/fixed-price-form" element={<FixedPriceForm />} />
+<Route path="/fixed-price-list" element={<FixedPriceList />} />
+<Route path="/fixed-price-change/:id" element={<FixedPriceChange />} />
+
           </Routes>
         </div>
       </div>
