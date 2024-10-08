@@ -19,49 +19,61 @@ function TodoList() {
   // Hent daglige oppgaver
   const fetchDailyTasks = useCallback(async () => {
     try {
-      const [dailyTasksResponse, completedTasksResponse] = await Promise.all([
-        fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/dailytasks'),
-        fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks?taskType=daily')
-      ]);
-
+      const dailyTasksResponse = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/dailytasks');
       const dailyTasksData = await dailyTasksResponse.json();
-      const completedTasksData = await completedTasksResponse.json();
 
-      // Logg begge datalisten for å bekrefte innholdet
-      console.log('Daily Tasks Data:', dailyTasksData);
-      console.log('Completed Tasks Data:', completedTasksData);
-
+      console.log('Daily Tasks Data:', dailyTasksData); // Logge oppgavene
 
       // Filtrer oppgaver relatert til butikkID
       const filteredDailyTasks = dailyTasksData.filter(task => task.store === butikkid);
 
-
-
-      filteredDailyTasks.forEach(task => {
-      });
-
       const updatedDailyTasks = [];
+
       for (const task of filteredDailyTasks) {
-        const completedTask = completedTasksData.find(ct => ct.task === task.task && ct.store === butikkid);
-        if (completedTask) {
-          const completedDate = new Date(completedTask.dateCompleted).toISOString().split('T')[0];
-          if (completedDate === today) {
-            updatedDailyTasks.push({ ...task, completed: true, completedBy: completedTask.employee });
+        if (task.completed && task.dateCompleted) {
+          const completedDate = new Date(task.dateCompleted).toISOString().split('T')[0];
+
+          if (completedDate !== today) {
+            // Logg oppgaven som skal oppdateres
+            console.log(`Oppgave "${task.task}" har en dato (${completedDate}) som er forskjellig fra dagens dato (${today}) og vil bli oppdatert til completed: false.`);
+
+            // Oppdater oppgaven i databasen hvis datoen ikke samsvarer med dagens dato
+            const updateResponse = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/dailytasks/${task._id}`, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ completed: false, completedBy: null, dateCompleted: null }),
+            });
+
+            if (updateResponse.ok) {
+              const updatedTask = await updateResponse.json();
+              console.log('Oppgave oppdatert til completed: false:', updatedTask);
+              updatedDailyTasks.push({ ...task, completed: false, completedBy: null });
+            } else {
+              console.error('Feil ved oppdatering av oppgave:', updateResponse.status);
+            }
           } else {
-            updatedDailyTasks.push({ ...task, completed: false, completedBy: null });
+            // Logg oppgaven som har fullført dato som dagens dato
+            console.log(`Oppgave "${task.task}" har fullføringsdato (${completedDate}) som dagens dato (${today}).`);
+            updatedDailyTasks.push(task); // Oppgaven er fortsatt fullført for i dag
           }
         } else {
-          updatedDailyTasks.push(task);
+          updatedDailyTasks.push(task); // Ikke fullført oppgave legges til som den er
         }
       }
-      console.log('Updated Daily Tasks:', updatedDailyTasks);
+
+      console.log('Oppdaterte daglige oppgaver:', updatedDailyTasks);
       setDailyTasks(updatedDailyTasks);
 
-
     } catch (error) {
-      console.error('Feil ved henting av faste oppgaver:', error);
+      console.error('Feil ved henting av daglige oppgaver:', error);
     }
   }, [butikkid, today]);
+
+
+
+
+
+
 
 
 
@@ -129,6 +141,7 @@ function TodoList() {
   }, [fetchDailyTasks, fetchCustomTasks, fetchCompletedTasks]);
 
 
+
   // Funksjon for å legge til en ny egendefinert oppgave
   const handleAddCustomTask = async () => {
     if (!newCustomTask || !customTaskDate || !butikkid) {
@@ -193,11 +206,13 @@ function TodoList() {
               : task
           )
         );
+        console.log("Oppgave fullført:", taskDescription);
       }
     } catch (error) {
       console.error('Feil ved oppdatering av daglig oppgave:', error);
     }
   };
+
 
 
 
