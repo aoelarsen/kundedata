@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { format, parse } from 'date-fns'; // Importer date-fns for formatering
+import { format, parse } from 'date-fns';
 
 function ServiceDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // State for service, kunde, ansatte, fixedprices og arbeid
   const [formData, setFormData] = useState({
     beskrivelse: '',
-    arbeid: [], // Endret til tom liste for arbeid
+    arbeid: [], // Liste over flere arbeid
     status: 'Aktiv',
     ansatt: '',
     Varemerke: '',
@@ -17,7 +16,6 @@ function ServiceDetails() {
     Størrelse: '',
     Farge: '',
   });
-
   const [fixedPrices, setFixedPrices] = useState([]);
   const [serviceDetails, setServiceDetails] = useState(null);
   const [customer, setCustomer] = useState(null);
@@ -35,26 +33,22 @@ function ServiceDetails() {
     return parsedDate ? format(parsedDate, 'd.M.yyyy HH:mm') : "Ugyldig dato";
   };
 
-  // Hent fastpriser basert på serviceType
+  // Hent fixedprices
   useEffect(() => {
     const fetchFixedPrices = async () => {
       try {
         const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/fixedprices');
         if (response.ok) {
           const prices = await response.json();
-          // Filtrer fastpriser basert på servicetype (hvis tilgjengelig)
-          const filteredPrices = prices.filter(price => price.serviceType === serviceDetails?.servicetype);
-          setFixedPrices(filteredPrices);
+          setFixedPrices(prices);
         }
       } catch (error) {
         console.error('Feil ved henting av fastpriser:', error);
       }
     };
 
-    if (serviceDetails?.servicetype) {
-      fetchFixedPrices();
-    }
-  }, [serviceDetails?.servicetype]);
+    fetchFixedPrices();
+  }, []);
 
   const handleAddWork = (e) => {
     const selectedWork = fixedPrices.find(price => price._id === e.target.value);
@@ -76,7 +70,7 @@ function ServiceDetails() {
           setServiceDetails(service);
           setFormData({
             beskrivelse: service.Beskrivelse || '',
-            arbeid: service.arbeid || [], // Endret for å sikre at arbeid er en liste
+            arbeid: service.arbeid || [],
             status: service.status || 'Aktiv',
             ansatt: service.ansatt || '',
             Varemerke: service.Varemerke || '',

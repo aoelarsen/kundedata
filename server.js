@@ -71,6 +71,10 @@ const serviceSchema = new mongoose.Schema({
   Produkt: String,
   Størrelse: String,
   Farge: String,
+  arbeid: [{
+    title: String,
+    price: Number
+  }],
   Beskrivelse: String,
   status: { type: String, default: 'Aktiv' },
   ansatt: String,
@@ -744,6 +748,7 @@ app.patch('/services/:id', async (req, res) => {
     res.status(400).json({ message: 'Feil ved oppdatering av tjeneste' });
   }
 });
+
 
 
 // Delete a service
