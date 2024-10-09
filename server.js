@@ -217,7 +217,7 @@ app.patch('/employees/:id', async (req, res) => {
     }
     if (req.body.epost != null) {
       employee.epost = req.body.epost;
-    }    
+    }
     if (req.body.butikk != null) {
       employee.butikk = req.body.butikk; // Sørg for at dette feltet blir oppdatert
     }
@@ -1155,6 +1155,19 @@ app.get('/fixedprices', async (req, res) => {
     res.status(200).json(fixedPrices);
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+});
+
+// Endpoint to get a single fixedpricee by ID
+app.get('/fixedprices/:id', async (req, res) => {
+  try {
+    const fixedprice = await Fixedprice.findById(req.params.id);
+    if (fixedprice == null) {
+      return res.status(404).json({ message: 'Priser ikke funnet' });
+    }
+    res.json(fixedprice);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 });
 
