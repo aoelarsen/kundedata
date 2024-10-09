@@ -147,11 +147,11 @@ function ServiceDetails() {
     e.preventDefault();
 
     if (!formData.beskrivelse.trim()) {
-      setIsDescriptionEmpty(true); // Sett fokus på feltene
-      return; // Stopp innsendingen dersom beskrivelse er tom
+      setIsDescriptionEmpty(true); // Sett feilmelding hvis beskrivelsen er tom
+      return; // Stopp innsendingen
     }
 
-    setIsDescriptionEmpty(false);
+    setIsDescriptionEmpty(false); // Fjern feilmeldingen hvis beskrivelsen er utfylt
 
     const updatedService = {
       ...formData,
@@ -281,13 +281,8 @@ function ServiceDetails() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        {isDescriptionEmpty && (
-          <div className="text-red-500 font-semibold mb-4">
-            Vennligst fyll ut feltene nedenfor før du går videre.
-          </div>
-        )}
-
-        <div className={isDescriptionEmpty ? "border-2 border-red-500 p-4 rounded" : ""}>
+        {/* Velg arbeid fra listen */}
+        <div className={`p-4 border ${isDescriptionEmpty ? 'border-red-500' : 'border-gray-300'} rounded-lg`}>
           <label className="block text-sm font-medium text-gray-700">Velg arbeid fra liste:</label>
           <select onChange={handleAddWork} className="mt-1 block w-full p-2 border border-gray-300 rounded-md">
             <option value="">Velg arbeid</option>
@@ -297,9 +292,13 @@ function ServiceDetails() {
               </option>
             ))}
           </select>
+          {formData.arbeid.length === 0 && (
+            <p className="text-red-500 text-sm mt-2">Vennligst velg minst ett arbeid før du går videre.</p>
+          )}
         </div>
 
-        <div className={isDescriptionEmpty ? "border-2 border-red-500 p-4 rounded" : ""}>
+        {/* Valgt arbeid */}
+        <div className={`p-4 border ${formData.arbeid.length === 0 ? 'border-red-500' : 'border-gray-300'} rounded-lg`}>
           <label className="block text-sm font-medium text-gray-700">Valgt arbeid:</label>
           <ul>
             {formData.arbeid.map((item, index) => (
@@ -315,9 +314,13 @@ function ServiceDetails() {
               </li>
             ))}
           </ul>
+          {formData.arbeid.length === 0 && (
+            <p className="text-red-500 text-sm mt-2">Du må legge til arbeid.</p>
+          )}
         </div>
 
-        <div className={isDescriptionEmpty ? "border-2 border-red-500 p-4 rounded" : ""}>
+        {/* Beskrivelse */}
+        <div className={`p-4 border ${isDescriptionEmpty ? 'border-red-500' : 'border-gray-300'} rounded-lg`}>
           <label className="block text-sm font-medium text-gray-700">Beskrivelse:</label>
           <textarea
             name="beskrivelse"
@@ -327,7 +330,11 @@ function ServiceDetails() {
             rows="3"
             className="mt-1 block w-full p-2 border border-gray-300 rounded-md resize-y"
           />
+          {isDescriptionEmpty && (
+            <p className="text-red-500 text-sm mt-2">Du må legge til arbeid.</p>
+          )}
         </div>
+
         <div>
           <label className="block text-sm font-medium text-gray-700">Varemerke:</label>
           <input
