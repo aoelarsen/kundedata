@@ -21,6 +21,8 @@ function ServiceDetails() {
   const [customer, setCustomer] = useState(null);
   const [employees, setEmployees] = useState([]);
   const [updateMessage, setUpdateMessage] = useState('');
+  const [isDescriptionEmpty, setIsDescriptionEmpty] = useState(false);
+
 
   const parseCustomDateString = (dateString) => {
     const parsedDate = parse(dateString, 'd.M.yyyy, HH:mm:ss', new Date());
@@ -144,9 +146,17 @@ function ServiceDetails() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!formData.beskrivelse.trim()) {
+      setIsDescriptionEmpty(true); // Sett fokus på feltene
+      return; // Stopp innsendingen dersom beskrivelse er tom
+    }
+
+    setIsDescriptionEmpty(false);
+
     const updatedService = {
       ...formData,
-      arbeid: formData.arbeid.map(work => ({ title: work.title, price: work.price })), // Map til kun title og price
+      Beskrivelse: formData.beskrivelse,
+      arbeid: formData.arbeid.map(work => ({ title: work.title, price: work.price })),
       endretdato: new Date().toLocaleString('no-NO', { timeZone: 'Europe/Oslo' }),
     };
 
@@ -171,6 +181,7 @@ function ServiceDetails() {
       console.error('Feil ved kommunikasjon med serveren:', error);
     }
   };
+
 
 
   const handlePrintLabel = () => {
@@ -270,7 +281,13 @@ function ServiceDetails() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
+        {isDescriptionEmpty && (
+          <div className="text-red-500 font-semibold mb-4">
+            Vennligst fyll ut feltene nedenfor før du går videre.
+          </div>
+        )}
+
+        <div className={isDescriptionEmpty ? "border-2 border-red-500 p-4 rounded" : ""}>
           <label className="block text-sm font-medium text-gray-700">Velg arbeid fra liste:</label>
           <select onChange={handleAddWork} className="mt-1 block w-full p-2 border border-gray-300 rounded-md">
             <option value="">Velg arbeid</option>
@@ -281,7 +298,8 @@ function ServiceDetails() {
             ))}
           </select>
         </div>
-        <div>
+
+        <div className={isDescriptionEmpty ? "border-2 border-red-500 p-4 rounded" : ""}>
           <label className="block text-sm font-medium text-gray-700">Valgt arbeid:</label>
           <ul>
             {formData.arbeid.map((item, index) => (
@@ -299,7 +317,7 @@ function ServiceDetails() {
           </ul>
         </div>
 
-        <div>
+        <div className={isDescriptionEmpty ? "border-2 border-red-500 p-4 rounded" : ""}>
           <label className="block text-sm font-medium text-gray-700">Beskrivelse:</label>
           <textarea
             name="beskrivelse"
