@@ -1158,18 +1158,6 @@ app.get('/fixedprices', async (req, res) => {
   }
 });
 
-// Endpoint to get a single fixedpricee by ID
-app.get('/fixedprices/:id', async (req, res) => {
-  try {
-    const fixedprice = await Fixedprice.findById(req.params.id);
-    if (fixedprice == null) {
-      return res.status(404).json({ message: 'Priser ikke funnet' });
-    }
-    res.json(fixedprice);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
 
 
 // Endpoint for å oppdatere en fastpris
@@ -1201,6 +1189,18 @@ app.patch('/fixedprices/:id', async (req, res) => {
   }
 });
 
+// Endpoint for å hente en spesifikk fastpris
+app.get('/fixedprices/:id', async (req, res) => {
+  try {
+    const fixedPrice = await FixedPrice.findById(req.params.id);
+    if (!fixedPrice) {
+      return res.status(404).json({ message: 'Fastpris ikke funnet' });
+    }
+    res.status(200).json(fixedPrice);
+  } catch (error) {
+    res.status(500).json({ message: 'Feil ved henting av fastpris', error });
+  }
+});
 
 
 
