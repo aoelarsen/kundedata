@@ -713,14 +713,15 @@ app.post('/services', async (req, res) => {
 });
 
 
-// Update a service
+// Update a service to include fixed prices (arbeid)
 app.patch('/services/:id', async (req, res) => {
   try {
     const service = await Service.findById(req.params.id);
-    if (service == null) {
+    if (!service) {
       return res.status(404).json({ message: 'Tjeneste ikke funnet' });
     }
 
+    // Oppdater feltene basert på forespørselen
     if (req.body.beskrivelse != null) {
       service.beskrivelse = req.body.beskrivelse;
     }
@@ -730,6 +731,9 @@ app.patch('/services/:id', async (req, res) => {
     if (req.body.ansatt != null) {
       service.ansatt = req.body.ansatt;
     }
+    if (req.body.arbeid != null) {
+      service.arbeid = req.body.arbeid; // Legg til valgt arbeid (FixedPrices)
+    }
     if (req.body.endretdato != null) {
       service.endretdato = req.body.endretdato;
     }
@@ -737,9 +741,10 @@ app.patch('/services/:id', async (req, res) => {
     const updatedService = await service.save();
     res.json(updatedService);
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    res.status(400).json({ message: 'Feil ved oppdatering av tjeneste' });
   }
 });
+
 
 // Delete a service
 app.delete('/services/:id', async (req, res) => {

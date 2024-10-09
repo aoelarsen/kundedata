@@ -3,11 +3,13 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { format, parse } from 'date-fns'; // Importer date-fns for formatering
 
 function ServiceDetails() {
-  const { id } = useParams(); // Henter _id fra URL (MongoDB ObjectId)
-  const navigate = useNavigate(); // For navigering
+  const { id } = useParams();
+  const navigate = useNavigate();
+
+  // State for service, kunde, ansatte, fixedprices og arbeid
   const [formData, setFormData] = useState({
     beskrivelse: '',
-    arbeid: '', // Legger til nytt felt 'arbeid'
+    arbeid: [], // Endret til tom liste for arbeid
     status: 'Aktiv',
     ansatt: '',
     Varemerke: '',
@@ -15,10 +17,12 @@ function ServiceDetails() {
     Størrelse: '',
     Farge: '',
   });
-  const [customer, setCustomer] = useState(null); // For å holde kundedetaljer
-  const [serviceDetails, setServiceDetails] = useState(null); // For å holde servicedetaljer fra API
-  const [employees, setEmployees] = useState([]); // For å holde ansatte data
-  const [updateMessage, setUpdateMessage] = useState(''); // For å vise oppdateringsmelding
+
+  const [fixedPrices, setFixedPrices] = useState([]);
+  const [serviceDetails, setServiceDetails] = useState(null);
+  const [customer, setCustomer] = useState(null);
+  const [employees, setEmployees] = useState([]);
+  const [updateMessage, setUpdateMessage] = useState('');
 
   const parseCustomDateString = (dateString) => {
     const parsedDate = parse(dateString, 'd.M.yyyy, HH:mm:ss', new Date());
@@ -26,14 +30,40 @@ function ServiceDetails() {
   };
 
   const formatDateTime = (dateString) => {
-    if (!dateString) {
-      return "Ukjent dato";
-    }
+    if (!dateString) return "Ukjent dato";
     const parsedDate = parseCustomDateString(dateString);
-    if (!parsedDate) {
-      return "Ugyldig dato";
+    return parsedDate ? format(parsedDate, 'd.M.yyyy HH:mm') : "Ugyldig dato";
+  };
+
+  // Hent fastpriser basert på serviceType
+  useEffect(() => {
+    const fetchFixedPrices = async () => {
+      try {
+        const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/fixedprices');
+        if (response.ok) {
+          const prices = await response.json();
+          // Filtrer fastpriser basert på servicetype (hvis tilgjengelig)
+          const filteredPrices = prices.filter(price => price.serviceType === serviceDetails?.servicetype);
+          setFixedPrices(filteredPrices);
+        }
+      } catch (error) {
+        console.error('Feil ved henting av fastpriser:', error);
+      }
+    };
+
+    if (serviceDetails?.servicetype) {
+      fetchFixedPrices();
     }
-    return format(parsedDate, 'd.M.yyyy HH:mm');
+  }, [serviceDetails?.servicetype]);
+
+  const handleAddWork = (e) => {
+    const selectedWork = fixedPrices.find(price => price._id === e.target.value);
+    if (selectedWork) {
+      setFormData((prevData) => ({
+        ...prevData,
+        arbeid: [...prevData.arbeid, selectedWork],
+      }));
+    }
   };
 
   // Hent servicedetaljer
@@ -46,7 +76,7 @@ function ServiceDetails() {
           setServiceDetails(service);
           setFormData({
             beskrivelse: service.Beskrivelse || '',
-            arbeid: service.arbeid || '', // Sett 'arbeid' fra service-dataen
+            arbeid: service.arbeid || [], // Endret for å sikre at arbeid er en liste
             status: service.status || 'Aktiv',
             ansatt: service.ansatt || '',
             Varemerke: service.Varemerke || '',
@@ -84,6 +114,7 @@ function ServiceDetails() {
     fetchService();
   }, [id]);
 
+  // Hent ansatte
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
@@ -234,6 +265,28 @@ function ServiceDetails() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Velg arbeid fra liste:</label>
+          <select onChange={handleAddWork} className="mt-1 block w-full p-2 border border-gray-300 rounded-md">
+            <option value="">Velg arbeid</option>
+            {fixedPrices.map((price) => (
+              <option key={price._id} value={price._id}>
+                {price.title} - {price.price} kr
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Valgt arbeid:</label>
+          <ul>
+            {formData.arbeid.map((item, index) => (
+              <li key={index}>
+                {item.title} - {item.price} kr
+              </li>
+            ))}
+          </ul>
+        </div>
+
         <div>
           <label className="block text-sm font-medium text-gray-700">Beskrivelse:</label>
           <textarea
