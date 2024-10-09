@@ -726,8 +726,9 @@ app.patch('/services/:id', async (req, res) => {
     }
 
     // Oppdater feltene basert på forespørselen
-    if (req.body.beskrivelse != null) {
-      service.beskrivelse = req.body.beskrivelse;
+
+    if (req.body.Beskrivelse != null) {
+      service.Beskrivelse = req.body.Beskrivelse;
     }
     if (req.body.status != null) {
       service.status = req.body.status;

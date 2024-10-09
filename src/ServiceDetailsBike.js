@@ -55,10 +55,11 @@ function ServiceDetails() {
     if (selectedWork) {
       setFormData((prevData) => ({
         ...prevData,
-        arbeid: [...prevData.arbeid, selectedWork],
+        arbeid: [...prevData.arbeid, { title: selectedWork.title, price: selectedWork.price }],
       }));
     }
   };
+
 
   // Hent servicedetaljer
   useEffect(() => {
@@ -132,11 +133,20 @@ function ServiceDetails() {
     }));
   };
 
+  const handleRemoveWork = (indexToRemove) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      arbeid: prevData.arbeid.filter((_, index) => index !== indexToRemove),
+    }));
+  };
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const updatedService = {
       ...formData,
+      arbeid: formData.arbeid.map(work => ({ title: work.title, price: work.price })), // Map til kun title og price
       endretdato: new Date().toLocaleString('no-NO', { timeZone: 'Europe/Oslo' }),
     };
 
@@ -161,6 +171,7 @@ function ServiceDetails() {
       console.error('Feil ved kommunikasjon med serveren:', error);
     }
   };
+
 
   const handlePrintLabel = () => {
     if (customer && serviceDetails) {
@@ -274,8 +285,15 @@ function ServiceDetails() {
           <label className="block text-sm font-medium text-gray-700">Valgt arbeid:</label>
           <ul>
             {formData.arbeid.map((item, index) => (
-              <li key={index}>
-                {item.title} - {item.price} kr
+              <li key={index} className="flex justify-between items-center">
+                <span>{item.title} - {item.price} kr</span>
+                <button
+                  type="button"
+                  onClick={() => handleRemoveWork(index)}
+                  className="text-red-500 hover:text-red-700 ml-4"
+                >
+                  Fjern
+                </button>
               </li>
             ))}
           </ul>
