@@ -267,19 +267,36 @@ function TodoList() {
     };
 
     try {
+      console.log('Sender følgende data til completedtasks:', bodyData);
+
       // Legg til oppgaven i 'completedtasks' collection med ny ansatt
-      await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks', {
+      const completedResponse = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(bodyData),
       });
 
+      if (!completedResponse.ok) {
+        throw new Error('Feil ved lagring i completedtasks');
+      }
+
+      console.log('Oppgaven ble lagret i completedtasks');
+
+      const patchData = { extraEmployeeAdded: true };
+      console.log('Sender følgende data til customtasks PATCH:', patchData);
+
       // Oppdater 'customtasks' for å sette `extraEmployeeAdded` til true
-      await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks/${taskId}`, {
+      const patchResponse = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks/${taskId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ extraEmployeeAdded: true }),
+        body: JSON.stringify(patchData),
       });
+
+      if (!patchResponse.ok) {
+        throw new Error('Feil ved oppdatering av customtasks');
+      }
+
+      console.log('Oppgaven ble oppdatert i customtasks med extraEmployeeAdded');
 
       // Oppdater lokal tilstand for å skjule "+"-knappen etter første bruk
       setCustomTasks((prevTasks) =>
@@ -292,6 +309,7 @@ function TodoList() {
       console.error('Feil ved oppdatering av fullført oppgave:', error);
     }
   };
+
 
 
 
@@ -356,11 +374,12 @@ function TodoList() {
               {task.dateCompleted && task.completedBy && !task.extraEmployeeAdded && (
                 <span
                   onClick={() => handleAddEmployeeToCompletedTask(task._id, task.task, task.dueDate)}
-                  style={{ cursor: 'pointer', color: '#007bff' }} // Legg til en klikkbar effekt med farge som ser ut som en lenke
+                  style={{ cursor: 'pointer', color: '#007bff' }}
                 >
                   +
                 </span>
               )}
+
             </li>
           ))}
 

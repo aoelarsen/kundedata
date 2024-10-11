@@ -877,15 +877,16 @@ const dailyTaskSchema = new mongoose.Schema({
 const DailyTask = mongoose.model('DailyTask', dailyTaskSchema);
 
 
-// Modell for egendefinerte oppgaver
 const customTaskSchema = new mongoose.Schema({
-  task: { type: String, required: true }, // Beskrivelse av oppgaven
-  dueDate: { type: Date, required: true }, // Når oppgaven skal være ferdig
-  completed: { type: Boolean, default: false }, // Om oppgaven er fullført eller ikke
-  dateCompleted: { type: Date }, // Datoen når oppgaven ble fullført
-  completedBy: { type: String }, // Ansatt som fullførte oppgaven
-  store: { type: Number, required: true } // Butikk-ID for å knytte oppgaven til riktig butikk, endret til Number
+  task: { type: String, required: true },
+  dueDate: { type: Date, required: true },
+  completed: { type: Boolean, default: false },
+  dateCompleted: { type: Date },
+  completedBy: { type: String },
+  store: { type: Number, required: true },
+  extraEmployeeAdded: { type: Boolean, default: false } // Nytt felt
 });
+
 
 const CustomTask = mongoose.model('CustomTask', customTaskSchema);
 
@@ -1076,11 +1077,9 @@ app.patch('/dailytasks/:id', async (req, res) => {
 
 // Oppdater en egendefinert oppgave
 app.patch('/customtasks/:id', async (req, res) => {
-  console.log('Mottok PATCH-forespørsel for customtask:', req.params.id, req.body);
   try {
     const task = await CustomTask.findById(req.params.id);
     if (!task) {
-      console.log('Custom task ikke funnet:', req.params.id);
       return res.status(404).json({ message: 'Egendefinert oppgave ikke funnet' });
     }
 
@@ -1096,14 +1095,17 @@ app.patch('/customtasks/:id', async (req, res) => {
       task.dateCompleted = req.body.dateCompleted;
     }
 
+    if (req.body.extraEmployeeAdded != null) {
+      task.extraEmployeeAdded = req.body.extraEmployeeAdded; // Oppdatering av det nye feltet
+    }
+
     const updatedTask = await task.save();
-    console.log('Custom task oppdatert:', updatedTask);
     res.json(updatedTask);
   } catch (error) {
-    console.error('Feil ved oppdatering av egendefinert oppgave:', error);
-    res.status(400).json({ message: 'Feil ved oppdatering av egendefinert oppgave' });
+    res.status(400).json({ message: 'Feil ved oppdatering av egendefinert oppgave', error });
   }
 });
+
 
 
 
