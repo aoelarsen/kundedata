@@ -751,6 +751,9 @@ app.patch('/services/:id', async (req, res) => {
     if (req.body.arbeid != null) {
       service.arbeid = req.body.arbeid;
     }
+    if (req.body.utførtArbeid != null) {
+      service.utførtArbeid = req.body.utførtArbeid;
+    }
     if (req.body.endretdato != null) {
       service.endretdato = req.body.endretdato;
     }

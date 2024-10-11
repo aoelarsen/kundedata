@@ -59,10 +59,10 @@ function ServiceDetails() {
     if (selectedWork) {
       const updatedWork = [...formData.arbeid, { title: selectedWork.title, price: selectedWork.price }];
 
-      // Oppdater front-end
+      // Oppdater front-end uten å påvirke beskrivelse-feltet
       setFormData((prevData) => ({
         ...prevData,
-        arbeid: updatedWork,
+        arbeid: updatedWork, // Oppdaterer kun arbeid
       }));
 
       // Send oppdatering til serveren
@@ -87,6 +87,10 @@ function ServiceDetails() {
       }
     }
   };
+
+
+
+
 
 
   const calculateTotalPrice = () => {
@@ -523,12 +527,13 @@ function ServiceDetails() {
           <label className="block text-sm font-medium text-gray-700">Utført arbeid:</label>
           <textarea
             name="arbeid"
-            value={formData.arbeid}
-            onChange={handleChange}
+            value={formData.arbeid.map(item => item.title).join("\n\n")} // Samle titlene og skill dem med to linjeskift
+            readOnly // Gjør feltet "readOnly" slik at det ikke kan redigeres direkte
             rows="3"
             className="mt-1 block w-full p-2 border border-gray-300 rounded-md resize-y"
           />
         </div>
+
         <div>
           <label className="block text-sm font-medium text-gray-700">Status:</label>
           <select
