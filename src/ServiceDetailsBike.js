@@ -9,6 +9,7 @@ function ServiceDetails() {
   const [formData, setFormData] = useState({
     beskrivelse: '',
     arbeid: [], // Liste over flere arbeid
+    utførtArbeid: '', // Kommentarer for utført arbeid
     status: 'Aktiv',
     ansatt: '',
     Varemerke: '',
@@ -109,6 +110,7 @@ function ServiceDetails() {
           setFormData({
             beskrivelse: service.Beskrivelse || '',
             arbeid: service.arbeid || [],
+            utførtArbeid: formData.utførtArbeid, // Send "Utført arbeid" som eget felt
             status: service.status || 'Aktiv',
             ansatt: service.ansatt || '',
             Varemerke: service.Varemerke || '',
@@ -250,6 +252,7 @@ function ServiceDetails() {
     const updatedService = {
       Beskrivelse: formData.beskrivelse,
       arbeid: formData.arbeid.map(work => ({ title: work.title, price: work.price })),
+      utførtArbeid: formData.utførtArbeid, // Inkluderer "Utført arbeid"
       Varemerke: formData.Varemerke, // Oppdater Varemerke
       Produkt: formData.Produkt, // Oppdater Produkt
       Størrelse: formData.Størrelse, // Oppdater Størrelse
@@ -258,6 +261,8 @@ function ServiceDetails() {
       ansatt: formData.ansatt, // Oppdater Ansatt
       endretdato: new Date().toLocaleString('no-NO', { timeZone: 'Europe/Oslo' }) // Legg til endringsdato
     };
+
+    console.log('Oppdaterer tjeneste med data:', updatedService); // Logger oppdaterte data
 
     try {
       const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/services/${id}`, {
@@ -280,6 +285,7 @@ function ServiceDetails() {
       console.error('Feil ved kommunikasjon med serveren:', error);
     }
   };
+
 
 
 
@@ -526,9 +532,9 @@ function ServiceDetails() {
         <div>
           <label className="block text-sm font-medium text-gray-700">Utført arbeid:</label>
           <textarea
-            name="arbeid"
-            value={formData.arbeid.map(item => item.title).join("\n\n")} // Samle titlene og skill dem med to linjeskift
-            readOnly // Gjør feltet "readOnly" slik at det ikke kan redigeres direkte
+            name="utførtArbeid"
+            value={formData.utførtArbeid}
+            onChange={handleChange}
             rows="3"
             className="mt-1 block w-full p-2 border border-gray-300 rounded-md resize-y"
           />

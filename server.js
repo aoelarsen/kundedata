@@ -76,6 +76,7 @@ const serviceSchema = new mongoose.Schema({
     price: Number
   }],
   Beskrivelse: String,
+  utførtArbeid: String, // Legg til dette feltet
   status: { type: String, default: 'Aktiv' },
   ansatt: String,
   registrertDato: String,
@@ -86,6 +87,7 @@ const serviceSchema = new mongoose.Schema({
   butikkid: Number,
   servicetype: String
 });
+
 
 
 
@@ -742,17 +744,17 @@ app.patch('/services/:id', async (req, res) => {
     if (req.body.Beskrivelse != null) {
       service.Beskrivelse = req.body.Beskrivelse;
     }
+    if (req.body.arbeid != null) {
+      service.arbeid = req.body.arbeid;
+    }
+    if (req.body.utførtArbeid != null) {
+      service.utførtArbeid = req.body.utførtArbeid; // Håndter utført arbeid
+    }
     if (req.body.status != null) {
       service.status = req.body.status;
     }
     if (req.body.ansatt != null) {
       service.ansatt = req.body.ansatt;
-    }
-    if (req.body.arbeid != null) {
-      service.arbeid = req.body.arbeid;
-    }
-    if (req.body.utførtArbeid != null) {
-      service.utførtArbeid = req.body.utførtArbeid;
     }
     if (req.body.endretdato != null) {
       service.endretdato = req.body.endretdato;
@@ -764,6 +766,7 @@ app.patch('/services/:id', async (req, res) => {
     res.status(400).json({ message: 'Feil ved oppdatering av tjeneste' });
   }
 });
+
 
 
 
