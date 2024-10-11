@@ -84,8 +84,9 @@ const serviceSchema = new mongoose.Schema({
   KundeTelefon: String,
   serviceid: Number,
   butikkid: Number,
-  servicetype: String // Nytt felt for tjenestetype
+  servicetype: String
 });
+
 
 
 const Service = mongoose.model('Service', serviceSchema);
@@ -726,7 +727,18 @@ app.patch('/services/:id', async (req, res) => {
     }
 
     // Oppdater feltene basert på forespørselen
-
+    if (req.body.Varemerke != null) {
+      service.Varemerke = req.body.Varemerke;
+    }
+    if (req.body.Produkt != null) {
+      service.Produkt = req.body.Produkt;
+    }
+    if (req.body.Størrelse != null) {
+      service.Størrelse = req.body.Størrelse;
+    }
+    if (req.body.Farge != null) {
+      service.Farge = req.body.Farge;
+    }
     if (req.body.Beskrivelse != null) {
       service.Beskrivelse = req.body.Beskrivelse;
     }
@@ -737,7 +749,7 @@ app.patch('/services/:id', async (req, res) => {
       service.ansatt = req.body.ansatt;
     }
     if (req.body.arbeid != null) {
-      service.arbeid = req.body.arbeid; // Legg til valgt arbeid (FixedPrices)
+      service.arbeid = req.body.arbeid;
     }
     if (req.body.endretdato != null) {
       service.endretdato = req.body.endretdato;
@@ -749,6 +761,7 @@ app.patch('/services/:id', async (req, res) => {
     res.status(400).json({ message: 'Feil ved oppdatering av tjeneste' });
   }
 });
+
 
 
 

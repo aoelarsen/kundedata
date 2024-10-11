@@ -22,6 +22,8 @@ function ServiceDetails() {
   const [employees, setEmployees] = useState([]);
   const [updateMessage, setUpdateMessage] = useState('');
   const [isDescriptionEmpty, setIsDescriptionEmpty] = useState(false);
+  const [isEditable, setIsEditable] = useState(false);
+
 
 
   const parseCustomDateString = (dateString) => {
@@ -142,6 +144,39 @@ function ServiceDetails() {
     }));
   };
 
+  const handleSaveFields = async () => {
+    const updatedFields = {
+      Varemerke: formData.Varemerke,
+      Produkt: formData.Produkt,
+      Størrelse: formData.Størrelse,
+      Farge: formData.Farge,
+    };
+
+    console.log("Lagrer følgende felt i databasen:", updatedFields);
+
+    try {
+      const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/services/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedFields),
+      });
+
+      if (response.ok) {
+        console.log('Oppdatering vellykket');
+        setUpdateMessage('Produktinfo oppdatert');
+      } else {
+        console.error('Feil ved oppdatering av produktinfo:', response.statusText);
+        console.log('Response status:', response.status);
+      }
+    } catch (error) {
+      console.error('Feil ved kommunikasjon med serveren:', error);
+    }
+  };
+
+
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -153,11 +188,17 @@ function ServiceDetails() {
 
     setIsDescriptionEmpty(false); // Fjern feilmeldingen hvis beskrivelsen er utfylt
 
+    // Opprett et objekt med de oppdaterte dataene som skal sendes til backend
     const updatedService = {
-      ...formData,
       Beskrivelse: formData.beskrivelse,
       arbeid: formData.arbeid.map(work => ({ title: work.title, price: work.price })),
-      endretdato: new Date().toLocaleString('no-NO', { timeZone: 'Europe/Oslo' }),
+      Varemerke: formData.Varemerke, // Oppdater Varemerke
+      Produkt: formData.Produkt, // Oppdater Produkt
+      Størrelse: formData.Størrelse, // Oppdater Størrelse
+      Farge: formData.Farge, // Oppdater Farge
+      status: formData.status, // Oppdater Status
+      ansatt: formData.ansatt, // Oppdater Ansatt
+      endretdato: new Date().toLocaleString('no-NO', { timeZone: 'Europe/Oslo' }) // Legg til endringsdato
     };
 
     try {
@@ -166,7 +207,7 @@ function ServiceDetails() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(updatedService),
+        body: JSON.stringify(updatedService), // Send oppdaterte felter til backend
       });
 
       if (response.ok) {
@@ -181,6 +222,8 @@ function ServiceDetails() {
       console.error('Feil ved kommunikasjon med serveren:', error);
     }
   };
+
+
 
 
 
@@ -281,6 +324,88 @@ function ServiceDetails() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="flex space-x-4">
+          {isEditable ? (
+            <>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Varemerke:</label>
+                <input
+                  type="text"
+                  name="Varemerke"
+                  value={formData.Varemerke}
+                  onChange={handleChange}
+                  className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Produkt:</label>
+                <input
+                  type="text"
+                  name="Produkt"
+                  value={formData.Produkt}
+                  onChange={handleChange}
+                  className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                />
+              </div>
+            </>
+          ) : (
+            <p>
+              <strong>Varemerke:</strong> {formData.Varemerke} &nbsp;&nbsp;
+              <strong>Produkt:</strong> {formData.Produkt}
+            </p>
+          )}
+        </div>
+
+        <div className="flex space-x-4">
+          {isEditable ? (
+            <>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Størrelse:</label>
+                <input
+                  type="text"
+                  name="Størrelse"
+                  value={formData.Størrelse}
+                  onChange={handleChange}
+                  className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Farge:</label>
+                <input
+                  type="text"
+                  name="Farge"
+                  value={formData.Farge}
+                  onChange={handleChange}
+                  className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                />
+              </div>
+            </>
+          ) : (
+            <p>
+              <strong>Størrelse:</strong> {formData.Størrelse} &nbsp;&nbsp;
+              <strong>Farge:</strong> {formData.Farge}
+            </p>
+          )}
+        </div>
+        <button
+          type="button"
+          onClick={async () => {
+            console.log('Lukker redigeringsmodus...');
+            if (isEditable) {
+              console.log('Oppdaterer produktinfo før lukking...');
+              await handleSaveFields(); // Lagre feltene når redigeringsmodus lukkes
+            }
+            setIsEditable(!isEditable); // Lukk redigeringsmodus
+          }}
+          className="text-blue-500 hover:underline"
+        >
+          {isEditable ? 'Lukk redigeringsmodus' : 'Rediger'}
+        </button>
+
+
+
+
+
         {/* Velg arbeid fra listen */}
         <div className={`p-4 border ${isDescriptionEmpty ? 'border-red-500' : 'border-gray-300'} rounded-lg`}>
           <label className="block text-sm font-medium text-gray-700">Velg arbeid fra liste:</label>
@@ -333,47 +458,6 @@ function ServiceDetails() {
           {isDescriptionEmpty && (
             <p className="text-red-500 text-sm mt-2">Du må legge til arbeid.</p>
           )}
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Varemerke:</label>
-          <input
-            type="text"
-            name="Varemerke"
-            value={formData.Varemerke}
-            onChange={handleChange}
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Produkt:</label>
-          <input
-            type="text"
-            name="Produkt"
-            value={formData.Produkt}
-            onChange={handleChange}
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Størrelse:</label>
-          <input
-            type="text"
-            name="Størrelse"
-            value={formData.Størrelse}
-            onChange={handleChange}
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Farge:</label>
-          <input
-            type="text"
-            name="Farge"
-            value={formData.Farge}
-            onChange={handleChange}
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-          />
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">Utført arbeid:</label>
