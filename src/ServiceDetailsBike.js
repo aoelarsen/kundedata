@@ -52,16 +52,45 @@ function ServiceDetails() {
     fetchFixedPrices();
   }, []);
 
-  const handleAddWork = (e) => {
+  const handleAddWork = async (e) => {
     const selectedWork = fixedPrices.find(price => price._id === e.target.value);
     if (selectedWork) {
+      const updatedWork = [...formData.arbeid, { title: selectedWork.title, price: selectedWork.price }];
+  
+      // Oppdater front-end
       setFormData((prevData) => ({
         ...prevData,
-        arbeid: [...prevData.arbeid, { title: selectedWork.title, price: selectedWork.price }],
+        arbeid: updatedWork,
       }));
+  
+      // Send oppdatering til serveren
+      try {
+        const updatedService = {
+          arbeid: updatedWork,
+        };
+  
+        const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/services/${id}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(updatedService),
+        });
+  
+        if (!response.ok) {
+          console.error('Feil ved oppdatering av arbeid:', response.statusText);
+        }
+      } catch (error) {
+        console.error('Feil ved kommunikasjon med serveren:', error);
+      }
     }
   };
+  
 
+  const calculateTotalPrice = () => {
+    return formData.arbeid.reduce((total, work) => total + work.price, 0);
+  };
+  
 
   // Hent servicedetaljer
   useEffect(() => {
@@ -135,12 +164,37 @@ function ServiceDetails() {
     }));
   };
 
-  const handleRemoveWork = (indexToRemove) => {
+  const handleRemoveWork = async (indexToRemove) => {
+    const updatedWork = formData.arbeid.filter((_, index) => index !== indexToRemove);
+  
+    // Oppdater front-end
     setFormData((prevData) => ({
       ...prevData,
-      arbeid: prevData.arbeid.filter((_, index) => index !== indexToRemove),
+      arbeid: updatedWork,
     }));
+  
+    // Oppdatering til server
+    try {
+      const updatedService = {
+        arbeid: updatedWork.map(work => ({ title: work.title, price: work.price })),
+      };
+  
+      const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/services/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedService),
+      });
+  
+      if (!response.ok) {
+        console.error('Feil ved oppdatering av arbeid på serveren:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Feil ved kommunikasjon med serveren:', error);
+    }
   };
+  
 
 
   const handleSubmit = async (e) => {
@@ -299,25 +353,30 @@ function ServiceDetails() {
 
         {/* Valgt arbeid */}
         <div className={`p-4 border ${formData.arbeid.length === 0 ? 'border-red-500' : 'border-gray-300'} rounded-lg`}>
-          <label className="block text-sm font-medium text-gray-700">Valgt arbeid:</label>
-          <ul>
-            {formData.arbeid.map((item, index) => (
-              <li key={index} className="flex justify-between items-center">
-                <span>{item.title} - {item.price} kr</span>
-                <button
-                  type="button"
-                  onClick={() => handleRemoveWork(index)}
-                  className="text-red-500 hover:text-red-700 ml-4"
-                >
-                  Fjern
-                </button>
-              </li>
-            ))}
-          </ul>
-          {formData.arbeid.length === 0 && (
-            <p className="text-red-500 text-sm mt-2">Du må legge til arbeid.</p>
-          )}
-        </div>
+  <label className="block text-sm font-medium text-gray-700">Valgt arbeid:</label>
+  <ul>
+    {formData.arbeid.map((item, index) => (
+      <li key={index} className="flex justify-between items-center">
+        <span>{item.title} - {item.price} kr</span>
+        <button
+          type="button"
+          onClick={() => handleRemoveWork(index)}
+          className="text-red-500 hover:text-red-700 ml-4"
+        >
+          Fjern
+        </button>
+      </li>
+    ))}
+  </ul>
+  {formData.arbeid.length >= 2 && (
+    <p className="text-lg font-bold mt-4">Totalsum arbeid med fastpris: {calculateTotalPrice()} kr <span className="font-normal">(eks. deler og annen kost)</span> </p>
+  )}
+  {formData.arbeid.length === 0 && (
+    <p className="text-red-500 text-sm mt-2">Du må legge til arbeid.</p>
+  )}
+</div>
+
+
 
         {/* Beskrivelse */}
         <div className={`p-4 border ${isDescriptionEmpty ? 'border-red-500' : 'border-gray-300'} rounded-lg`}>
