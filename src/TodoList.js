@@ -206,7 +206,8 @@ function TodoList() {
               : task
           )
         );
-        console.log("Oppgave fullført:", taskDescription);
+        // Hent de siste fullførte oppgavene på nytt
+        await fetchCompletedTasks();
       }
     } catch (error) {
       console.error('Feil ved oppdatering av daglig oppgave:', error);
@@ -250,6 +251,8 @@ function TodoList() {
               : task
           )
         );
+        // Hent de siste fullførte oppgavene på nytt
+        await fetchCompletedTasks();
       }
     } catch (error) {
       console.error('Feil ved oppdatering av egendefinert oppgave:', error);
@@ -305,10 +308,14 @@ function TodoList() {
         )
       );
 
+      // Hent de siste fullførte oppgavene på nytt
+      await fetchCompletedTasks();
+
     } catch (error) {
       console.error('Feil ved oppdatering av fullført oppgave:', error);
     }
   };
+
 
 
 
