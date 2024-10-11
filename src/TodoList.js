@@ -256,6 +256,43 @@ function TodoList() {
     }
   };
 
+  const handleAddEmployeeToCompletedTask = async (taskId, taskDescription, dueDate) => {
+    const bodyData = {
+      task: taskDescription,
+      taskType: 'custom',
+      dueDate,
+      dateCompleted: new Date().toISOString(),
+      employee,
+      store: butikkid,
+    };
+
+    try {
+      // Legg til oppgaven i 'completedtasks' collection med ny ansatt
+      await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bodyData),
+      });
+
+      // Oppdater 'customtasks' for å sette `extraEmployeeAdded` til true
+      await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks/${taskId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ extraEmployeeAdded: true }),
+      });
+
+      // Oppdater lokal tilstand for å skjule "+"-knappen etter første bruk
+      setCustomTasks((prevTasks) =>
+        prevTasks.map((task) =>
+          task._id === taskId ? { ...task, extraEmployeeAdded: true } : task
+        )
+      );
+
+    } catch (error) {
+      console.error('Feil ved oppdatering av fullført oppgave:', error);
+    }
+  };
+
 
 
   return (
@@ -314,8 +351,19 @@ function TodoList() {
               ) : (
                 <span className="text-gray-500">Utført</span>
               )}
+
+              {/* Vise "+"-knappen hvis oppgaven er fullført, men ekstra ansatt ikke er lagt til */}
+              {task.dateCompleted && task.completedBy && !task.extraEmployeeAdded && (
+                <span
+                  onClick={() => handleAddEmployeeToCompletedTask(task._id, task.task, task.dueDate)}
+                  style={{ cursor: 'pointer', color: '#007bff' }} // Legg til en klikkbar effekt med farge som ser ut som en lenke
+                >
+                  +
+                </span>
+              )}
             </li>
           ))}
+
         </ul>
 
 
