@@ -60,16 +60,21 @@ function ServiceDetails() {
     if (selectedWork) {
       const updatedWork = [...formData.arbeid, { title: selectedWork.title, price: selectedWork.price }];
 
+      // Legg til den nye arbeidets kommentar øverst uten pris, med to linjeskift under for eksisterende tekst
+      const newUtførtArbeid = `${selectedWork.description || selectedWork.title}\n\n${formData.utførtArbeid}`.trim();
+
       // Oppdater front-end uten å påvirke beskrivelse-feltet
       setFormData((prevData) => ({
         ...prevData,
-        arbeid: updatedWork, // Oppdaterer kun arbeid
+        arbeid: updatedWork, // Oppdaterer arbeid
+        utførtArbeid: newUtførtArbeid, // Oppdaterer utførtArbeid-feltet med ny kommentar øverst
       }));
 
       // Send oppdatering til serveren
       try {
         const updatedService = {
           arbeid: updatedWork,
+          utførtArbeid: newUtførtArbeid, // Send oppdatert utførtArbeid til serveren
         };
 
         const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/services/${id}`, {
@@ -94,6 +99,8 @@ function ServiceDetails() {
 
 
 
+
+
   const calculateTotalPrice = () => {
     return formData.arbeid.reduce((total, work) => total + work.price, 0);
   };
@@ -110,7 +117,7 @@ function ServiceDetails() {
           setFormData({
             beskrivelse: service.Beskrivelse || '',
             arbeid: service.arbeid || [],
-            utførtArbeid: formData.utførtArbeid, // Send "Utført arbeid" som eget felt
+            utførtArbeid: service.utførtArbeid || '',  // Hent utførtArbeid
             status: service.status || 'Aktiv',
             ansatt: service.ansatt || '',
             Varemerke: service.Varemerke || '',
@@ -539,6 +546,7 @@ function ServiceDetails() {
             className="mt-1 block w-full p-2 border border-gray-300 rounded-md resize-y"
           />
         </div>
+
 
         <div>
           <label className="block text-sm font-medium text-gray-700">Status:</label>
