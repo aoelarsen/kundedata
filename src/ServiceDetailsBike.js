@@ -446,7 +446,7 @@ function ServiceDetails() {
 
         {/* Beskrivelse */}
         <div className={`p-4 border ${isDescriptionEmpty ? 'border-red-500' : 'border-gray-300'} rounded-lg`}>
-          <label className="block text-sm font-medium text-gray-700">Beskrivelse:</label>
+          <label className="block text-sm font-medium text-gray-700">Beskrivelse: (Skriv utfyllende om hvilket arbeid som skal utføres)</label>
           <textarea
             name="beskrivelse"
             value={formData.beskrivelse}
