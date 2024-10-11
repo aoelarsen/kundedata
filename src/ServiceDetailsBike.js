@@ -24,6 +24,7 @@ function ServiceDetails() {
   const [updateMessage, setUpdateMessage] = useState('');
   const [isDescriptionEmpty, setIsDescriptionEmpty] = useState(false);
   const [isEditable, setIsEditable] = useState(false);
+  const [customWork, setCustomWork] = useState({ title: '', price: '' }); // Nytt state for egendefinert arbeid
 
 
 
@@ -58,25 +59,27 @@ function ServiceDetails() {
   const handleAddWork = async (e) => {
     const selectedWork = fixedPrices.find(price => price._id === e.target.value);
     if (selectedWork) {
-      const updatedWork = [...formData.arbeid, { title: selectedWork.title, price: selectedWork.price }];
-
-      // Legg til den nye arbeidets kommentar øverst uten pris, med to linjeskift under for eksisterende tekst
-      const newUtførtArbeid = `${selectedWork.description || selectedWork.title}\n\n${formData.utførtArbeid}`.trim();
-
-      // Oppdater front-end uten å påvirke beskrivelse-feltet
+  
+      // Legg til title, price, og description i arbeid-arrayen
+      const updatedWork = [...formData.arbeid, { 
+        title: selectedWork.title, 
+        price: selectedWork.price,
+        description: selectedWork.description || "Ingen beskrivelse tilgjengelig" // Bruk description eller fallback
+      }];
+    
       setFormData((prevData) => ({
         ...prevData,
-        arbeid: updatedWork, // Oppdaterer arbeid
-        utførtArbeid: newUtførtArbeid, // Oppdaterer utførtArbeid-feltet med ny kommentar øverst
+        arbeid: updatedWork, // Oppdaterer arbeid med title, price, og description
       }));
-
-      // Send oppdatering til serveren
+  
+      // Logging for å sjekke om description blir korrekt satt
+  
+      // Send oppdatering til serveren (hvis nødvendig)
       try {
         const updatedService = {
           arbeid: updatedWork,
-          utførtArbeid: newUtførtArbeid, // Send oppdatert utførtArbeid til serveren
         };
-
+    
         const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/services/${id}`, {
           method: 'PATCH',
           headers: {
@@ -84,7 +87,7 @@ function ServiceDetails() {
           },
           body: JSON.stringify(updatedService),
         });
-
+    
         if (!response.ok) {
           console.error('Feil ved oppdatering av arbeid:', response.statusText);
         }
@@ -93,12 +96,27 @@ function ServiceDetails() {
       }
     }
   };
-
-
-
-
-
-
+  
+  
+  const handleCopyWork = (indexToCopy) => {
+    const selectedWork = formData.arbeid[indexToCopy];
+    
+    // Bruk beskrivelsen hvis tilgjengelig
+    const descriptionToCopy = selectedWork.description;
+  
+    // Hvis descriptionToCopy er undefined eller tom, fall tilbake til tittel
+    const newUtførtArbeid = `${descriptionToCopy ? descriptionToCopy : "Ingen beskrivelse tilgjengelig"}\n\n${formData.utførtArbeid}`.trim();
+    
+    // Oppdater utførtArbeid-feltet med ny kommentar øverst
+    setFormData((prevData) => ({
+      ...prevData,
+      utførtArbeid: newUtførtArbeid, // Legger til valgt arbeid sin beskrivelse i utført arbeid-feltet
+    }));
+  
+    // Logging for å sjekke hva som legges til i utført arbeid
+  };
+  
+  
 
 
   const calculateTotalPrice = () => {
@@ -244,7 +262,6 @@ function ServiceDetails() {
 
 
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -293,7 +310,14 @@ function ServiceDetails() {
     }
   };
 
-
+  // Legg til egendefinert arbeid
+  const handleAddCustomWork = () => {
+    if (customWork.title && customWork.price) {
+      const updatedWork = [...formData.arbeid, { title: customWork.title, price: parseFloat(customWork.price) }];
+      setFormData((prevData) => ({ ...prevData, arbeid: updatedWork }));
+      setCustomWork({ title: '', price: '' }); // Tøm feltene etter at arbeidet er lagt til
+    }
+  };
 
 
 
@@ -498,21 +522,33 @@ function ServiceDetails() {
         <div className={`p-4 border ${formData.arbeid.length === 0 ? 'border-red-500' : 'border-gray-300'} rounded-lg`}>
           <label className="block text-sm font-medium text-gray-700">Valgt arbeid:</label>
           <ul>
-            {formData.arbeid.map((item, index) => (
-              <li key={index} className="flex justify-between items-center">
-                <span>{item.title} - {item.price} kr</span>
-                <button
-                  type="button"
-                  onClick={() => handleRemoveWork(index)}
-                  className="text-red-500 hover:text-red-700 ml-4"
-                >
-                  Fjern
-                </button>
-              </li>
-            ))}
-          </ul>
+  {formData.arbeid.map((item, index) => (
+    <li key={index} className="flex justify-between items-center">
+      <span>{item.title} - {item.price} kr</span>
+      <div className="flex space-x-2">
+        {/* Kopi-knapp for å kopiere beskrivelse til Utført Arbeid */}
+        <button
+          type="button"
+          onClick={() => handleCopyWork(index)}
+          className="text-blue-500 hover:text-blue-700"
+        >
+          Mal
+        </button>
+        {/* Fjern-knapp for å fjerne arbeid */}
+        <button
+          type="button"
+          onClick={() => handleRemoveWork(index)}
+          className="text-red-500 hover:text-red-700"
+        >
+          Fjern
+        </button>
+      </div>
+    </li>
+  ))}
+</ul>
+
           {formData.arbeid.length >= 2 && (
-            <p className="text-lg font-bold mt-4">Totalsum arbeid med fastpris: {calculateTotalPrice()} kr <span className="font-normal">(eks. deler og annen kost)</span> </p>
+            <p className="text-lg font-bold mt-4">Totalsum arbeid: {calculateTotalPrice()} kr <span className="font-normal">(eks. deler og annen kost)</span> </p>
           )}
           {formData.arbeid.length === 0 && (
             <p className="text-red-500 text-sm mt-2">Du må legge til arbeid.</p>
@@ -523,7 +559,7 @@ function ServiceDetails() {
 
         {/* Beskrivelse */}
         <div className={`p-4 border ${isDescriptionEmpty ? 'border-red-500' : 'border-gray-300'} rounded-lg`}>
-          <label className="block text-sm font-medium text-gray-700">Beskrivelse: (Skriv utfyllende om hvilket arbeid som skal utføres)</label>
+          <label className="block text-sm font-medium text-gray-700">Kundens ønsker til servicen: (Skriv utfyllende om hvilket arbeid som ønskes utføres)</label>
           <textarea
             name="beskrivelse"
             value={formData.beskrivelse}
@@ -536,6 +572,36 @@ function ServiceDetails() {
             <p className="text-red-500 text-sm mt-2">Du må legge til arbeid.</p>
           )}
         </div>
+                {/* Egendefinert arbeid */}
+                <div className="p-4 border border-gray-300 rounded-lg">
+  <label className="block text-sm font-medium text-gray-700">Legg til egendefinert arbeid:</label>
+  <div className="mt-2 flex space-x-4">
+    <input
+      type="text"
+      placeholder="Arbeid"
+      value={customWork.title}
+      onChange={(e) => setCustomWork({ ...customWork, title: e.target.value })}
+      className="block w-full p-2 border border-gray-300 rounded-md"
+    />
+    <input
+      type="number"
+      placeholder="Pris"
+      value={customWork.price}
+      onChange={(e) => setCustomWork({ ...customWork, price: e.target.value })}
+      className="block w-1/2 p-2 border border-gray-300 rounded-md"
+    />
+    <button
+      type="button"
+      onClick={handleAddCustomWork}
+      className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+    >
+      +
+    </button>
+  </div>
+</div>
+
+
+      
         <div>
           <label className="block text-sm font-medium text-gray-700">Utført arbeid:</label>
           <textarea
