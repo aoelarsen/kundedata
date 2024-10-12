@@ -25,6 +25,9 @@ function ServiceDetails() {
   const [isDescriptionEmpty, setIsDescriptionEmpty] = useState(false);
   const [isEditable, setIsEditable] = useState(false);
   const [customWork, setCustomWork] = useState({ title: '', price: '' }); // Nytt state for egendefinert arbeid
+  const [customPart, setCustomPart] = useState({ ean: '', product: '', price: '', discount: '' }); // Nytt state for egendefinert del
+const [parts, setParts] = useState([]); // State for lagring av alle deler
+
 
 
 
@@ -311,15 +314,90 @@ function ServiceDetails() {
   };
 
   // Legg til egendefinert arbeid
-  const handleAddCustomWork = () => {
+  const handleAddCustomWork = async () => {
     if (customWork.title && customWork.price) {
       const updatedWork = [...formData.arbeid, { title: customWork.title, price: parseFloat(customWork.price) }];
+      
+      // Oppdater front-end
       setFormData((prevData) => ({ ...prevData, arbeid: updatedWork }));
-      setCustomWork({ title: '', price: '' }); // Tøm feltene etter at arbeidet er lagt til
+      
+      // Tøm feltene etter at arbeidet er lagt til
+      setCustomWork({ title: '', price: '' });
+      
+      // Send oppdatering til backend
+      try {
+        const updatedService = {
+          arbeid: updatedWork.map(work => ({
+            title: work.title,
+            price: work.price
+          }))
+        };
+        
+        const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/services/${id}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(updatedService),
+        });
+  
+        if (!response.ok) {
+          console.error('Feil ved oppdatering av arbeid på serveren:', response.statusText);
+        } else {
+          console.log('Egendefinert arbeid lagret');
+        }
+      } catch (error) {
+        console.error('Feil ved kommunikasjon med serveren:', error);
+      }
     }
   };
+  
 
+// Funksjon for å legge til egendefinerte deler
+const handleAddCustomPart = async () => {
+  if (customPart.ean && customPart.product && customPart.price) {
+    const updatedParts = [...parts, {
+      ean: customPart.ean,
+      product: customPart.product,
+      price: parseFloat(customPart.price),
+      discount: parseFloat(customPart.discount || 0) // Rabatt valgfritt
+    }];
 
+    // Oppdater front-end
+    setParts(updatedParts);
+
+    // Tøm feltene etter at delen er lagt til
+    setCustomPart({ ean: '', product: '', price: '', discount: '' });
+
+    // Send oppdatering til backend
+    try {
+      const updatedService = {
+        deler: updatedParts.map(part => ({
+          ean: part.ean,
+          product: part.product,
+          price: part.price,
+          discount: part.discount
+        }))
+      };
+      
+      const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/services/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedService),
+      });
+
+      if (!response.ok) {
+        console.error('Feil ved oppdatering av deler på serveren:', response.statusText);
+      } else {
+        console.log('Egendefinert del lagret');
+      }
+    } catch (error) {
+      console.error('Feil ved kommunikasjon med serveren:', error);
+    }
+  }
+};
 
 
   const handlePrintLabel = () => {
@@ -593,6 +671,48 @@ function ServiceDetails() {
     <button
       type="button"
       onClick={handleAddCustomWork}
+      className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+    >
+      +
+    </button>
+  </div>
+</div>
+<div className="p-4 border border-gray-300 rounded-lg">
+  <label className="block text-sm font-medium text-gray-700">Legg til egendefinert del:</label>
+
+  {/* Alle feltene på én linje */}
+  <div className="mt-2 flex space-x-4">
+    <input
+      type="text"
+      placeholder="EAN"
+      value={customPart.ean}
+      onChange={(e) => setCustomPart({ ...customPart, ean: e.target.value })}
+      className="block w-1/5 p-2 border border-gray-300 rounded-md" // Medium bredde for EAN
+    />
+    <input
+      type="text"
+      placeholder="Merke/Produkt"
+      value={customPart.product}
+      onChange={(e) => setCustomPart({ ...customPart, product: e.target.value })}
+      className="block w-2/5 p-2 border border-gray-300 rounded-md" // Large bredde for Merke/Produkt
+    />
+    <input
+      type="number"
+      placeholder="Pris"
+      value={customPart.price}
+      onChange={(e) => setCustomPart({ ...customPart, price: e.target.value })}
+      className="block w-1/6 p-2 border border-gray-300 rounded-md" // Small bredde for Pris
+    />
+    <input
+      type="number"
+      placeholder="Rabatt (%)"
+      value={customPart.discount}
+      onChange={(e) => setCustomPart({ ...customPart, discount: e.target.value })}
+      className="block w-1/6 p-2 border border-gray-300 rounded-md" // Small bredde for Rabatt
+    />
+    <button
+      type="button"
+      onClick={handleAddCustomPart}
       className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
     >
       +
