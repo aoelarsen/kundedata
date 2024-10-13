@@ -1235,6 +1235,93 @@ app.get('/fixedprices/:id', async (req, res) => {
 });
 
 
+// Schema and Model for Parts
+const partSchema = new mongoose.Schema({
+  ean: { type: String, required: true },
+  brand: { type: String, required: true },
+  product: { type: String, required: true },
+  price: { type: Number, required: true },
+});
+
+const Part = mongoose.model('Part', partSchema);
+
+// Endpoint to create a new part
+app.post('/parts', async (req, res) => {
+  const part = new Part(req.body);
+
+  try {
+    const newPart = await part.save();
+    res.status(201).json(newPart);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+// Endpoint to get all parts
+app.get('/parts', async (req, res) => {
+  try {
+    const parts = await Part.find();
+    res.status(200).json(parts);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Endpoint to get a single part by ID
+app.get('/parts/:id', async (req, res) => {
+  try {
+    const part = await Part.findById(req.params.id);
+    if (part == null) {
+      return res.status(404).json({ message: 'Part not found' });
+    }
+    res.json(part);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Endpoint to update a part
+app.patch('/parts/:id', async (req, res) => {
+  try {
+    const part = await Part.findById(req.params.id);
+    if (part == null) {
+      return res.status(404).json({ message: 'Part not found' });
+    }
+
+    if (req.body.ean != null) {
+      part.ean = req.body.ean;
+    }
+    if (req.body.brand != null) {
+      part.brand = req.body.brand;
+    }
+    if (req.body.product != null) {
+      part.product = req.body.product;
+    }
+    if (req.body.price != null) {
+      part.price = req.body.price;
+    }
+
+    const updatedPart = await part.save();
+    res.json(updatedPart);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+// Endpoint to delete a part
+app.delete('/parts/:id', async (req, res) => {
+  try {
+    const part = await Part.findById(req.params.id);
+    if (part == null) {
+      return res.status(404).json({ message: 'Part not found' });
+    }
+
+    await part.remove();
+    res.json({ message: 'Part deleted' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
 
 
 
