@@ -101,6 +101,26 @@ const calculateTotalPrice = () => {
     fetchFixedPrices();
   }, []);
 
+  // Hent deler fra serveren (nytt useEffect)
+useEffect(() => {
+  const fetchParts = async () => {
+    try {
+      const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/parts'); // URL til serveren din
+      if (!response.ok) {
+        throw new Error(`Feil ved henting av deler: ${response.statusText}`);
+      }
+      const partsData = await response.json();
+      setParts(partsData); // Sett delene i state
+      console.log("Deler hentet:", partsData); // Legg til logging her
+    } catch (error) {
+      console.error("Feil ved henting av deler:", error); // Logg eventuelle feil
+    }
+  };
+
+  fetchParts();
+}, []);
+
+
   const handleAddWork = async (e) => {
     const selectedWork = fixedPrices.find(price => price._id === e.target.value);
     if (selectedWork) {
@@ -720,18 +740,34 @@ const handleAddCustomPart = async () => {
 {/* Søkefelt for deler */}
 <div className="p-4 border border-gray-300 rounded-lg">
   <div>
-  <label className="block text-sm font-medium text-gray-700">Søk etter deler (EAN, Merke, Produkt):</label>
-  <input
-    type="text"
-    value={searchTerm}
-    onChange={handleSearchParts}
-    placeholder="Søk etter deler"
-    className="mt-2 block w-full p-2 border border-gray-300 rounded-md"
-  />
-  
+    <label className="block text-sm font-medium text-gray-700">Søk etter deler (EAN, Merke, Produkt):</label>
+    <input
+      type="text"
+      value={searchTerm}
+      onChange={handleSearchParts}
+      placeholder="Skriv inn for å søke etter deler"
+      className="mt-2 block w-full p-2 border border-gray-300 rounded-md"
+    />
+  </div>
+
+  {/* Vise filtrerte deler som nedtrekksliste */}
+  {filteredParts.length > 0 && (
+    <ul className="mt-2 border border-gray-300 rounded-md">
+      {filteredParts.map((part, index) => (
+        <li
+          key={index}
+          onClick={() => handleAddPartToWork(part)}
+          className="cursor-pointer p-2 hover:bg-gray-100"
+        >
+          {part.ean} - {part.product} - {part.brand} - {part.price} kr
+        </li>
+      ))}
+    </ul>
+  )}
 
 
-</div>
+
+
 
 
 {/* Egendefinert arbeid */}

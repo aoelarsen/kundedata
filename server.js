@@ -75,8 +75,14 @@ const serviceSchema = new mongoose.Schema({
     title: String,
     price: Number
   }],
+  deler: [{  // Legg til en ny array for deler
+    ean: String,
+    product: String,
+    price: Number,
+    discount: Number // Valgfritt felt for rabatt
+  }],
   Beskrivelse: String,
-  utførtArbeid: String, // Legg til dette feltet
+  utførtArbeid: String, 
   status: { type: String, default: 'Aktiv' },
   ansatt: String,
   registrertDato: String,
@@ -87,6 +93,7 @@ const serviceSchema = new mongoose.Schema({
   butikkid: Number,
   servicetype: String
 });
+
 
 
 
@@ -752,6 +759,9 @@ app.patch('/services/:id', async (req, res) => {
     }
     if (req.body.status != null) {
       service.status = req.body.status;
+    }
+    if (req.body.deler != null) {  // Legg til støtte for oppdatering av deler
+      service.deler = req.body.deler;
     }
     if (req.body.ansatt != null) {
       service.ansatt = req.body.ansatt;
