@@ -761,35 +761,33 @@ const handleAddCustomPart = async () => {
           )}
         </div>
                 
+      {/* Søkefelt for deler */}
+      <div className="p-4 border border-gray-300 rounded-lg">
+        <label className="block text-sm font-medium text-gray-700">Søk etter deler (EAN, Merke, Produkt):</label>
+        <input
+          type="text"
+          value={searchTerm}
+          onChange={handleSearchParts}
+          placeholder="Skriv inn for å søke etter deler"
+          className="mt-2 block w-full p-2 border border-gray-300 rounded-md"
+        />
 
+        {/* Vise filtrerte deler som nedtrekksliste */}
+        {filteredParts.length > 0 && (
+          <ul className="mt-2 border border-gray-300 rounded-md">
+            {filteredParts.map((part, index) => (
+              <li
+                key={index}
+                onClick={() => handleAddPartToWork(part)}
+                className="cursor-pointer p-2 hover:bg-gray-100"
+              >
+                {part.ean} - {part.product} - {part.price} kr
+              </li>
+            ))}
+          </ul>
+        )}
 
-{/* Søkefelt for deler */}
-<div className="p-4 border border-gray-300 rounded-lg">
-  <div>
-    <label className="block text-sm font-medium text-gray-700">Søk etter deler (EAN, Merke, Produkt):</label>
-    <input
-      type="text"
-      value={searchTerm}
-      onChange={handleSearchParts}
-      placeholder="Skriv inn for å søke etter deler"
-      className="mt-2 block w-full p-2 border border-gray-300 rounded-md"
-    />
-  </div>
-
-  {/* Vise filtrerte deler som nedtrekksliste */}
-  {filteredParts.length > 0 && (
-    <ul className="mt-2 border border-gray-300 rounded-md">
-      {filteredParts.map((part, index) => (
-        <li
-          key={index}
-          onClick={() => handleAddPartToWork(part)}
-          className="cursor-pointer p-2 hover:bg-gray-100"
-        >
-          {part.ean} - {part.product} - {part.brand} - {part.price} kr
-        </li>
-      ))}
-    </ul>
-  )}
+ 
 
 
 
