@@ -27,7 +27,49 @@ function ServiceDetails() {
   const [customWork, setCustomWork] = useState({ title: '', price: '' }); // Nytt state for egendefinert arbeid
   const [customPart, setCustomPart] = useState({ ean: '', product: '', price: '', discount: '' }); // Nytt state for egendefinert del
 const [parts, setParts] = useState([]); // State for lagring av alle deler
+const [searchTerm, setSearchTerm] = useState('');
+const [filteredParts, setFilteredParts] = useState([]);
 
+
+
+// Funksjon for å filtrere deler basert på søk
+const handleSearchParts = (e) => {
+  const searchValue = e.target.value.toLowerCase();
+  setSearchTerm(searchValue);
+
+  // Filtrer delene basert på EAN, produktnavn eller merke
+  const filtered = parts.filter(
+    (part) =>
+      part.ean.toLowerCase().includes(searchValue) ||
+      part.product.toLowerCase().includes(searchValue)
+  );
+  setFilteredParts(filtered);
+};
+
+const handleAddPartToWork = (selectedPart) => {
+  const updatedWork = [
+    ...formData.arbeid,
+    {
+      title: `Del: ${selectedPart.product}`,
+      price: selectedPart.price,
+    },
+  ];
+
+  setFormData((prevData) => ({
+    ...prevData,
+    arbeid: updatedWork, // Oppdater listen over arbeid med den valgte delen
+  }));
+
+  // Oppdater totalsummen når delen legges til
+  calculateTotalPrice();
+};
+
+
+const calculateTotalPrice = () => {
+  const totalWorkPrice = formData.arbeid.reduce((total, work) => total + work.price, 0);
+  const totalPartsPrice = parts.reduce((total, part) => total + part.price, 0);
+  return totalWorkPrice + totalPartsPrice;
+};
 
 
 
@@ -122,9 +164,6 @@ const [parts, setParts] = useState([]); // State for lagring av alle deler
   
 
 
-  const calculateTotalPrice = () => {
-    return formData.arbeid.reduce((total, work) => total + work.price, 0);
-  };
 
 
   // Hent servicedetaljer
@@ -498,6 +537,8 @@ const handleAddCustomPart = async () => {
 
 
       <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="p-4 border border-gray-300 rounded-lg">
+
         <div className="flex space-x-4">
           {isEditable ? (
             <>
@@ -575,7 +616,7 @@ const handleAddCustomPart = async () => {
         >
           {isEditable ? 'Lukk redigeringsmodus' : 'Rediger'}
         </button>
-
+</div>
 
 
 
@@ -623,6 +664,7 @@ const handleAddCustomPart = async () => {
       </div>
     </li>
   ))}
+
 </ul>
 
           {formData.arbeid.length >= 2 && (
@@ -631,6 +673,28 @@ const handleAddCustomPart = async () => {
           {formData.arbeid.length === 0 && (
             <p className="text-red-500 text-sm mt-2">Du må legge til arbeid.</p>
           )}
+
+            {/* Vise filtrerte deler */}
+  {filteredParts.length > 0 && (
+    <ul className="mt-4">
+      {filteredParts.map((part, index) => (
+        <li key={index} className="flex justify-between items-center mb-2">
+          <span>{part.ean} - {part.product} - {part.price} kr</span>
+          <button
+            onClick={() => handleAddPartToWork(part)}
+            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+          >
+            Legg til
+          </button>
+        </li>
+      ))}
+    </ul>
+  )}
+  {formData.arbeid.length > 0 && (
+  <p className="text-lg font-bold mt-4">
+    Totalsum arbeid og deler: {calculateTotalPrice()} kr
+  </p>
+)}
         </div>
 
 
@@ -650,8 +714,27 @@ const handleAddCustomPart = async () => {
             <p className="text-red-500 text-sm mt-2">Du må legge til arbeid.</p>
           )}
         </div>
-                {/* Egendefinert arbeid */}
-                <div className="p-4 border border-gray-300 rounded-lg">
+                
+
+
+{/* Søkefelt for deler */}
+<div className="p-4 border border-gray-300 rounded-lg">
+  <div>
+  <label className="block text-sm font-medium text-gray-700">Søk etter deler (EAN, Merke, Produkt):</label>
+  <input
+    type="text"
+    value={searchTerm}
+    onChange={handleSearchParts}
+    placeholder="Søk etter deler"
+    className="mt-2 block w-full p-2 border border-gray-300 rounded-md"
+  />
+  
+
+
+</div>
+
+
+{/* Egendefinert arbeid */}
   <label className="block text-sm font-medium text-gray-700">Legg til egendefinert arbeid:</label>
   <div className="mt-2 flex space-x-4">
     <input
@@ -676,8 +759,7 @@ const handleAddCustomPart = async () => {
       +
     </button>
   </div>
-</div>
-<div className="p-4 border border-gray-300 rounded-lg">
+  
   <label className="block text-sm font-medium text-gray-700">Legg til egendefinert del:</label>
 
   {/* Alle feltene på én linje */}
@@ -720,8 +802,8 @@ const handleAddCustomPart = async () => {
   </div>
 </div>
 
+<div className="p-4 border border-gray-300 rounded-lg">
 
-      
         <div>
           <label className="block text-sm font-medium text-gray-700">Utført arbeid:</label>
           <textarea
@@ -732,7 +814,8 @@ const handleAddCustomPart = async () => {
             className="mt-1 block w-full p-2 border border-gray-300 rounded-md resize-y"
           />
         </div>
-
+</div>
+<div className="p-4 border border-gray-300 rounded-lg">
 
         <div>
           <label className="block text-sm font-medium text-gray-700">Status:</label>
@@ -762,7 +845,7 @@ const handleAddCustomPart = async () => {
             ))}
           </select>
         </div>
-
+</div>
         <div className="text-center mt-6">
           <button
             type="submit"
@@ -774,6 +857,7 @@ const handleAddCustomPart = async () => {
         {updateMessage && <p className="text-green-500 text-center mt-4">{updateMessage}</p>}
       </form>
     </div>
+
   );
 }
 

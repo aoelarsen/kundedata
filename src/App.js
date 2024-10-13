@@ -33,7 +33,9 @@ import CompletedTasks from './CompletedTasks'; // Importer den nye komponenten
 import FixedPriceForm from './FixedPriceForm';
 import FixedPriceList from './FixedPriceList';
 import FixedPriceChange from './FixedPriceChange';
-
+import PartList from './PartList';
+import PartForm from './PartForm';
+import PartChange from './PartChange';
 
 function App() {
   const [customers, setCustomers] = useState([]);
@@ -220,6 +222,10 @@ function App() {
             <Route path="/fixed-price-form" element={<FixedPriceForm />} />
 <Route path="/fixed-price-list" element={<FixedPriceList />} />
 <Route path="/fixed-price-change/:id" element={<FixedPriceChange />} />
+<Route path="/part-form" element={<PartForm />} /> {/* Legge til ny del */}
+          <Route path="/part-list" element={<PartList />} /> {/* Vise liste over deler */}
+          <Route path="/part-change/:id" element={<PartChange />} /> {/* Endre en eksisterende del */}
+          
 
           </Routes>
         </div>

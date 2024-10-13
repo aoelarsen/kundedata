@@ -1324,7 +1324,17 @@ app.delete('/parts/:id', async (req, res) => {
 });
 
 
-
+app.get('/parts', async (req, res) => {
+  console.log("Forespørsel mottatt for å hente deler"); // Logg for å bekrefte at forespørselen kommer gjennom
+  try {
+    const parts = await Part.find();
+    console.log("Deler funnet:", parts); // Logg delene som blir funnet
+    res.status(200).json(parts);
+  } catch (err) {
+    console.error("Feil ved henting av deler fra databasen:", err); // Logg eventuelle feil
+    res.status(500).json({ message: err.message });
+  }
+});
 
 
 
