@@ -9,6 +9,7 @@ function ServiceDetails() {
   const [formData, setFormData] = useState({
     beskrivelse: '',
     arbeid: [], // Liste over flere arbeid
+    deler: [], // Ny array for deler
     utførtArbeid: '', // Kommentarer for utført arbeid
     status: 'Aktiv',
     ansatt: '',
@@ -26,22 +27,26 @@ function ServiceDetails() {
   const [isEditable, setIsEditable] = useState(false);
   const [customWork, setCustomWork] = useState({ title: '', price: '' }); // Nytt state for egendefinert arbeid
   const [customPart, setCustomPart] = useState({ ean: '', product: '', price: '', discount: '' }); // Nytt state for egendefinert del
-const [parts, setParts] = useState([]); // State for lagring av alle deler
-const [searchTerm, setSearchTerm] = useState('');
-const [filteredParts, setFilteredParts] = useState([]);
+  const [parts, setParts] = useState([]); // State for lagring av alle deler
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredParts, setFilteredParts] = useState([]);
 
-// Funksjon for å filtrere deler basert på søk
-const handleSearchParts = (e) => {
+ // Funksjon for å filtrere deler basert på søk, minimum 2 bokstaver
+ const handleSearchParts = (e) => {
   const searchValue = e.target.value.toLowerCase();
   setSearchTerm(searchValue);
 
-  const filtered = parts.filter(
-    (part) =>
-      part.ean.toLowerCase().includes(searchValue) ||
-      part.product.toLowerCase().includes(searchValue) ||
-      part.brand.toLowerCase().includes(searchValue)
-  );
-  setFilteredParts(filtered);
+  if (searchValue.length >= 2) {
+    const filtered = parts.filter(
+      (part) =>
+        part.ean.toLowerCase().includes(searchValue) ||
+        part.product.toLowerCase().includes(searchValue) ||
+        part.brand.toLowerCase().includes(searchValue)
+    );
+    setFilteredParts(filtered);
+  } else {
+    setFilteredParts([]); // Fjern treff hvis søket er kortere enn 2 bokstaver
+  }
 };
 
 // Funksjon for å legge til del
@@ -88,14 +93,24 @@ const handleRemovePart = async (indexToRemove) => {
   }
 };
 
+// Hent deler fra serveren (nytt useEffect)
+useEffect(() => {
+  const fetchParts = async () => {
+    try {
+      const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/parts');
+      if (!response.ok) {
+        throw new Error(`Feil ved henting av deler: ${response.statusText}`);
+      }
+      const partsData = await response.json();
+      setParts(partsData); // Sett delene i state
+    } catch (error) {
+      console.error("Feil ved henting av deler:", error);
+    }
+  };
 
+  fetchParts();
+}, []);
 
-
-const calculateTotalPrice = () => {
-  const totalWorkPrice = formData.arbeid.reduce((total, work) => total + work.price, 0);
-  const totalPartsPrice = parts.reduce((total, part) => total + part.price, 0);
-  return totalWorkPrice + totalPartsPrice;
-};
 
 
 
@@ -203,9 +218,8 @@ useEffect(() => {
       ...prevData,
       utførtArbeid: newUtførtArbeid, // Legger til valgt arbeid sin beskrivelse i utført arbeid-feltet
     }));
-  
-    // Logging for å sjekke hva som legges til i utført arbeid
   };
+  
   
   
 
@@ -223,7 +237,7 @@ useEffect(() => {
           setFormData({
             beskrivelse: service.Beskrivelse || '',
             arbeid: service.arbeid || [],
-            deler: [], // Ny array for deler
+            deler: service.deler || [], // Endret her for å hente delene fra service
             utførtArbeid: service.utførtArbeid || '',  // Hent utførtArbeid
             status: service.status || 'Aktiv',
             ansatt: service.ansatt || '',
@@ -485,6 +499,8 @@ const handleAddCustomPart = async () => {
   }
 };
 
+
+
   const handlePrintLabel = () => {
     if (customer && serviceDetails) {
       const printWindow = window.open('', '', 'width=500,height=300');
@@ -522,6 +538,21 @@ const handleAddCustomPart = async () => {
       printWindow.focus();
       printWindow.print();
     }
+  };
+
+  // Beregn totalprisen for arbeid
+  const calculateTotalWorkPrice = () => {
+    return formData.arbeid.reduce((total, work) => total + work.price, 0);
+  };
+
+  // Beregn totalprisen for deler
+  const calculateTotalPartsPrice = () => {
+    return formData.deler.reduce((total, part) => total + part.price, 0);
+  };
+
+  // Beregn totalprisen for både arbeid og deler
+  const calculateTotalPrice = () => {
+    return calculateTotalWorkPrice() + calculateTotalPartsPrice();
   };
 
   const handleSendSMS = () => {
@@ -667,81 +698,69 @@ const handleAddCustomPart = async () => {
 
 
 
-        {/* Velg arbeid fra listen */}
-        <div className={`p-4 border ${isDescriptionEmpty ? 'border-red-500' : 'border-gray-300'} rounded-lg`}>
-          <label className="block text-sm font-medium text-gray-700">Velg arbeid fra liste:</label>
-          <select onChange={handleAddWork} className="mt-1 block w-full p-2 border border-gray-300 rounded-md">
-            <option value="">Velg arbeid</option>
-            {fixedPrices.map((price) => (
-              <option key={price._id} value={price._id}>
-                {price.title} - {price.price} kr
-              </option>
-            ))}
-          </select>
-          {formData.arbeid.length === 0 && (
-            <p className="text-red-500 text-sm mt-2">Vennligst velg minst ett arbeid før du går videre.</p>
-          )}
+  {/* Velg arbeid fra listen */}
+<div className="p-4 border border-gray-300 rounded-lg">
+  <label className="block text-sm font-medium text-gray-700">Velg arbeid fra liste:</label>
+  <select onChange={handleAddWork} className="mt-1 block w-full p-2 border border-gray-300 rounded-md">
+    <option value="">Velg arbeid</option>
+    {fixedPrices.map((price) => (
+      <option key={price._id} value={price._id}>
+        {price.title} - {price.price} kr
+      </option>
+    ))}
+  </select>
+</div>
+{/* Valgt arbeid */}
+{/* Valgt arbeid */}
+<div className="p-4 border border-gray-300 rounded-lg">
+  <h3 className="text-lg font-semibold mb-4">Arbeid:</h3>
+  <ul>
+    {formData.arbeid.map((item, index) => (
+      <li key={index} className="flex justify-between items-center">
+        <span>{item.title} - {item.price} kr</span>
+        <div className="flex space-x-2">
+          <button
+            onClick={() => handleCopyWork(index)}
+            className="text-blue-500 hover:text-blue-700"
+          >
+            Kopi
+          </button>
+          <button
+            onClick={() => handleRemoveWork(index)}
+            className="text-red-500 hover:text-red-700"
+          >
+            Fjern
+          </button>
         </div>
+      </li>
+    ))}
+  </ul>
+  <p className="text-lg font-bold mt-4 text-right">Totalsum arbeid: {calculateTotalWorkPrice()} kr</p>
 
-        {/* Valgt arbeid */}
-        <div className={`p-4 border ${formData.arbeid.length === 0 ? 'border-red-500' : 'border-gray-300'} rounded-lg`}>
-          <label className="block text-sm font-medium text-gray-700">Valgt arbeid:</label>
-          <ul>
-  {formData.arbeid.map((item, index) => (
-    <li key={index} className="flex justify-between items-center">
-      <span>{item.title} - {item.price} kr</span>
-      <div className="flex space-x-2">
-        {/* Kopi-knapp for å kopiere beskrivelse til Utført Arbeid */}
+{/* Valgte deler */}
+  <h3 className="text-lg font-semibold mb-4">Deler:</h3>
+  <ul>
+    {formData.deler.map((part, index) => (
+      <li key={index} className="flex justify-between items-center">
+        <span>{part.ean} - {part.product} - {part.price} kr</span>
         <button
-          type="button"
-          onClick={() => handleCopyWork(index)}
-          className="text-blue-500 hover:text-blue-700"
-        >
-          Mal
-        </button>
-        {/* Fjern-knapp for å fjerne arbeid */}
-        <button
-          type="button"
-          onClick={() => handleRemoveWork(index)}
+          onClick={() => handleRemovePart(index)}
           className="text-red-500 hover:text-red-700"
         >
           Fjern
         </button>
-      </div>
-    </li>
-  ))}
+      </li>
+    ))}
+  </ul>
+  {/* Totalsum deler til høyre */}
+  <p className="text-lg font-bold mt-4 text-right">Totalsum deler: {calculateTotalPartsPrice()} kr</p>
 
-</ul>
+{/* Totalpris arbeid og deler */}
+  <h3 className="text-xl font-semibold mb-4">Totalt arbeid og deler:</h3>
+  {/* Totalpris til høyre */}
+  <p className="text-lg font-bold mt-4 text-right">Totalt: {calculateTotalPrice()} kr</p>
+</div>
 
-          {formData.arbeid.length >= 2 && (
-            <p className="text-lg font-bold mt-4">Totalsum arbeid: {calculateTotalPrice()} kr <span className="font-normal">(eks. deler og annen kost)</span> </p>
-          )}
-          {formData.arbeid.length === 0 && (
-            <p className="text-red-500 text-sm mt-2">Du må legge til arbeid.</p>
-          )}
-
-            {/* Vise filtrerte deler */}
-  {filteredParts.length > 0 && (
-    <ul className="mt-4">
-      {filteredParts.map((part, index) => (
-        <li key={index} className="flex justify-between items-center mb-2">
-          <span>{part.ean} - {part.product} - {part.price} kr</span>
-          <button
-            onClick={() => handleAddPartToWork(part)}
-            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-          >
-            Legg til
-          </button>
-        </li>
-      ))}
-    </ul>
-  )}
-  {formData.arbeid.length > 0 && (
-  <p className="text-lg font-bold mt-4">
-    Totalsum arbeid og deler: {calculateTotalPrice()} kr
-  </p>
-)}
-        </div>
 
 
 
@@ -761,6 +780,8 @@ const handleAddCustomPart = async () => {
           )}
         </div>
                 
+
+
       {/* Søkefelt for deler */}
       <div className="p-4 border border-gray-300 rounded-lg">
         <label className="block text-sm font-medium text-gray-700">Søk etter deler (EAN, Merke, Produkt):</label>
@@ -768,7 +789,7 @@ const handleAddCustomPart = async () => {
           type="text"
           value={searchTerm}
           onChange={handleSearchParts}
-          placeholder="Skriv inn for å søke etter deler"
+          placeholder="Skriv inn minst 2 bokstaver for å søke etter deler"
           className="mt-2 block w-full p-2 border border-gray-300 rounded-md"
         />
 
@@ -781,13 +802,11 @@ const handleAddCustomPart = async () => {
                 onClick={() => handleAddPartToWork(part)}
                 className="cursor-pointer p-2 hover:bg-gray-100"
               >
-                {part.ean} - {part.product} - {part.price} kr
+                {part.ean} - {part.product} - {part.brand} - {part.price} kr
               </li>
             ))}
           </ul>
         )}
-
- 
 
 
 
