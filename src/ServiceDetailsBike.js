@@ -30,39 +30,65 @@ const [parts, setParts] = useState([]); // State for lagring av alle deler
 const [searchTerm, setSearchTerm] = useState('');
 const [filteredParts, setFilteredParts] = useState([]);
 
-
-
 // Funksjon for å filtrere deler basert på søk
 const handleSearchParts = (e) => {
   const searchValue = e.target.value.toLowerCase();
   setSearchTerm(searchValue);
 
-  // Filtrer delene basert på EAN, produktnavn eller merke
   const filtered = parts.filter(
     (part) =>
       part.ean.toLowerCase().includes(searchValue) ||
-      part.product.toLowerCase().includes(searchValue)
+      part.product.toLowerCase().includes(searchValue) ||
+      part.brand.toLowerCase().includes(searchValue)
   );
   setFilteredParts(filtered);
 };
 
-const handleAddPartToWork = (selectedPart) => {
-  const updatedWork = [
-    ...formData.arbeid,
-    {
-      title: `Del: ${selectedPart.product}`,
-      price: selectedPart.price,
-    },
-  ];
+// Funksjon for å legge til del
+const handleAddPartToWork = async (selectedPart) => {
+  const updatedParts = [...formData.deler, selectedPart];
+  
+  setFormData((prevData) => ({
+    ...prevData,
+    deler: updatedParts,
+  }));
+
+  // Oppdater backend
+  try {
+    const updatedService = { deler: updatedParts };
+    await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/services/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedService),
+    });
+  } catch (error) {
+    console.error('Feil ved oppdatering av deler:', error);
+  }
+};
+
+// Funksjon for å fjerne del
+const handleRemovePart = async (indexToRemove) => {
+  const updatedParts = formData.deler.filter((_, index) => index !== indexToRemove);
 
   setFormData((prevData) => ({
     ...prevData,
-    arbeid: updatedWork, // Oppdater listen over arbeid med den valgte delen
+    deler: updatedParts,
   }));
 
-  // Oppdater totalsummen når delen legges til
-  calculateTotalPrice();
+  // Oppdater backend
+  try {
+    const updatedService = { deler: updatedParts };
+    await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/services/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedService),
+    });
+  } catch (error) {
+    console.error('Feil ved fjerning av del:', error);
+  }
 };
+
+
 
 
 const calculateTotalPrice = () => {
@@ -197,6 +223,7 @@ useEffect(() => {
           setFormData({
             beskrivelse: service.Beskrivelse || '',
             arbeid: service.arbeid || [],
+            deler: [], // Ny array for deler
             utførtArbeid: service.utførtArbeid || '',  // Hent utførtArbeid
             status: service.status || 'Aktiv',
             ansatt: service.ansatt || '',
@@ -457,7 +484,6 @@ const handleAddCustomPart = async () => {
     }
   }
 };
-
 
   const handlePrintLabel = () => {
     if (customer && serviceDetails) {
