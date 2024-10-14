@@ -966,7 +966,6 @@ app.delete('/customtasks/:id', async (req, res) => {
 });
 
 
-
 // Legg til en ny egendefinert oppgave
 app.post('/customtasks', async (req, res) => {
   const { task, dueDate, store } = req.body; // Inkluder butikk-ID fra request body
