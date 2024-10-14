@@ -419,9 +419,7 @@ function ServiceDetails() {
 
       if (response.ok) {
         setUpdateMessage('Tjenesten er oppdatert');
-        if (customer) {
-          navigate(`/customer-details/${customer._id}`);
-        }
+        // Fjern navigate funksjonen slik at brukeren forblir på samme side
       } else {
         console.error('Feil ved oppdatering av tjeneste:', response.statusText);
       }
@@ -429,6 +427,7 @@ function ServiceDetails() {
       console.error('Feil ved kommunikasjon med serveren:', error);
     }
   };
+
 
   // Legg til egendefinert arbeid
   const handleAddCustomWork = async () => {
@@ -735,7 +734,6 @@ function ServiceDetails() {
           </select>
         </div>
         {/* Valgt arbeid */}
-        {/* Valgt arbeid */}
         <div className="p-4 border border-gray-300 rounded-lg">
           <h3 className="text-lg font-semibold mb-4">Arbeid:</h3>
           <ul>
@@ -744,14 +742,34 @@ function ServiceDetails() {
                 <span>{item.title} - {item.price} kr</span>
                 <div className="flex space-x-2">
                   <button
-                    type="button"  // Legg til type="button" for å hindre form-innsending
+                    type="button"
                     onClick={() => handleCopyWork(index)}
                     className="text-blue-500 hover:text-blue-700"
                   >
                     Kopi
                   </button>
                   <button
-                    onClick={() => handleRemoveWork(index)}
+                    type="button"
+                    onClick={async () => {
+                      // Oppdaterer kun state
+                      const updatedWork = formData.arbeid.filter((_, i) => i !== index);
+                      setFormData((prevData) => ({
+                        ...prevData,
+                        arbeid: updatedWork
+                      }));
+
+                      // Oppdater backend asynkront
+                      try {
+                        const updatedService = { arbeid: updatedWork };
+                        await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/services/${id}`, {
+                          method: 'PATCH',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify(updatedService),
+                        });
+                      } catch (error) {
+                        console.error('Feil ved fjerning av arbeid:', error);
+                      }
+                    }}
                     className="text-red-500 hover:text-red-700"
                   >
                     Fjern
@@ -760,6 +778,7 @@ function ServiceDetails() {
               </li>
             ))}
           </ul>
+
           <p className="text-lg font-bold mt-4 text-right">Totalsum arbeid: {calculateTotalWorkPrice()} kr</p>
 
           {/* Valgte deler */}
@@ -769,7 +788,27 @@ function ServiceDetails() {
               <li key={index} className="flex justify-between items-center">
                 <span>{part.ean} - {part.product} - {part.price} kr</span>
                 <button
-                  onClick={() => handleRemovePart(index)}
+                  type="button"
+                  onClick={async () => {
+                    // Oppdaterer kun state
+                    const updatedParts = formData.deler.filter((_, i) => i !== index);
+                    setFormData((prevData) => ({
+                      ...prevData,
+                      deler: updatedParts
+                    }));
+
+                    // Oppdater backend asynkront
+                    try {
+                      const updatedService = { deler: updatedParts };
+                      await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/services/${id}`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(updatedService),
+                      });
+                    } catch (error) {
+                      console.error('Feil ved fjerning av del:', error);
+                    }
+                  }}
                   className="text-red-500 hover:text-red-700"
                 >
                   Fjern
@@ -777,6 +816,7 @@ function ServiceDetails() {
               </li>
             ))}
           </ul>
+
           {/* Totalsum deler til høyre */}
           <p className="text-lg font-bold mt-4 text-right">Totalsum deler: {calculateTotalPartsPrice()} kr</p>
 
@@ -870,7 +910,7 @@ function ServiceDetails() {
           <div className="mt-2 flex space-x-4">
             <input
               type="text"
-              placeholder="EAN"
+              placeholder="EAN/PLU"
               value={customPart.ean}
               onChange={(e) => setCustomPart({ ...customPart, ean: e.target.value })}
               className="block w-1/5 p-2 border border-gray-300 rounded-md"
