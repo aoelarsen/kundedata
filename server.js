@@ -79,9 +79,10 @@ const serviceSchema = new mongoose.Schema({
   }],
   deler: [{  // Legg til en ny array for deler
     ean: String,
-    product: String,
+    brand: String, // Nytt felt for Varemerke
+    product: String, // Produktfelt
     price: Number,
-    discount: Number // Valgfritt felt for rabatt
+    discount: Number
   }],
   Beskrivelse: String,
   utførtArbeid: String,

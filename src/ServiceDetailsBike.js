@@ -26,7 +26,7 @@ function ServiceDetails() {
   const [isDescriptionEmpty, setIsDescriptionEmpty] = useState(false);
   const [isEditable, setIsEditable] = useState(false);
   const [customWork, setCustomWork] = useState({ title: '', price: '' }); // Nytt state for egendefinert arbeid
-  const [customPart, setCustomPart] = useState({ ean: '', product: '', price: '', discount: '' }); // Nytt state for egendefinert del
+  const [customPart, setCustomPart] = useState({ ean: '', brand: '', product: '', price: '', discount: '' });
   const [parts, setParts] = useState([]); // State for lagring av alle deler
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredParts, setFilteredParts] = useState([]);
@@ -323,8 +323,14 @@ function ServiceDetails() {
     // Oppdatering til server
     try {
       const updatedService = {
-        arbeid: updatedWork.map(work => ({ title: work.title, price: work.price })),
+        arbeid: updatedWork.map(work => ({
+          title: work.title,
+          price: work.price,
+          description: work.description // Inkluder beskrivelse i oppdateringen
+        }))
       };
+
+      console.log('Oppdaterer arbeid i backend med:', updatedService);
 
       const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/services/${id}`, {
         method: 'PATCH',
@@ -464,27 +470,32 @@ function ServiceDetails() {
   };
 
 
-  // Funksjon for å legge til egendefinerte deler
+  // Funksjon for å legge til egendefinert del
   const handleAddCustomPart = async () => {
-    if (customPart.ean && customPart.product && customPart.price) {
-      const updatedParts = [...parts, {
+    if (customPart.ean && customPart.brand && customPart.product && customPart.price) {
+      const updatedParts = [...formData.deler, {
         ean: customPart.ean,
+        brand: customPart.brand,
         product: customPart.product,
         price: parseFloat(customPart.price),
-        discount: parseFloat(customPart.discount || 0) // Rabatt valgfritt
+        discount: parseFloat(customPart.discount || 0)
       }];
 
       // Oppdater front-end
-      setParts(updatedParts);
+      setFormData((prevData) => ({
+        ...prevData,
+        deler: updatedParts
+      }));
 
       // Tøm feltene etter at delen er lagt til
-      setCustomPart({ ean: '', product: '', price: '', discount: '' });
+      setCustomPart({ ean: '', brand: '', product: '', price: '', discount: '' });
 
       // Send oppdatering til backend
       try {
         const updatedService = {
           deler: updatedParts.map(part => ({
             ean: part.ean,
+            brand: part.brand,
             product: part.product,
             price: part.price,
             discount: part.discount
@@ -509,6 +520,8 @@ function ServiceDetails() {
       }
     }
   };
+
+
 
 
 
@@ -860,28 +873,35 @@ function ServiceDetails() {
               placeholder="EAN"
               value={customPart.ean}
               onChange={(e) => setCustomPart({ ...customPart, ean: e.target.value })}
-              className="block w-1/5 p-2 border border-gray-300 rounded-md" // Medium bredde for EAN
+              className="block w-1/5 p-2 border border-gray-300 rounded-md"
             />
             <input
               type="text"
-              placeholder="Merke/Produkt"
+              placeholder="Varemerke"
+              value={customPart.brand}
+              onChange={(e) => setCustomPart({ ...customPart, brand: e.target.value })}
+              className="block w-1/5 p-2 border border-gray-300 rounded-md"
+            />
+            <input
+              type="text"
+              placeholder="Produkt"
               value={customPart.product}
               onChange={(e) => setCustomPart({ ...customPart, product: e.target.value })}
-              className="block w-2/5 p-2 border border-gray-300 rounded-md" // Large bredde for Merke/Produkt
+              className="block w-1/5 p-2 border border-gray-300 rounded-md"
             />
             <input
               type="number"
               placeholder="Pris"
               value={customPart.price}
               onChange={(e) => setCustomPart({ ...customPart, price: e.target.value })}
-              className="block w-1/6 p-2 border border-gray-300 rounded-md" // Small bredde for Pris
+              className="block w-1/6 p-2 border border-gray-300 rounded-md"
             />
             <input
               type="number"
               placeholder="Rabatt (%)"
               value={customPart.discount}
               onChange={(e) => setCustomPart({ ...customPart, discount: e.target.value })}
-              className="block w-1/6 p-2 border border-gray-300 rounded-md" // Small bredde for Rabatt
+              className="block w-1/6 p-2 border border-gray-300 rounded-md"
             />
             <button
               type="button"
@@ -891,6 +911,7 @@ function ServiceDetails() {
               +
             </button>
           </div>
+
         </div>
 
         <div className="p-4 border border-gray-300 rounded-lg">
