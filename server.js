@@ -73,7 +73,9 @@ const serviceSchema = new mongoose.Schema({
   Farge: String,
   arbeid: [{
     title: String,
-    price: Number
+    price: Number,
+    description: String // Sørg for at description er inkludert her
+
   }],
   deler: [{  // Legg til en ny array for deler
     ean: String,
@@ -82,7 +84,7 @@ const serviceSchema = new mongoose.Schema({
     discount: Number // Valgfritt felt for rabatt
   }],
   Beskrivelse: String,
-  utførtArbeid: String, 
+  utførtArbeid: String,
   status: { type: String, default: 'Aktiv' },
   ansatt: String,
   registrertDato: String,
