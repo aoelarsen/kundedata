@@ -948,6 +948,21 @@ app.get('/customtasks', async (req, res) => {
   }
 });
 
+app.delete('/customtasks/:id', async (req, res) => {
+  try {
+    const task = await CustomTask.findById(req.params.id);
+    if (!task) {
+      return res.status(404).json({ message: 'Oppgave ikke funnet' });
+    }
+
+    await task.remove();
+    res.json({ message: 'Oppgave slettet' });
+  } catch (err) {
+    res.status(500).json({ message: 'Feil ved sletting av oppgave', error: err });
+  }
+});
+
+
 // Legg til en ny egendefinert oppgave
 app.post('/customtasks', async (req, res) => {
   const { task, dueDate, store } = req.body; // Inkluder butikk-ID fra request body

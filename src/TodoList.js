@@ -78,44 +78,40 @@ function TodoList() {
 
 
   // Hent egendefinerte oppgaver
+  // Hent egendefinerte oppgaver
   const fetchCustomTasks = useCallback(async () => {
     try {
       const customTasksResponse = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks');
       const customTasksData = await customTasksResponse.json();
       const filteredCustomTasks = customTasksData.filter(task => task.store === butikkid);
+
       const updatedCustomTasks = [];
 
       for (const task of filteredCustomTasks) {
-        if (task.dateCompleted) {
-          const completedDate = new Date(task.dateCompleted).toISOString().split('T')[0];
-          if (completedDate !== today) {
-            // Oppdater oppgaven i customtasks hvis utførtdato ikke stemmer med dagens dato
-            await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks/${task._id}`, {
-              method: 'PATCH',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ completed: true }),
-            });
+        if (task.completed) {
+          // Hvis oppgaven er markert som fullført, slett den fra 'customtasks'
+          const deleteResponse = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks/${task._id}`, {
+            method: 'DELETE',
+          });
 
-            updatedCustomTasks.push({
-              ...task,
-              completed: true, // Marker som fullført
-            });
+          if (deleteResponse.ok) {
+            console.log(`Oppgave ${task.task} slettet fra customtasks fordi den er fullført.`);
           } else {
-            updatedCustomTasks.push({
-              ...task,
-              completed: !!task.dateCompleted && !!task.completedBy, // Marker som fullført hvis dateCompleted og completedBy finnes
-            });
+            console.error(`Feil ved sletting av oppgave ${task.task}:`, deleteResponse.statusText);
           }
         } else {
+          // Hvis oppgaven ikke er fullført, legg den til i den oppdaterte listen
           updatedCustomTasks.push(task);
         }
       }
 
+      // Oppdater state med ikke-fullførte oppgaver
       setCustomTasks(updatedCustomTasks);
     } catch (error) {
       console.error('Feil ved henting av egendefinerte oppgaver:', error);
     }
-  }, [butikkid, today]);
+  }, [butikkid]);
+
 
 
 
