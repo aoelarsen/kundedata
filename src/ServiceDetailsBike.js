@@ -320,6 +320,10 @@ function ServiceDetails() {
       arbeid: updatedWork,
     }));
 
+    // Console-logg oppgaven som blir slettet
+    const removedTask = formData.arbeid[indexToRemove];
+    console.log('Sletter oppgave fra serveren:', removedTask);
+
     // Oppdatering til server
     try {
       const updatedService = {
