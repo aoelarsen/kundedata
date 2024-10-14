@@ -956,7 +956,7 @@ app.delete('/customtasks/:id', async (req, res) => {
       console.log('Oppgave ikke funnet');
       return res.status(404).json({ message: 'Oppgave ikke funnet' });
     }
-    await task.remove();
+    await CustomTask.findByIdAndDelete(req.params.id);
     console.log('Oppgave slettet:', task);
     res.json({ message: 'Oppgave slettet' });
   } catch (err) {
