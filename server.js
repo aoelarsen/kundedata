@@ -950,17 +950,21 @@ app.get('/customtasks', async (req, res) => {
 
 app.delete('/customtasks/:id', async (req, res) => {
   try {
+    console.log('Forsøker å slette oppgave med ID:', req.params.id);
     const task = await CustomTask.findById(req.params.id);
     if (!task) {
+      console.log('Oppgave ikke funnet');
       return res.status(404).json({ message: 'Oppgave ikke funnet' });
     }
-
     await task.remove();
+    console.log('Oppgave slettet:', task);
     res.json({ message: 'Oppgave slettet' });
   } catch (err) {
-    res.status(500).json({ message: 'Feil ved sletting av oppgave', error: err });
+    console.error('Feil ved sletting av oppgave:', err);
+    res.status(500).json({ message: 'Feil ved sletting av oppgave', err });
   }
 });
+
 
 
 // Legg til en ny egendefinert oppgave
