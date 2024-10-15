@@ -71,27 +71,7 @@ function ServiceDetails() {
     }
   };
 
-  // Funksjon for å fjerne del
-  const handleRemovePart = async (indexToRemove) => {
-    const updatedParts = formData.deler.filter((_, index) => index !== indexToRemove);
 
-    setFormData((prevData) => ({
-      ...prevData,
-      deler: updatedParts,
-    }));
-
-    // Oppdater backend
-    try {
-      const updatedService = { deler: updatedParts };
-      await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/services/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updatedService),
-      });
-    } catch (error) {
-      console.error('Feil ved fjerning av del:', error);
-    }
-  };
 
   // Hent deler fra serveren (nytt useEffect)
   useEffect(() => {
@@ -311,46 +291,7 @@ function ServiceDetails() {
     }));
   };
 
-  const handleRemoveWork = async (indexToRemove) => {
-    const updatedWork = formData.arbeid.filter((_, index) => index !== indexToRemove);
 
-    // Oppdater front-end
-    setFormData((prevData) => ({
-      ...prevData,
-      arbeid: updatedWork,
-    }));
-
-    // Console-logg oppgaven som blir slettet
-    const removedTask = formData.arbeid[indexToRemove];
-    console.log('Sletter oppgave fra serveren:', removedTask);
-
-    // Oppdatering til server
-    try {
-      const updatedService = {
-        arbeid: updatedWork.map(work => ({
-          title: work.title,
-          price: work.price,
-          description: work.description // Inkluder beskrivelse i oppdateringen
-        }))
-      };
-
-      console.log('Oppdaterer arbeid i backend med:', updatedService);
-
-      const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/services/${id}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updatedService),
-      });
-
-      if (!response.ok) {
-        console.error('Feil ved oppdatering av arbeid på serveren:', response.statusText);
-      }
-    } catch (error) {
-      console.error('Feil ved kommunikasjon med serveren:', error);
-    }
-  };
 
 
   const handleSaveFields = async () => {
