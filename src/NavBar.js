@@ -125,6 +125,7 @@ function NavBar() {
   };
 
   return (
+    <>
     <nav className="bg-gray-800 p-4">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <div className="flex items-center space-x-4">
@@ -268,6 +269,14 @@ function NavBar() {
         </div>
       )}
     </nav>
+
+      {/* Banner for å vise hvilken ansatt som er logget inn */}
+      {selectedEmployee && (
+        <div className="bg-blue-600 text-white text-center py-2">
+          Du er logget inn som: {selectedEmployee.split(' ')[0]}
+        </div>
+      )}
+    </>
   );
 }
 
