@@ -557,8 +557,8 @@ function ServiceDetails() {
 
       {customer && (
         <div className="bg-gray-100 p-6 rounded-lg mb-6">
-          <h2 className="text-2xl font-semibold mb-4">Kundedetaljer</h2>
-          <div className="space-y-4">
+          <h2 className="text-xl font-semibold mb-4">Kundedetaljer</h2>
+          <div className="space-y-1">
             <div>
               <span className="font-semibold">Navn: </span>
               {customer.firstName} {customer.lastName}
