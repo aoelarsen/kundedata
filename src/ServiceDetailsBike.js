@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { format, parse } from 'date-fns';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable'; // Importer for tabeller i PDF
+import logo from './image/logo.png';
+import { generateServicePDF } from './pdfUtils'; // Importer PDF-genereringsfunksjonen
+
+
 
 function ServiceDetails() {
   const { id } = useParams();
@@ -508,17 +514,22 @@ function ServiceDetails() {
     }
   };
 
-  // Beregn totalprisen for arbeid
+  //importerer fil for genereringa av faktura pdf
+  const generatePDF = () => {
+    generateServicePDF(serviceDetails, customer, formData, calculateTotalPrice);
+  };
+
+
+
+  // Funksjoner for å beregne totalpris
   const calculateTotalWorkPrice = () => {
     return formData.arbeid.reduce((total, work) => total + work.price, 0);
   };
 
-  // Beregn totalprisen for deler
   const calculateTotalPartsPrice = () => {
     return formData.deler.reduce((total, part) => total + part.price, 0);
   };
 
-  // Beregn totalprisen for både arbeid og deler
   const calculateTotalPrice = () => {
     return calculateTotalWorkPrice() + calculateTotalPartsPrice();
   };
@@ -724,7 +735,7 @@ function ServiceDetails() {
             ))}
           </ul>
 
-          <p className="text-lg font-bold mt-4 text-right">Totalsum arbeid: {calculateTotalWorkPrice()} kr</p>
+          <p className="text-lg font-bold mt-4 mb-4 text-left">Totalt: {calculateTotalWorkPrice()} kr</p>
 
           {/* Valgte deler */}
           <h3 className="text-lg font-semibold mb-4">Deler:</h3>
@@ -763,12 +774,18 @@ function ServiceDetails() {
           </ul>
 
           {/* Totalsum deler til høyre */}
-          <p className="text-lg font-bold mt-4 text-right">Totalsum deler: {calculateTotalPartsPrice()} kr</p>
+          <p className="text-lg font-bold mt-4 text-left">Totalt: {calculateTotalPartsPrice()} kr</p>
 
-          {/* Totalpris arbeid og deler */}
-          <h3 className="text-xl font-semibold mb-4">Totalt arbeid og deler:</h3>
           {/* Totalpris til høyre */}
-          <p className="text-lg font-bold mt-4 text-right">Totalt: {calculateTotalPrice()} kr</p>
+
+          <p className="text-lg font-bold mt-4 text-right">Totalpris arbeid og deler: {calculateTotalPrice()} kr</p>
+          {/* Knapp for å generere PDF */}
+          <button
+            onClick={generatePDF}
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          >
+            Generer Servicefaktura (PDF)
+          </button>
         </div>
 
 
