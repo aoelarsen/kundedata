@@ -14,14 +14,15 @@ function NavBar() {
   const settingsRef = useRef(null);
 
   useEffect(() => {
+    // Sjekk først om butikk er valgt
     if (!Cookies.get('selectedStore')) {
       setIsStoreModalOpen(true);
-    }
-
-    if (!Cookies.get('selectedEmployee')) {
+    } else if (!Cookies.get('selectedEmployee')) {
+      // Vis ansattmodal kun hvis butikk er valgt men ansatt ikke er valgt
       setIsEmployeeModalOpen(true);
     }
   }, []);
+  
 
   useEffect(() => {
     const fetchEmployees = async () => {
