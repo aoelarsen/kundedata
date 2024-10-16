@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { format, parse } from 'date-fns';
-import jsPDF from 'jspdf';
 import 'jspdf-autotable'; // Importer for tabeller i PDF
-import logo from './image/logo.png';
-import { generateServicePDF } from './pdfUtils'; // Importer PDF-genereringsfunksjonen
+import PrintInvoice from './PrintInvoice'; // Importer den utskriftsvennlige komponenten
+
 
 
 
@@ -514,12 +513,67 @@ function ServiceDetails() {
     }
   };
 
-  //importerer fil for genereringa av faktura pdf
-  const generatePDF = () => {
-    generateServicePDF(serviceDetails, customer, formData, calculateTotalPrice);
+  // Funksjon som åpner en ny fane og viser den utskriftsvennlige siden
+  const openPrintWindow = (serviceDetails, customer, formData, calculateTotalPrice) => {
+    const newWindow = window.open('', '_blank');
+  
+    // Sjekk at .print-invoice finnes i DOM-en før du fortsetter
+    const printInvoiceElement = document.getElementsByClassName('print-invoice')[0];
+    if (!printInvoiceElement) {
+      console.error('Kan ikke finne print-invoice elementet');
+      return;
+    }
+  
+    // Skriv HTML til det nye vinduet, inkludert Tailwind CSS fra et CDN eller din egen bygde versjon
+    newWindow.document.write(`
+      <html>
+        <head>
+          <title>Service Faktura</title>
+          <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+          <style>
+            /* Inline CSS for additional styling, if necessary */
+            body {
+              width: 148mm;
+              height: 210mm;
+              padding: 20mm;
+              font-family: Arial, sans-serif;
+            }
+            table {
+              width: 100%;
+              border-collapse: collapse;
+            }
+            th, td {
+              border: 1px solid black;
+              padding: 5px;
+            }
+            img {
+              width: 100px;
+            }
+          </style>
+        </head>
+        <body>
+          ${printInvoiceElement.outerHTML}
+        </body>
+      </html>
+    `);
+  
+    // Vent til vinduet er lastet, deretter fokuser og skriv ut
+    newWindow.onload = () => {
+      newWindow.focus();
+      newWindow.print();
+    };
+  
+    // Lukk dokumentet når innholdet er skrevet
+    newWindow.document.close();
+  };
+  
+  
+    // Funksjon for å håndtere utskrift
+    const handlePrint = () => {
+      openPrintWindow(serviceDetails, customer, formData, calculateTotalPrice);
   };
 
-
+ 
 
   // Funksjoner for å beregne totalpris
   const calculateTotalWorkPrice = () => {
@@ -781,13 +835,16 @@ function ServiceDetails() {
           <p className="text-lg font-bold mt-4 text-right">Totalpris arbeid og deler: {calculateTotalPrice()} kr</p>
           {/* Knapp for å generere PDF */}
           <button
-            onClick={generatePDF}
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-          >
-            Generer Servicefaktura (PDF)
-          </button>
-        </div>
-
+                onClick={handlePrint}
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            >
+                Åpne utskriftsvennlig side
+            </button>
+            {/* Render den utskriftsvennlige komponenten i bakgrunnen (ikke synlig) */}
+            <div style={{ display: 'none' }}>
+                <PrintInvoice serviceDetails={serviceDetails} customer={customer} formData={formData} calculateTotalPrice={calculateTotalPrice} />
+            </div>
+</div>
 
 
 
