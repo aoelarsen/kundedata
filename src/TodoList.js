@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Cookies from 'js-cookie';
 
+// Hent dagens dato i formatet yyyy-mm-dd for input type="date"
+const today = new Date().toISOString().split('T')[0];
 
 function TodoList() {
   const [dailyTasks, setDailyTasks] = useState([]);
@@ -11,8 +13,6 @@ function TodoList() {
   // Hent butikk-ID fra cookies som i OrderList
   const butikkid = parseInt(Cookies.get('butikkid'), 10) || null;
 
-  // Hent dagens dato i formatet yyyy-mm-dd for input type="date"
-  const today = new Date().toISOString().split('T')[0];
 
   const [customTaskDate, setCustomTaskDate] = useState(today);
   const [employee] = useState(Cookies.get('selectedEmployee') || '');
@@ -53,7 +53,7 @@ function TodoList() {
             }
           } else {
             // Logg oppgaven som har fullført dato som dagens dato
-            console.log(`Oppgave "${task.task}" har fullføringsdato (${completedDate}) som dagens dato (${today}).`);
+
             updatedDailyTasks.push(task); // Oppgaven er fortsatt fullført for i dag
           }
         } else {
@@ -66,7 +66,7 @@ function TodoList() {
     } catch (error) {
       console.error('Feil ved henting av daglige oppgaver:', error);
     }
-  }, [butikkid, today]);
+  }, [butikkid]);
 
 
 
@@ -79,39 +79,62 @@ function TodoList() {
   // Hent egendefinerte oppgaver
   const fetchCustomTasks = useCallback(async () => {
     try {
+      console.log("Starter henting av egendefinerte oppgaver...");
+
       const customTasksResponse = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks');
       const customTasksData = await customTasksResponse.json();
+
+      console.log("Rådata fra API-et:", customTasksData);
+
       const filteredCustomTasks = customTasksData.filter(task => task.store === butikkid);
+      console.log("Filtrerte oppgaver for butikkID:", filteredCustomTasks);
 
       const updatedCustomTasks = [];
 
       for (const task of filteredCustomTasks) {
-        if (task.completed) {
-          // Logg oppgaven som skal slettes
-          console.log(`Oppgave "${task.task}" er fullført og vil bli slettet.`);
+        console.log(`Behandler oppgave: ${task.task}, completed: ${task.completed}, dateCompleted: ${task.dateCompleted}`);
 
-          // Slett oppgaven som har completed: true
-          const deleteResponse = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks/${task._id}`, {
-            method: 'DELETE',
-          });
+        if (task.dateCompleted) {  // Sjekk om det finnes en dateCompleted
+          const completedDate = new Date(task.dateCompleted).toISOString().split('T')[0];
+          console.log(`Oppgave: ${task.task}, utførtdato: ${completedDate}, dagens dato: ${today}`);
 
-          if (deleteResponse.ok) {
-            console.log(`Oppgave "${task.task}" slettet fra customtasks.`);
+          // Sjekk om dateCompleted er ulik dagens dato
+          if (completedDate !== today) {
+            console.log(`Oppgave "${task.task}" har en utførtdato (${completedDate}) som ikke samsvarer med dagens dato (${today}) og vil bli slettet.`);
+
+            // Slett oppgaven fra customtasks
+            const deleteResponse = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks/${task._id}`, {
+              method: 'DELETE',
+            });
+
+            if (deleteResponse.ok) {
+              console.log(`Oppgave "${task.task}" ble slettet.`);
+            } else {
+              console.error(`Feil ved sletting av oppgave ${task.task}: ${deleteResponse.statusText}`);
+            }
           } else {
-            console.error(`Feil ved sletting av oppgave ${task.task}:`, deleteResponse.statusText);
+            console.log(`Oppgave "${task.task}" har riktig utførtdato og vil bli beholdt.`);
+            // Behold oppgaver som har riktig utførtdato
+            updatedCustomTasks.push(task);
           }
         } else {
-          // Behold oppgaver som ikke er fullført
+          console.log(`Oppgave "${task.task}" har ikke fullførtdato og vil bli beholdt.`);
+          // Behold oppgaver som ikke har dateCompleted
           updatedCustomTasks.push(task);
         }
       }
 
-      // Oppdaterer customTasks state med ikke-fullførte oppgaver
+
+      console.log("Oppdaterte egendefinerte oppgaver:", updatedCustomTasks);
+
+      // Oppdaterer customTasks state med gyldige oppgaver
       setCustomTasks(updatedCustomTasks);
     } catch (error) {
       console.error('Feil ved henting av egendefinerte oppgaver:', error);
     }
-  }, [butikkid, today]);
+  }, [butikkid]);
+
+
 
 
 
@@ -133,7 +156,7 @@ function TodoList() {
 
   useEffect(() => {
     fetchDailyTasks();
-    fetchCustomTasks();
+    fetchCustomTasks(); // Sørg for å hente og slette før siden lastes
     fetchCompletedTasks();
   }, [fetchDailyTasks, fetchCustomTasks, fetchCompletedTasks]);
 
