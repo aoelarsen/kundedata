@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Cookies from 'js-cookie';
 
+
 function TodoList() {
   const [dailyTasks, setDailyTasks] = useState([]);
   const [customTasks, setCustomTasks] = useState([]);
@@ -22,7 +23,6 @@ function TodoList() {
       const dailyTasksResponse = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/dailytasks');
       const dailyTasksData = await dailyTasksResponse.json();
 
-      console.log('Daily Tasks Data:', dailyTasksData); // Logge oppgavene
 
       // Filtrer oppgaver relatert til butikkID
       const filteredDailyTasks = dailyTasksData.filter(task => task.store === butikkid);
@@ -35,7 +35,7 @@ function TodoList() {
 
           if (completedDate !== today) {
             // Logg oppgaven som skal oppdateres
-            console.log(`Oppgave "${task.task}" har en dato (${completedDate}) som er forskjellig fra dagens dato (${today}) og vil bli oppdatert til completed: false.`);
+
 
             // Oppdater oppgaven i databasen hvis datoen ikke samsvarer med dagens dato
             const updateResponse = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/dailytasks/${task._id}`, {
@@ -61,7 +61,6 @@ function TodoList() {
         }
       }
 
-      console.log('Oppdaterte daglige oppgaver:', updatedDailyTasks);
       setDailyTasks(updatedDailyTasks);
 
     } catch (error) {
@@ -78,7 +77,6 @@ function TodoList() {
 
 
   // Hent egendefinerte oppgaver
-  // Hent egendefinerte oppgaver
   const fetchCustomTasks = useCallback(async () => {
     try {
       const customTasksResponse = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks');
@@ -89,28 +87,31 @@ function TodoList() {
 
       for (const task of filteredCustomTasks) {
         if (task.completed) {
-          // Hvis oppgaven er markert som fullført, slett den fra 'customtasks'
+          // Logg oppgaven som skal slettes
+          console.log(`Oppgave "${task.task}" er fullført og vil bli slettet.`);
+
+          // Slett oppgaven som har completed: true
           const deleteResponse = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks/${task._id}`, {
             method: 'DELETE',
           });
 
           if (deleteResponse.ok) {
-            console.log(`Oppgave ${task.task} slettet fra customtasks fordi den er fullført.`);
+            console.log(`Oppgave "${task.task}" slettet fra customtasks.`);
           } else {
             console.error(`Feil ved sletting av oppgave ${task.task}:`, deleteResponse.statusText);
           }
         } else {
-          // Hvis oppgaven ikke er fullført, legg den til i den oppdaterte listen
+          // Behold oppgaver som ikke er fullført
           updatedCustomTasks.push(task);
         }
       }
 
-      // Oppdater state med ikke-fullførte oppgaver
+      // Oppdaterer customTasks state med ikke-fullførte oppgaver
       setCustomTasks(updatedCustomTasks);
     } catch (error) {
       console.error('Feil ved henting av egendefinerte oppgaver:', error);
     }
-  }, [butikkid]);
+  }, [butikkid, today]);
 
 
 
@@ -202,8 +203,7 @@ function TodoList() {
               : task
           )
         );
-        // Hent de siste fullførte oppgavene på nytt
-        await fetchCompletedTasks();
+        console.log("Oppgave fullført:", taskDescription);
       }
     } catch (error) {
       console.error('Feil ved oppdatering av daglig oppgave:', error);
@@ -247,8 +247,6 @@ function TodoList() {
               : task
           )
         );
-        // Hent de siste fullførte oppgavene på nytt
-        await fetchCompletedTasks();
       }
     } catch (error) {
       console.error('Feil ved oppdatering av egendefinert oppgave:', error);
@@ -304,14 +302,10 @@ function TodoList() {
         )
       );
 
-      // Hent de siste fullførte oppgavene på nytt
-      await fetchCompletedTasks();
-
     } catch (error) {
       console.error('Feil ved oppdatering av fullført oppgave:', error);
     }
   };
-
 
 
 
