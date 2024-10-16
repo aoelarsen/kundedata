@@ -7,6 +7,8 @@ function OrderList() {
   const [orders, setOrders] = useState([]);
   const [filteredOrders, setFilteredOrders] = useState([]); // State for filtrerte ordrer
   const [employeeOrders, setEmployeeOrders] = useState([]); // State for ansattes ordrer
+  const [hoveredOrder, setHoveredOrder] = useState(null); // For å holde hover til Kommentar
+  const [tooltipStyle, setTooltipStyle] = useState({}); // State for tooltip-styling
   const [searchQuery, setSearchQuery] = useState(''); // Søkefelt
   const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
   const [statusFilter, setStatusFilter] = useState('Aktiv');
@@ -51,18 +53,30 @@ function OrderList() {
     fetchOrders();
   }, [butikkid, statusFilter, selectedEmployee]);
 
+  // Funksjon for å håndtere hover på rader og vise Kommentar
+  const handleMouseEnter = (order, event) => {
+    setHoveredOrder(order);
+    const tooltipX = event.clientX;
+    const tooltipY = event.clientY + window.scrollY;
+    setTooltipStyle({ left: tooltipX + 'px', top: tooltipY + 'px' });
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredOrder(null);
+  };
+
   // Funksjon for å håndtere søk
   const handleSearch = (e) => {
     const query = e.target.value.toLowerCase();
     setSearchQuery(query);
 
     const filtered = orders.filter(order =>
-      (order.ordreid.toString().includes(query) ||
-        order.Varemerke.toLowerCase().includes(query) ||
-        order.Produkt.toLowerCase().includes(query) ||
-        order.Størrelse?.toLowerCase().includes(query) ||
-        order.Farge?.toLowerCase().includes(query) ||
-        order.Kommentar?.toLowerCase().includes(query))
+    (order.ordreid.toString().includes(query) ||
+      order.Varemerke.toLowerCase().includes(query) ||
+      order.Produkt.toLowerCase().includes(query) ||
+      order.Størrelse?.toLowerCase().includes(query) ||
+      order.Farge?.toLowerCase().includes(query) ||
+      order.Kommentar?.toLowerCase().includes(query))
     );
 
     setFilteredOrders(filtered);
@@ -98,27 +112,27 @@ function OrderList() {
   };
 
   // Funksjon for å parse datoformatet fra serveren og returnere en formatert dato
-const parseCustomDateString = (dateString) => {
-  // Prøver å parse streng med formatet 'd.M.yyyy, HH:mm:ss' (forventet format fra databasen)
-  const parsedDate = parse(dateString, 'd.M.yyyy, HH:mm:ss', new Date());
-  return isNaN(parsedDate) ? null : parsedDate;
-};
+  const parseCustomDateString = (dateString) => {
+    // Prøver å parse streng med formatet 'd.M.yyyy, HH:mm:ss' (forventet format fra databasen)
+    const parsedDate = parse(dateString, 'd.M.yyyy, HH:mm:ss', new Date());
+    return isNaN(parsedDate) ? null : parsedDate;
+  };
 
-const formatDate = (dateString) => {
-  // Hvis datoen er ugyldig eller ikke eksisterer, returner "Ukjent dato"
-  if (!dateString) {
-    return "Ukjent dato";
-  }
+  const formatDate = (dateString) => {
+    // Hvis datoen er ugyldig eller ikke eksisterer, returner "Ukjent dato"
+    if (!dateString) {
+      return "Ukjent dato";
+    }
 
-  const parsedDate = parseCustomDateString(dateString);
+    const parsedDate = parseCustomDateString(dateString);
 
-  if (!parsedDate) {
-    return "Ugyldig dato";
-  }
+    if (!parsedDate) {
+      return "Ugyldig dato";
+    }
 
-  // Returner formatert dato i ønsket format
-  return format(parsedDate, 'd.M.yyyy HH:mm');
-};
+    // Returner formatert dato i ønsket format
+    return format(parsedDate, 'd.M.yyyy HH:mm');
+  };
   const renderSortIndicator = (key) => {
     if (sortConfig.key !== key) return null;
     return sortConfig.direction === 'ascending' ? ' 🔼' : ' 🔽';
@@ -150,6 +164,8 @@ const formatDate = (dateString) => {
                 key={order._id}
                 className="hover:bg-gray-50 cursor-pointer"
                 onClick={() => handleSelectOrder(order)}
+                onMouseEnter={(event) => handleMouseEnter(order, event)}
+                onMouseLeave={handleMouseLeave}
               >
                 <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.ordreid}</td>
                 <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.Varemerke}</td>
@@ -162,6 +178,15 @@ const formatDate = (dateString) => {
             ))}
           </tbody>
         </table>
+        {/* Tooltip for Kommentar */}
+        {hoveredOrder && (
+          <div
+            className="absolute bg-gray-200 border border-gray-400 rounded-lg shadow-lg p-2 text-sm z-10"
+            style={tooltipStyle}
+          >
+            {hoveredOrder.Kommentar ? hoveredOrder.Kommentar : 'Ingen kommentar'}
+          </div>
+        )}
       </div>
 
       {/* Resten av siden */}
@@ -226,6 +251,8 @@ const formatDate = (dateString) => {
                 key={order._id}
                 className="hover:bg-gray-50 cursor-pointer"
                 onClick={() => handleSelectOrder(order)}
+                onMouseEnter={(event) => handleMouseEnter(order, event)}
+                onMouseLeave={handleMouseLeave}
               >
                 <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.ordreid}</td>
                 <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{order.Varemerke}</td>
@@ -240,6 +267,15 @@ const formatDate = (dateString) => {
             ))}
           </tbody>
         </table>
+        {/* Tooltip for Kommentar */}
+        {hoveredOrder && (
+          <div
+            className="absolute bg-gray-200 border border-gray-400 rounded-lg shadow-lg p-2 text-sm z-10"
+            style={tooltipStyle}
+          >
+            {hoveredOrder.Kommentar ? hoveredOrder.Kommentar : 'Ingen kommentar'}
+          </div>
+        )}
       </div>
     </div>
   );

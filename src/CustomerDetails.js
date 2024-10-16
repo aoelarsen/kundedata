@@ -108,12 +108,23 @@ function CustomerDetails() {
     fetchCustomer();
   }, [id, butikkid]);
 
-  const handleMouseEnter = (order, event) => {
-    setHoveredOrder(order);
+  const handleMouseEnter = (item, event, type = 'order') => {
+    if (type === 'service') {
+      // Håndter hover for tjenester (services)
+      setHoveredOrder({
+        text: item.Beskrivelse ? item.Beskrivelse : 'Ingen beskrivelse', // Bruk Beskrivelse fra service
+      });
+    } else {
+      // Håndter hover for ordrer (orders)
+      setHoveredOrder({
+        text: item.Kommentar ? item.Kommentar : 'Ingen kommentar', // Bruk Kommentar fra ordre
+      });
+    }
     const tooltipX = event.clientX;
     const tooltipY = event.clientY + window.scrollY;
     setTooltipStyle({ left: tooltipX + 'px', top: tooltipY + 'px' });
   };
+
 
   // Funksjon for å håndtere valg av tjeneste basert på servicetype
   const handleSelectService = (service) => {
@@ -296,7 +307,7 @@ function CustomerDetails() {
                   key={service._id}
                   className="hover:bg-gray-50 cursor-pointer"
                   onClick={() => handleSelectService(service)}
-                  onMouseEnter={(event) => handleMouseEnter(service, event, 'service')}
+                  onMouseEnter={(event) => handleMouseEnter(service, event, 'service')}  // Spesifiser at det er en tjeneste
                   onMouseLeave={handleMouseLeave}
                 >
                   <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{service.serviceid}</td>
@@ -317,15 +328,16 @@ function CustomerDetails() {
 
 
 
-      {/* Tooltip for kommentar */}
+      {/* Tooltip for Beskrivelse */}
       {hoveredOrder && (
         <div
           className="absolute bg-gray-200 border border-gray-400 rounded-lg shadow-lg p-2 text-sm z-10"
           style={tooltipStyle}
         >
-          {hoveredOrder.Kommentar ? hoveredOrder.Kommentar : 'Ingen kommentar'}
+          {hoveredOrder.text}
         </div>
       )}
+
     </div>
   );
 }

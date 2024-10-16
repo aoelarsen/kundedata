@@ -6,7 +6,6 @@ import PrintInvoice from './PrintInvoice'; // Importer den utskriftsvennlige kom
 
 
 
-
 function ServiceDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -63,6 +62,10 @@ function ServiceDetails() {
       deler: updatedParts,
     }));
 
+    // Nullstill søketerm og fjern nedtrekkslisten
+    setSearchTerm('');  // Nullstiller søkefeltet
+    setFilteredParts([]);  // Tømmer søkeresultatene
+
     // Oppdater backend
     try {
       const updatedService = { deler: updatedParts };
@@ -75,6 +78,19 @@ function ServiceDetails() {
       console.error('Feil ved oppdatering av deler:', error);
     }
   };
+
+
+  // Legg til denne useEffect for å håndtere tidsstyring av meldingen
+  useEffect(() => {
+    if (updateMessage) {
+      const timer = setTimeout(() => {
+        setUpdateMessage(''); // Fjern meldingen etter 5 sekunder
+      }, 5000);
+
+      // Rydd opp etter timeren når komponenten blir avmontert eller når meldingen endres
+      return () => clearTimeout(timer);
+    }
+  }, [updateMessage]);
 
 
 
@@ -137,7 +153,6 @@ function ServiceDetails() {
         }
         const partsData = await response.json();
         setParts(partsData); // Sett delene i state
-        console.log("Deler hentet:", partsData); // Legg til logging her
       } catch (error) {
         console.error("Feil ved henting av deler:", error); // Logg eventuelle feil
       }
@@ -151,8 +166,6 @@ function ServiceDetails() {
     const selectedWork = fixedPrices.find(price => price._id === e.target.value);
     if (selectedWork) {
 
-      console.log("Selected work description:", selectedWork.description); // Logg beskrivelsen
-
       // Legg til title, price, og description i arbeid-arrayen
       const updatedWork = [...formData.arbeid, {
         title: selectedWork.title,
@@ -160,18 +173,19 @@ function ServiceDetails() {
         description: selectedWork.description || "Ingen beskrivelse tilgjengelig" // Bruk description eller fallback
       }];
 
+      // Oppdater formData i frontend
       setFormData((prevData) => ({
         ...prevData,
         arbeid: updatedWork, // Oppdaterer arbeid med title, price, og description
       }));
 
-      // Send oppdatering til backend inkludert description
+      // Oppdater backend inkludert description
       try {
         const updatedService = {
           arbeid: updatedWork.map(work => ({
             title: work.title,
             price: work.price,
-            description: work.description  // Inkluderer beskrivelse i oppdateringen
+            description: work.description  // Sørg for å inkludere beskrivelsen
           })),
         };
 
@@ -180,7 +194,7 @@ function ServiceDetails() {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(updatedService),
+          body: JSON.stringify(updatedService), // Send oppdaterte arbeid inkludert description til backend
         });
 
         if (!response.ok) {
@@ -195,25 +209,38 @@ function ServiceDetails() {
 
 
 
+
   const handleCopyWork = (indexToCopy) => {
-    const selectedWork = formData.arbeid[indexToCopy];
+    // Log hele arbeid-arrayen fra serviceDetails for å inspisere hva som er lagret
+    console.log("Arbeid array fra serviceDetails:", serviceDetails.arbeid);
 
-    console.log("Copying description:", selectedWork.description); // Logg beskrivelsen
+    // Velg det arbeidet som er på den angitte indeksen
+    const selectedWork = serviceDetails.arbeid[indexToCopy]; // Bruk serviceDetails i stedet for formData
 
-    // Bruk beskrivelsen hvis tilgjengelig
-    const descriptionToCopy = selectedWork.description;
+    // Log det valgte arbeidet for å inspisere om det har en beskrivelse
+    console.log("Valgt arbeid:", selectedWork);
 
-    // Hvis descriptionToCopy er undefined eller tom, fall tilbake til tittel
-    const newUtførtArbeid = `${descriptionToCopy ? descriptionToCopy : "Ingen beskrivelse tilgjengelig"}\n\n${formData.utførtArbeid}`.trim();
+    if (selectedWork && selectedWork.description) {
+      // Log hva som blir kopiert hvis det er en beskrivelse
+      console.log("Kopierer beskrivelse fra backend:", selectedWork.description);
 
-    // Oppdater utførtArbeid-feltet med ny kommentar øverst
-    setFormData((prevData) => ({
-      ...prevData,
-      utførtArbeid: newUtførtArbeid, // Legger til valgt arbeid sin beskrivelse i utført arbeid-feltet
-    }));
+      // Oppdater utført arbeid med beskrivelse fra det valgte arbeidet
+      const newUtførtArbeid = `${selectedWork.description}\n\n${formData.utførtArbeid}`.trim();
 
-    console.log("Updated utførtArbeid:", newUtførtArbeid); // Logg den oppdaterte verdien
+      setFormData((prevData) => ({
+        ...prevData,
+        utførtArbeid: newUtførtArbeid,
+      }));
+
+      // Log den oppdaterte verdien for utført arbeid
+      console.log("Oppdatert utført arbeid:", newUtførtArbeid);
+    } else {
+      // Hvis beskrivelsen mangler, log en feilmelding
+      console.error("Ingen beskrivelse tilgjengelig for det valgte arbeidet.");
+    }
   };
+
+
 
 
 
@@ -343,10 +370,11 @@ function ServiceDetails() {
     setIsDescriptionEmpty(false); // Fjern feilmeldingen hvis beskrivelsen er utfylt
 
     // Opprett et objekt med de oppdaterte dataene som skal sendes til backend
+    const { arbeid, ...updatedFields } = formData; // Ekskluder arbeid fra oppdateringen
+
     const updatedService = {
-      Beskrivelse: formData.beskrivelse,
-      arbeid: formData.arbeid.map(work => ({ title: work.title, price: work.price })),
-      utførtArbeid: formData.utførtArbeid, // Inkluderer "Utført arbeid"
+      ...updatedFields,
+      utførtArbeid: formData.utførtArbeid, // Inkluder "Utført arbeid"
       Varemerke: formData.Varemerke, // Oppdater Varemerke
       Produkt: formData.Produkt, // Oppdater Produkt
       Størrelse: formData.Størrelse, // Oppdater Størrelse
@@ -369,7 +397,6 @@ function ServiceDetails() {
 
       if (response.ok) {
         setUpdateMessage('Tjenesten er oppdatert');
-        // Fjern navigate funksjonen slik at brukeren forblir på samme side
       } else {
         console.error('Feil ved oppdatering av tjeneste:', response.statusText);
       }
@@ -377,6 +404,7 @@ function ServiceDetails() {
       console.error('Feil ved kommunikasjon med serveren:', error);
     }
   };
+
 
 
   // Legg til egendefinert arbeid
@@ -513,67 +541,67 @@ function ServiceDetails() {
     }
   };
 
-  // Funksjon som åpner en ny fane og viser den utskriftsvennlige siden
   const openPrintWindow = (serviceDetails, customer, formData, calculateTotalPrice) => {
     const newWindow = window.open('', '_blank');
-  
+
     // Sjekk at .print-invoice finnes i DOM-en før du fortsetter
     const printInvoiceElement = document.getElementsByClassName('print-invoice')[0];
     if (!printInvoiceElement) {
       console.error('Kan ikke finne print-invoice elementet');
       return;
     }
-  
+
     // Skriv HTML til det nye vinduet, inkludert Tailwind CSS fra et CDN eller din egen bygde versjon
     newWindow.document.write(`
-      <html>
-        <head>
-          <title>Service Faktura</title>
-          <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-          <style>
-            /* Inline CSS for additional styling, if necessary */
-            body {
-              width: 148mm;
-              height: 210mm;
-              padding: 20mm;
-              font-family: Arial, sans-serif;
-            }
-            table {
-              width: 100%;
-              border-collapse: collapse;
-            }
-            th, td {
-              border: 1px solid black;
-              padding: 5px;
-            }
-            img {
-              width: 100px;
-            }
-          </style>
-        </head>
-        <body>
-          ${printInvoiceElement.outerHTML}
-        </body>
-      </html>
-    `);
-  
+    <html>
+      <head>
+        <title>Service Faktura</title>
+        <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+        <style>
+          /* Inline CSS for additional styling, if necessary */
+          body {
+            width: 210mm; /* A4 bredde */
+            height: 297mm; /* A4 høyde */
+            padding: 20mm;
+            font-family: Arial, sans-serif;
+          }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+          }
+          th, td {
+            border: 1px solid black;
+            padding: 5px;
+          }
+          img {
+            width: 100px;
+          }
+        </style>
+      </head>
+      <body>
+        ${printInvoiceElement.outerHTML}
+      </body>
+    </html>
+  `);
+
     // Vent til vinduet er lastet, deretter fokuser og skriv ut
     newWindow.onload = () => {
       newWindow.focus();
       newWindow.print();
     };
-  
+
     // Lukk dokumentet når innholdet er skrevet
     newWindow.document.close();
   };
-  
-  
-    // Funksjon for å håndtere utskrift
-    const handlePrint = () => {
-      openPrintWindow(serviceDetails, customer, formData, calculateTotalPrice);
+
+
+
+  // Funksjon for å håndtere utskrift
+  const handlePrint = () => {
+    openPrintWindow(serviceDetails, customer, formData, calculateTotalPrice);
   };
 
- 
+
 
   // Funksjoner for å beregne totalpris
   const calculateTotalWorkPrice = () => {
@@ -835,16 +863,16 @@ function ServiceDetails() {
           <p className="text-lg font-bold mt-4 text-right">Totalpris arbeid og deler: {calculateTotalPrice()} kr</p>
           {/* Knapp for å generere PDF */}
           <button
-                onClick={handlePrint}
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-            >
-                Åpne utskriftsvennlig side
-            </button>
-            {/* Render den utskriftsvennlige komponenten i bakgrunnen (ikke synlig) */}
-            <div style={{ display: 'none' }}>
-                <PrintInvoice serviceDetails={serviceDetails} customer={customer} formData={formData} calculateTotalPrice={calculateTotalPrice} />
-            </div>
-</div>
+            onClick={handlePrint}
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          >
+            Skriv ut fakturaside
+          </button>
+          {/* Render den utskriftsvennlige komponenten i bakgrunnen (ikke synlig) */}
+          <div style={{ display: 'none' }}>
+            <PrintInvoice serviceDetails={serviceDetails} customer={customer} formData={formData} calculateTotalPrice={calculateTotalPrice} />
+          </div>
+        </div>
 
 
 
@@ -981,7 +1009,7 @@ function ServiceDetails() {
               name="utførtArbeid"
               value={formData.utførtArbeid}
               onChange={handleChange}
-              rows="3"
+              rows="7"
               className="mt-1 block w-full p-2 border border-gray-300 rounded-md resize-y"
             />
           </div>

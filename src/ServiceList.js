@@ -85,7 +85,7 @@ function ServiceList() {
         service.Produkt.toLowerCase().includes(query) ||
         service.Størrelse?.toLowerCase().includes(query) ||
         service.Farge?.toLowerCase().includes(query) ||
-        service.beskrivelse?.toLowerCase().includes(query)) && // Legg til parentes rundt hele OR-betingelsen
+        service.Beskrivelse?.toLowerCase().includes(query)) && // Legg til parentes rundt hele OR-betingelsen
       (serviceTypeFilter === '' || service.servicetype === serviceTypeFilter) // Legg til parentes rundt servicetype-filteret
     );
 
@@ -215,7 +215,7 @@ function ServiceList() {
             className="absolute bg-gray-200 border border-gray-400 rounded-lg shadow-lg p-2 text-sm z-10"
             style={tooltipStyle}
           >
-            {hoveredService.beskrivelse ? hoveredService.beskrivelse : 'Ingen beskrivelse'}
+            {hoveredService.Beskrivelse ? hoveredService.Beskrivelse : 'Ingen beskrivelse'}
           </div>
         )}
       </div>
