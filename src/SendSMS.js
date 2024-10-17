@@ -115,12 +115,12 @@ function SendSMS() {
     e.preventDefault();
 
     const smsData = {
-      phoneNumber: formData.telefonnummer,
-      message: formData.meldingstekst,
+      ...formData,
+      sendtDato: new Date().toISOString(),
     };
 
     try {
-      const response = await fetch('/api/send-sms', {
+      const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/smsarchives', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
