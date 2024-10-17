@@ -1367,6 +1367,37 @@ app.get('/parts', async (req, res) => {
   }
 });
 
+// smsController.js
+const axios = require('axios');
+require('dotenv').config();
+
+const sendSMS = async (req, res) => {
+  const { phoneNumber, message } = req.body;
+
+  try {
+    // Hent brukernavn og passord fra miljøvariabler
+    const username = process.env.SMS_USERNAME;
+    const password = process.env.SMS_PASSWORD;
+
+    // Bygg URL for å sende SMS
+    const smsUrl = `http://smsc.vianett.no/v3/send.ashx?src=YourSender&dst=${phoneNumber}&msg=${encodeURIComponent(message)}&username=${username}&password=${password}`;
+
+    // Send forespørsel til Vianett API
+    const response = await axios.get(smsUrl);
+
+    // Sjekk om forespørselen var vellykket
+    if (response.data.includes("OK")) {
+      res.status(200).json({ success: true, message: 'SMS sendt!' });
+    } else {
+      res.status(500).json({ success: false, message: 'Feil ved sending av SMS' });
+    }
+  } catch (error) {
+    console.error('Feil ved sending av SMS:', error);
+    res.status(500).json({ success: false, message: 'Serverfeil' });
+  }
+};
+
+module.exports = sendSMS;
 
 
 
