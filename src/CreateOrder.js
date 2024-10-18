@@ -166,11 +166,11 @@ function CreateOrder() {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">Kommentar</label>
-            <input
-              type="text"
-              name="Kommentar"
+            <textarea
+            name="Kommentar"
               value={formData.Kommentar}
               onChange={handleChange}
+              rows="3"
               className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
             />
           </div>

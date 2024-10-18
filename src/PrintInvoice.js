@@ -100,13 +100,16 @@ function PrintInvoice({ serviceDetails, customer, formData, calculateTotalPrice,
         </tbody>
       </table>
 
-      {/* Kommentar og Oppsummering på samme linje */}
-      <div className="flex justify-between mb-4">
-        {/* Kommentar */}
-        <div className="border border-gray-300 p-2 rounded-lg w-2/3 mr-4">
-          <h3 className="text-xl font-semibold text-gray-800 mb-2">Kommentar til arbeidet</h3>
-          <p className="text-gray-700">{formData.utførtArbeid || "Ingen kommentarer til arbeidet."}</p>
-        </div>
+{/* Kommentar og Oppsummering på samme linje */}
+<div className="flex justify-between mb-4">
+  {/* Kommentar */}
+  <div className="border border-gray-300 p-2 rounded-lg w-2/3 mr-4">
+    <h3 className="text-xl font-semibold text-gray-800 mb-2">Kommentar til arbeidet</h3>
+    {/* Bruker white-space: pre-line for å bevare linjeskift */}
+    <p className="text-gray-700" style={{ whiteSpace: 'pre-line' }}>
+      {formData.utførtArbeid || "Ingen kommentarer til arbeidet."}
+    </p>
+  </div>
 
         {/* Oppsummering */}
         <div className="w-1/3">

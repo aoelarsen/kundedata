@@ -34,6 +34,24 @@ function ServiceDetails() {
   const [parts, setParts] = useState([]); // State for lagring av alle deler
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredParts, setFilteredParts] = useState([]);
+  const [isWorkEmpty, setIsWorkEmpty] = useState(false); // Ny tilstand for å sjekke om arbeid er tom
+
+
+   // Funksjon som sjekker beskrivelse når siden lastes
+   useEffect(() => {
+    if (!formData.beskrivelse.trim()) {
+      setIsDescriptionEmpty(true); // Sett isDescriptionEmpty til true hvis beskrivelse er tom
+    }
+  }, [formData.beskrivelse]);
+
+  // Funksjon som sjekker om arbeid-arrayen er tom
+  useEffect(() => {
+    if (formData.arbeid.length === 0) {
+      setIsWorkEmpty(true); // Sett isWorkEmpty til true hvis arbeid-arrayen er tom
+    } else {
+      setIsWorkEmpty(false); // Skjul feilmeldingen hvis arbeid-arrayen ikke er tom
+    }
+  }, [formData.arbeid]);
 
   // Funksjon for å filtrere deler basert på søk, minimum 2 bokstaver
   const handleSearchParts = (e) => {
@@ -374,6 +392,8 @@ function ServiceDetails() {
 
     const updatedService = {
       ...updatedFields,
+      Beskrivelse: formData.beskrivelse, // Bruk stor bokstav her
+
       utførtArbeid: formData.utførtArbeid, // Inkluder "Utført arbeid"
       Varemerke: formData.Varemerke, // Oppdater Varemerke
       Produkt: formData.Produkt, // Oppdater Produkt
@@ -756,141 +776,144 @@ function ServiceDetails() {
           </button>
         </div>
 
+ {/* Velg arbeid fra listen */}
+<div className={`p-4 border ${isWorkEmpty ? 'border-red-500' : 'border-gray-300'} rounded-lg`}>
+  <label className="block text-sm font-medium text-gray-700">Velg arbeid fra listen:</label>
+  <select onChange={handleAddWork} className="mt-1 block w-full p-2 border border-gray-300 rounded-md">
+    <option value="">Velg arbeid</option>
+    {fixedPrices.map((price) => (
+      <option key={price._id} value={price._id}>
+        {price.title} - {price.price} kr
+      </option>
+    ))}
+  </select>
+  {isWorkEmpty && (
+    <p className="text-red-500 text-sm mt-2">Legg til arbeid.</p>
+  )}
+</div>
 
+{/* Valgt arbeid, deler, priser og knapp */}
+{!isWorkEmpty && (
+  <div className="p-4 border border-gray-300 rounded-lg">
+    {/* Arbeid */}
+    <h3 className="text-lg font-semibold mb-4">Arbeid:</h3>
+    <ul>
+      {formData.arbeid.map((item, index) => (
+        <li key={index} className="flex justify-between items-center">
+          <span>{item.title} - {item.price} kr</span>
+          <div className="flex space-x-2">
+            <button
+              type="button"
+              onClick={() => handleCopyWork(index)}
+              className="text-blue-500 hover:text-blue-700"
+            >
+              Kopi
+            </button>
+            <button
+              type="button"
+              onClick={async () => {
+                // Oppdaterer kun state
+                const updatedWork = formData.arbeid.filter((_, i) => i !== index);
+                setFormData((prevData) => ({
+                  ...prevData,
+                  arbeid: updatedWork,
+                }));
 
-
-        {/* Velg arbeid fra listen */}
-        <div className="p-4 border border-gray-300 rounded-lg">
-          <label className="block text-sm font-medium text-gray-700">Velg arbeid fra liste:</label>
-          <select onChange={handleAddWork} className="mt-1 block w-full p-2 border border-gray-300 rounded-md">
-            <option value="">Velg arbeid</option>
-            {fixedPrices.map((price) => (
-              <option key={price._id} value={price._id}>
-                {price.title} - {price.price} kr
-              </option>
-            ))}
-          </select>
-        </div>
-        {/* Valgt arbeid */}
-        <div className="p-4 border border-gray-300 rounded-lg">
-          <h3 className="text-lg font-semibold mb-4">Arbeid:</h3>
-          <ul>
-            {formData.arbeid.map((item, index) => (
-              <li key={index} className="flex justify-between items-center">
-                <span>{item.title} - {item.price} kr</span>
-                <div className="flex space-x-2">
-                  <button
-                    type="button"
-                    onClick={() => handleCopyWork(index)}
-                    className="text-blue-500 hover:text-blue-700"
-                  >
-                    Kopi
-                  </button>
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      // Oppdaterer kun state
-                      const updatedWork = formData.arbeid.filter((_, i) => i !== index);
-                      setFormData((prevData) => ({
-                        ...prevData,
-                        arbeid: updatedWork
-                      }));
-
-                      // Oppdater backend asynkront
-                      try {
-                        const updatedService = { arbeid: updatedWork };
-                        await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/services/${id}`, {
-                          method: 'PATCH',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify(updatedService),
-                        });
-                      } catch (error) {
-                        console.error('Feil ved fjerning av arbeid:', error);
-                      }
-                    }}
-                    className="text-red-500 hover:text-red-700"
-                  >
-                    Fjern
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
-
-          <p className="text-lg font-bold mt-4 mb-4 text-left">Totalt: {calculateTotalWorkPrice()} kr</p>
-
-          {/* Valgte deler */}
-          <h3 className="text-lg font-semibold mb-4">Deler:</h3>
-          <ul>
-            {formData.deler.map((part, index) => (
-              <li key={index} className="flex justify-between items-center">
-                <span>{part.ean} - {part.product} - {part.price} kr</span>
-                <button
-                  type="button"
-                  onClick={async () => {
-                    // Oppdaterer kun state
-                    const updatedParts = formData.deler.filter((_, i) => i !== index);
-                    setFormData((prevData) => ({
-                      ...prevData,
-                      deler: updatedParts
-                    }));
-
-                    // Oppdater backend asynkront
-                    try {
-                      const updatedService = { deler: updatedParts };
-                      await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/services/${id}`, {
-                        method: 'PATCH',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(updatedService),
-                      });
-                    } catch (error) {
-                      console.error('Feil ved fjerning av del:', error);
-                    }
-                  }}
-                  className="text-red-500 hover:text-red-700"
-                >
-                  Fjern
-                </button>
-              </li>
-            ))}
-          </ul>
-
-          {/* Totalsum deler til høyre */}
-          <p className="text-lg font-bold mt-4 text-left">Totalt: {calculateTotalPartsPrice()} kr</p>
-
-          {/* Totalpris til høyre */}
-
-          <p className="text-lg font-bold mt-4 text-right">Totalpris arbeid og deler: {calculateTotalPrice()} kr</p>
-          {/* Knapp for å generere PDF */}
-          <button
-            onClick={handlePrint}
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-          >
-            Skriv ut fakturaside
-          </button>
-          {/* Render den utskriftsvennlige komponenten i bakgrunnen (ikke synlig) */}
-          <div style={{ display: 'none' }}>
-            <PrintInvoice serviceDetails={serviceDetails} customer={customer} formData={formData} calculateTotalPrice={calculateTotalPrice} />
+                // Oppdater backend
+                try {
+                  const updatedService = { arbeid: updatedWork };
+                  await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/services/${id}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updatedService),
+                  });
+                } catch (error) {
+                  console.error('Feil ved fjerning av arbeid:', error);
+                }
+              }}
+              className="text-red-500 hover:text-red-700"
+            >
+              Fjern
+            </button>
           </div>
-        </div>
+        </li>
+      ))}
+    </ul>
+
+    <p className="text-lg font-bold mt-4 mb-4 text-left">Totalt arbeid: {calculateTotalWorkPrice()} kr</p>
+
+    {/* Deler */}
+    <h3 className="text-lg font-semibold mb-4">Deler:</h3>
+    <ul>
+      {formData.deler.map((part, index) => (
+        <li key={index} className="flex justify-between items-center">
+          <span>{part.ean} - {part.product} - {part.price} kr</span>
+          <button
+            type="button"
+            onClick={async () => {
+              // Oppdaterer kun state
+              const updatedParts = formData.deler.filter((_, i) => i !== index);
+              setFormData((prevData) => ({
+                ...prevData,
+                deler: updatedParts,
+              }));
+
+              // Oppdater backend
+              try {
+                const updatedService = { deler: updatedParts };
+                await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/services/${id}`, {
+                  method: 'PATCH',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(updatedService),
+                });
+              } catch (error) {
+                console.error('Feil ved fjerning av del:', error);
+              }
+            }}
+            className="text-red-500 hover:text-red-700"
+          >
+            Fjern
+          </button>
+        </li>
+      ))}
+    </ul>
+
+    <p className="text-lg font-bold mt-4 text-left">Totalt deler: {calculateTotalPartsPrice()} kr</p>
+
+    {/* Totalpris */}
+    <p className="text-lg font-bold mt-4 text-right">Totalpris: {calculateTotalPrice()} kr</p>
+
+    {/* Knapp for å generere PDF */}
+    <button
+      onClick={handlePrint}
+      className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mt-4"
+    >
+      Skriv ut fakturaside
+    </button>
+
+    {/* Render den utskriftsvennlige komponenten i bakgrunnen (ikke synlig) */}
+    <div style={{ display: 'none' }}>
+      <PrintInvoice serviceDetails={serviceDetails} customer={customer} formData={formData} calculateTotalPrice={calculateTotalPrice} />
+    </div>
+  </div>
+)}
 
 
-
-        {/* Beskrivelse */}
-        <div className={`p-4 border ${isDescriptionEmpty ? 'border-red-500' : 'border-gray-300'} rounded-lg`}>
-          <label className="block text-sm font-medium text-gray-700">Kundens ønsker til servicen: (Skriv utfyllende om hvilket arbeid som ønskes utføres)</label>
-          <textarea
-            name="beskrivelse"
-            value={formData.beskrivelse}
-            onChange={handleChange}
-            required
-            rows="3"
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md resize-y"
-          />
-          {isDescriptionEmpty && (
-            <p className="text-red-500 text-sm mt-2">Du må legge til arbeid.</p>
-          )}
-        </div>
+ {/* Beskrivelse */}
+ <div className={`p-4 border ${isDescriptionEmpty ? 'border-red-500' : 'border-gray-300'} rounded-lg`}>
+        <label className="block text-sm font-medium text-gray-700">
+          Kundens ønsker til servicen: (Skriv utfyllende om hvilket arbeid som ønskes utføres)
+        </label>
+        <textarea
+          name="beskrivelse"
+          value={formData.beskrivelse}
+          onChange={(e) => setFormData({ ...formData, beskrivelse: e.target.value })}
+          required
+          rows="3"
+          className="mt-1 block w-full p-2 border border-gray-300 rounded-md resize-y"
+        />
+        {isDescriptionEmpty && <p className="text-red-500 text-sm mt-2">Beskrivelse må fylles ut.</p>}
+      </div>
 
 
 

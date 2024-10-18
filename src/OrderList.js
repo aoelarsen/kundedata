@@ -208,6 +208,7 @@ function OrderList() {
         placeholder="Søk etter ID, merke, produkt, størrelse, farge, eller kommentar"
         value={searchQuery}
         onChange={handleSearch}
+        rows="3"
         className="mb-4 p-2 border border-gray-300 rounded-md w-full"
       />
 
@@ -240,9 +241,6 @@ function OrderList() {
               <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600 hidden md:table-cell cursor-pointer" onClick={() => handleSort('RegistrertDato')}>
                 Registrert Dato {renderSortIndicator('RegistrertDato')}
               </th>
-              <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600 hidden md:table-cell cursor-pointer" onClick={() => handleSort('butikkid')}>
-                BID {renderSortIndicator('butikkid')}
-              </th>
             </tr>
           </thead>
           <tbody>
@@ -262,7 +260,6 @@ function OrderList() {
                 <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{order.Status}</td>
                 <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{order.Ansatt}</td>
                 <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{formatDate(order.RegistrertDato)}</td>
-                <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{order.butikkid}</td>
               </tr>
             ))}
           </tbody>

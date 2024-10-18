@@ -273,7 +273,7 @@ function NavBar() {
       {/* Banner for å vise hvilken ansatt som er logget inn */}
       {selectedEmployee && (
         <div className="bg-blue-600 text-white text-center py-2">
-          Du er logget inn som: {selectedEmployee.split(' ')[0]}
+          Du er logget inn som: <strong className="uppercase">{selectedEmployee.split(' ')[0]}</strong>
         </div>
       )}
     </>
