@@ -7,7 +7,8 @@ function FixedPriceChange() {
         title: '',
         price: '',
         description: '',
-        serviceType: ''
+        serviceType: '',
+        priority: 0, // Nytt felt for prioritet
     });
 
     const [serviceTypes, setServiceTypes] = useState([]);
@@ -106,6 +107,7 @@ function FixedPriceChange() {
                         name="description"
                         value={formData.description}
                         onChange={handleChange}
+                        rows='8'
                         required
                         className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
                     />
@@ -123,6 +125,18 @@ function FixedPriceChange() {
                             <option key={type._id} value={type.type}>{type.type}</option>
                         ))}
                     </select>
+                </div>
+                                {/* Nytt prioritet-felt */}
+                                <div>
+                    <label className="block text-sm font-medium text-gray-700">Prioritet</label>
+                    <input
+                        type="number"
+                        name="priority"
+                        value={formData.priority}
+                        onChange={handleChange}
+                        required
+                        className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
+                    />
                 </div>
                 <div className="text-center">
                     <button type="submit" className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600">

@@ -288,16 +288,23 @@ function ServiceDetails() {
             Farge: service.Farge || '',
           });
 
-          if (service.kundeid) {
-            fetchCustomer(service.kundeid);
-          }
-        } else {
-          console.error('Tjeneste ble ikke funnet');
-        }
-      } catch (error) {
-        console.error('Feil ved henting av tjenesten:', error);
-      }
-    };
+    // Sett isDescriptionEmpty basert på den hentede beskrivelsen
+    if (!service.Beskrivelse || !service.Beskrivelse.trim()) {
+      setIsDescriptionEmpty(true);
+    } else {
+      setIsDescriptionEmpty(false);
+    }
+
+    if (service.kundeid) {
+      fetchCustomer(service.kundeid);
+    }
+  } else {
+    console.error('Tjeneste ble ikke funnet');
+  }
+} catch (error) {
+  console.error('Feil ved henting av tjenesten:', error);
+}
+};
 
     const fetchCustomer = async (kundeid) => {
       try {
@@ -898,22 +905,22 @@ function ServiceDetails() {
   </div>
 )}
 
+{/* Beskrivelse */}
+<div className={`p-4 border ${isDescriptionEmpty ? 'border-red-500' : 'border-gray-300'} rounded-lg`}>
+  <label className="block text-sm font-medium text-gray-700">
+    Kundens ønsker til servicen: (Skriv utfyllende om hvilket arbeid som ønskes utføres)
+  </label>
+  <textarea
+    name="beskrivelse"
+    value={formData.beskrivelse}
+    onChange={(e) => setFormData({ ...formData, beskrivelse: e.target.value })}
+    required
+    rows="3"
+    className="mt-1 block w-full p-2 border border-gray-300 rounded-md resize-y"
+  />
+  {isDescriptionEmpty && <p className="text-red-500 text-sm mt-2">Beskrivelse må fylles ut.</p>}
+</div>
 
- {/* Beskrivelse */}
- <div className={`p-4 border ${isDescriptionEmpty ? 'border-red-500' : 'border-gray-300'} rounded-lg`}>
-        <label className="block text-sm font-medium text-gray-700">
-          Kundens ønsker til servicen: (Skriv utfyllende om hvilket arbeid som ønskes utføres)
-        </label>
-        <textarea
-          name="beskrivelse"
-          value={formData.beskrivelse}
-          onChange={(e) => setFormData({ ...formData, beskrivelse: e.target.value })}
-          required
-          rows="3"
-          className="mt-1 block w-full p-2 border border-gray-300 rounded-md resize-y"
-        />
-        {isDescriptionEmpty && <p className="text-red-500 text-sm mt-2">Beskrivelse må fylles ut.</p>}
-      </div>
 
 
 

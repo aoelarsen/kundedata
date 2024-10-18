@@ -1192,16 +1192,14 @@ const fixedPriceSchema = new mongoose.Schema({
   price: { type: Number, required: true },
   description: { type: String, required: true },
   serviceType: { type: String, required: true },
+  priority: { type: Number, default: 0 }, // Nytt felt for prioritet
 });
-
-// Modell for fastpris
-const FixedPrice = mongoose.model('FixedPrice', fixedPriceSchema);
 
 // Endpoint for å opprette ny fastpris
 app.post('/fixedprices', async (req, res) => {
-  const { title, price, description, serviceType } = req.body;
+  const { title, price, description, serviceType, priority } = req.body;
 
-  const newFixedPrice = new FixedPrice({ title, price, description, serviceType });
+  const newFixedPrice = new FixedPrice({ title, price, description, serviceType, priority });
 
   try {
     const savedFixedPrice = await newFixedPrice.save();
@@ -1210,18 +1208,6 @@ app.post('/fixedprices', async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 });
-
-// Endpoint for å hente alle fastpriser
-app.get('/fixedprices', async (req, res) => {
-  try {
-    const fixedPrices = await FixedPrice.find();
-    res.status(200).json(fixedPrices);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-
 
 // Endpoint for å oppdatere en fastpris
 app.patch('/fixedprices/:id', async (req, res) => {
@@ -1244,6 +1230,9 @@ app.patch('/fixedprices/:id', async (req, res) => {
     if (req.body.serviceType != null) {
       fixedPrice.serviceType = req.body.serviceType;
     }
+    if (req.body.priority != null) {
+      fixedPrice.priority = req.body.priority;
+    }
 
     const updatedFixedPrice = await fixedPrice.save();
     res.json(updatedFixedPrice);
@@ -1251,6 +1240,18 @@ app.patch('/fixedprices/:id', async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 });
+
+// Endpoint for å hente alle fastpriser
+app.get('/fixedprices', async (req, res) => {
+  try {
+    const fixedPrices = await FixedPrice.find();
+    res.status(200).json(fixedPrices);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+
 
 // Endpoint for å hente en spesifikk fastpris
 app.get('/fixedprices/:id', async (req, res) => {
