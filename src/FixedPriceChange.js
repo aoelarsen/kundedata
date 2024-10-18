@@ -127,7 +127,7 @@ function FixedPriceChange() {
                     </select>
                 </div>
                                 {/* Nytt prioritet-felt */}
-                                <div>
+                <div>
                     <label className="block text-sm font-medium text-gray-700">Prioritet</label>
                     <input
                         type="number"

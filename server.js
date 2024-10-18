@@ -1195,6 +1195,9 @@ const fixedPriceSchema = new mongoose.Schema({
   priority: { type: Number, default: 0 }, // Nytt felt for prioritet
 });
 
+// Modell for fastpris
+const FixedPrice = mongoose.model('FixedPrice', fixedPriceSchema);
+
 // Endpoint for å opprette ny fastpris
 app.post('/fixedprices', async (req, res) => {
   const { title, price, description, serviceType, priority } = req.body;
@@ -1208,6 +1211,18 @@ app.post('/fixedprices', async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 });
+
+// Endpoint for å hente alle fastpriser
+app.get('/fixedprices', async (req, res) => {
+  try {
+    const fixedPrices = await FixedPrice.find();
+    res.status(200).json(fixedPrices);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+
 
 // Endpoint for å oppdatere en fastpris
 app.patch('/fixedprices/:id', async (req, res) => {
@@ -1240,18 +1255,6 @@ app.patch('/fixedprices/:id', async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 });
-
-// Endpoint for å hente alle fastpriser
-app.get('/fixedprices', async (req, res) => {
-  try {
-    const fixedPrices = await FixedPrice.find();
-    res.status(200).json(fixedPrices);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-
 
 // Endpoint for å hente en spesifikk fastpris
 app.get('/fixedprices/:id', async (req, res) => {
