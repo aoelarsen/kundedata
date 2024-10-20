@@ -10,6 +10,10 @@ function ServiceDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
 
+    // Ny loading state
+    const [isLoading, setIsLoading] = useState(true);
+
+
   const [formData, setFormData] = useState({
     beskrivelse: '',
     arbeid: [], // Liste over flere arbeid
@@ -36,6 +40,11 @@ function ServiceDetails() {
   const [filteredParts, setFilteredParts] = useState([]);
   const [isWorkEmpty, setIsWorkEmpty] = useState(false); // Ny tilstand for å sjekke om arbeid er tom
 
+
+  // Scroll til toppen ved første innlasting
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
    // Funksjon som sjekker beskrivelse når siden lastes
    useEffect(() => {
@@ -121,9 +130,11 @@ function ServiceDetails() {
           throw new Error(`Feil ved henting av deler: ${response.statusText}`);
         }
         const partsData = await response.json();
-        setParts(partsData); // Sett delene i state
+        setParts(partsData);
+        setIsLoading(false); // Sett isLoading til false etter at data er hentet
       } catch (error) {
         console.error("Feil ved henting av deler:", error);
+        setIsLoading(false); // Selv om det feiler, sett isLoading til false
       }
     };
 
@@ -181,82 +192,80 @@ function ServiceDetails() {
 
 
   const handleAddWork = async (e) => {
-    const selectedWork = fixedPrices.find(price => price._id === e.target.value);
+    const selectedWork = fixedPrices.find(price => price._id === e.target.value && price.serviceType === "Sykkelservice");
     if (selectedWork) {
+        // Legg til title, price, og description i arbeid-arrayen
+        const updatedWork = [...formData.arbeid, {
+            title: selectedWork.title,
+            price: selectedWork.price,
+            description: selectedWork.description || "Ingen beskrivelse tilgjengelig" // Bruk description eller fallback
+        }];
 
-      // Legg til title, price, og description i arbeid-arrayen
-      const updatedWork = [...formData.arbeid, {
-        title: selectedWork.title,
-        price: selectedWork.price,
-        description: selectedWork.description || "Ingen beskrivelse tilgjengelig" // Bruk description eller fallback
-      }];
+        // Oppdater formData i frontend
+        setFormData((prevData) => ({
+            ...prevData,
+            arbeid: updatedWork, // Oppdaterer arbeid med title, price, og description
+        }));
 
-      // Oppdater formData i frontend
-      setFormData((prevData) => ({
-        ...prevData,
-        arbeid: updatedWork, // Oppdaterer arbeid med title, price, og description
-      }));
+        // Oppdater backend inkludert description
+        try {
+            const updatedService = {
+                arbeid: updatedWork.map(work => ({
+                    title: work.title,
+                    price: work.price,
+                    description: work.description  // Sørg for å inkludere beskrivelsen
+                })),
+            };
 
-      // Oppdater backend inkludert description
-      try {
-        const updatedService = {
-          arbeid: updatedWork.map(work => ({
-            title: work.title,
-            price: work.price,
-            description: work.description  // Sørg for å inkludere beskrivelsen
-          })),
-        };
+            const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/services/${id}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(updatedService), // Send oppdaterte arbeid inkludert description til backend
+            });
 
-        const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/services/${id}`, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(updatedService), // Send oppdaterte arbeid inkludert description til backend
-        });
-
-        if (!response.ok) {
-          console.error('Feil ved oppdatering av arbeid:', response.statusText);
+            if (!response.ok) {
+                console.error('Feil ved oppdatering av arbeid:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Feil ved kommunikasjon med serveren:', error);
         }
-      } catch (error) {
-        console.error('Feil ved kommunikasjon med serveren:', error);
-      }
     }
-  };
-
-
+};
 
 
 
   const handleCopyWork = (indexToCopy) => {
     // Log hele arbeid-arrayen fra serviceDetails for å inspisere hva som er lagret
-    console.log("Arbeid array fra serviceDetails:", serviceDetails.arbeid);
+    console.log("Arbeid array fra serviceDetails:", serviceDetails?.arbeid);
 
     // Velg det arbeidet som er på den angitte indeksen
-    const selectedWork = serviceDetails.arbeid[indexToCopy]; // Bruk serviceDetails i stedet for formData
+    const selectedWork = serviceDetails?.arbeid[indexToCopy]; // Bruk serviceDetails i stedet for formData
 
     // Log det valgte arbeidet for å inspisere om det har en beskrivelse
-    console.log("Valgt arbeid:", selectedWork);
+    console.log("Valgt arbeid for kopiering:", selectedWork);
 
     if (selectedWork && selectedWork.description) {
-      // Log hva som blir kopiert hvis det er en beskrivelse
-      console.log("Kopierer beskrivelse fra backend:", selectedWork.description);
+        // Log hva som blir kopiert hvis det er en beskrivelse
+        console.log("Kopierer beskrivelse fra backend:", selectedWork.description);
 
-      // Oppdater utført arbeid med beskrivelse fra det valgte arbeidet
-      const newUtførtArbeid = `${selectedWork.description}\n\n${formData.utførtArbeid}`.trim();
+        // Oppdater utført arbeid med beskrivelse fra det valgte arbeidet
+        const newUtførtArbeid = `${selectedWork.description}\n\n${formData.utførtArbeid}`.trim();
 
-      setFormData((prevData) => ({
-        ...prevData,
-        utførtArbeid: newUtførtArbeid,
-      }));
+        setFormData((prevData) => ({
+            ...prevData,
+            utførtArbeid: newUtførtArbeid,
+        }));
 
-      // Log den oppdaterte verdien for utført arbeid
-      console.log("Oppdatert utført arbeid:", newUtførtArbeid);
+        // Log den oppdaterte verdien for utført arbeid
+        console.log("Oppdatert utført arbeid med kopi:", newUtførtArbeid);
     } else {
-      // Hvis beskrivelsen mangler, log en feilmelding
-      console.error("Ingen beskrivelse tilgjengelig for det valgte arbeidet.");
+        // Hvis beskrivelsen mangler, log en feilmelding
+        console.error("Ingen beskrivelse tilgjengelig for det valgte arbeidet.");
     }
-  };
+};
+
 
 
 
@@ -647,6 +656,11 @@ function ServiceDetails() {
     navigate('/sendsms', { state: { serviceDetails, customer } });
   };
 
+    // Hvis siden er i ferd med å laste, vis et lasteskjermbilde
+    if (isLoading) {
+      return <div className="text-center py-10">Laster inn data...</div>;
+    }
+
   return (
     <div className="max-w-5xl mx-auto py-8 bg-white shadow-lg rounded-lg p-6 mb-4">
       {/* Dynamisk tittel med servicetype */}
@@ -783,21 +797,25 @@ function ServiceDetails() {
           </button>
         </div>
 
- {/* Velg arbeid fra listen */}
-<div className={`p-4 border ${isWorkEmpty ? 'border-red-500' : 'border-gray-300'} rounded-lg`}>
-  <label className="block text-sm font-medium text-gray-700">Velg arbeid fra listen:</label>
-  <select onChange={handleAddWork} className="mt-1 block w-full p-2 border border-gray-300 rounded-md">
-    <option value="">Velg arbeid</option>
-    {fixedPrices.map((price) => (
-      <option key={price._id} value={price._id}>
-        {price.title} - {price.price} kr
-      </option>
-    ))}
-  </select>
-  {isWorkEmpty && (
-    <p className="text-red-500 text-sm mt-2">Legg til arbeid.</p>
-  )}
+        <div className={`p-4 border ${isWorkEmpty ? 'border-red-500' : 'border-gray-300'} rounded-lg`}>
+    <label className="block text-sm font-medium text-gray-700">Velg arbeid fra listen:</label>
+    <select onChange={handleAddWork} className="mt-1 block w-full p-2 border border-gray-300 rounded-md">
+        <option value="">Velg arbeid</option>
+        {fixedPrices
+            .filter(price => price.serviceType === "Sykkelservice")  // Filtrer på "Sykkelservice"
+            .sort((a, b) => a.priority - b.priority)  // Sorter etter priority
+            .map((price) => (
+                <option key={price._id} value={price._id}>
+                    {price.title} - {price.price} kr)
+                </option>
+            ))}
+    </select>
+    {isWorkEmpty && (
+        <p className="text-red-500 text-sm mt-2">Legg til arbeid.</p>
+    )}
 </div>
+
+
 
 {/* Valgt arbeid, deler, priser og knapp */}
 {!isWorkEmpty && (
