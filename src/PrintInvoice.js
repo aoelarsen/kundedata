@@ -11,7 +11,6 @@ const Barcode = ({ ean }) => {
       const canvas = document.createElement('canvas');
       JsBarcode(canvas, ean, { format: 'EAN13', displayValue: false });
 
-      // Konverter canvas til et dataURL (bilde)
       setBarcodeSrc(canvas.toDataURL('image/png'));
     }
   }, [ean]);
@@ -27,7 +26,7 @@ const Barcode = ({ ean }) => {
 
 function PrintInvoice({ serviceDetails, customer, formData, calculateTotalPrice, storeName }) {
   if (!customer || !serviceDetails) {
-    return <p>Loading...</p>;  // Returner en melding mens dataene lastes
+    return <p>Loading...</p>;
   }
 
   const totalWorkPrice = formData.arbeid.reduce((total, work) => total + work.price, 0);
@@ -36,30 +35,44 @@ function PrintInvoice({ serviceDetails, customer, formData, calculateTotalPrice,
 
   return (
     <div className="print-invoice p-2 font-sans">
+      {/* CSS for utskrift */}
+      <style>
+        {`
+          @media print {
+            thead th {
+              background-color: #e5e7eb !important; /* Lysegrå bakgrunn for tittelraden */
+              color: #000 !important; /* Svart tekst for tittelraden */
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+            h3 {
+              color: #000 !important; /* Svart farge for overskrifter */
+            }
+          }
+        `}
+      </style>
       {/* Kundeinfo og Servicenummer */}
       <div className="border border-gray-300 p-2 mb-4 rounded-lg">
         <div className="flex justify-between">
           <div className="w-1/2">
-            <h2 className="text-lg font-semibold text-gray-700">Kunde:</h2>
             <p className="text-gray-600">{customer.firstName} {customer.lastName}</p>
             <p className="text-gray-600">Telefon: {customer.phoneNumber}</p>
             <p className="text-gray-600">E-post: {customer.email}</p>
+            <h2 className="text-l font-semibold text-gray-700">Artikkel: {formData.Varemerke} {formData.Produkt}</h2>
+
           </div>
           <div className="w-1/2 flex flex-col items-end">
-            {/* Butikklogo */}
             <img src={logo} alt="Butikklogo" className="w-30 h-auto mb-4" />
-            {/* Servicenummer og Dato */}
             <p className="text-gray-600">Dato: {new Date().toLocaleDateString()}</p>
             <h2 className="text-xl font-semibold text-gray-700">Servicenummer: {serviceDetails.serviceid}</h2>
-
           </div>
         </div>
       </div>
 
       {/* Arbeid */}
-      <h3 className="text-xl font-semibold text-blue-600 mb-4">Arbeid</h3>
+      <h3 className="text-xl font-semibold text-black mb-4">Arbeid</h3>
       <table className="w-full table-auto mb-6">
-        <thead className="bg-blue-600 text-white">
+        <thead className="bg-gray-200 text-black">
           <tr>
             <th className="p-2 text-left">Beskrivelse</th>
             <th className="p-2 text-right">Pris</th>
@@ -76,9 +89,9 @@ function PrintInvoice({ serviceDetails, customer, formData, calculateTotalPrice,
       </table>
 
       {/* Deler */}
-      <h3 className="text-xl font-semibold text-green-600 mb-4">Deler</h3>
+      <h3 className="text-xl font-semibold text-black mb-4">Deler</h3>
       <table className="w-full table-auto mb-6">
-        <thead className="bg-green-600 text-white">
+        <thead className="bg-gray-200 text-black">
           <tr>
             <th className="p-2 text-left">Varemerke</th>
             <th className="p-2 text-left">Produkt</th>
@@ -93,23 +106,22 @@ function PrintInvoice({ serviceDetails, customer, formData, calculateTotalPrice,
               <td className="p-2 text-gray-700">{part.product}</td>
               <td className="p-2 text-gray-700 text-center">
                 {part.ean && part.ean.length === 13 ? <Barcode ean={part.ean} /> : part.ean}
-              </td> {/* Viser EAN som strekkode eller tekst */}
+              </td>
               <td className="p-2 text-right text-gray-700">{part.price} kr</td>
             </tr>
           ))}
         </tbody>
       </table>
 
-{/* Kommentar og Oppsummering på samme linje */}
-<div className="flex justify-between mb-4">
-  {/* Kommentar */}
-  <div className="border border-gray-300 p-2 rounded-lg w-2/3 mr-4">
-    <h3 className="text-xl font-semibold text-gray-800 mb-2">Kommentar til arbeidet</h3>
-    {/* Bruker white-space: pre-line for å bevare linjeskift */}
-    <p className="text-gray-700" style={{ whiteSpace: 'pre-line' }}>
-      {formData.utførtArbeid || "Ingen kommentarer til arbeidet."}
-    </p>
-  </div>
+      {/* Kommentar og Oppsummering */}
+      <div className="flex justify-between mb-4">
+        {/* Kommentar */}
+        <div className="border border-gray-300 p-2 rounded-lg w-2/3 mr-4">
+          <h3 className="text-xl font-semibold text-gray-800 mb-2">Kommentar til arbeidet</h3>
+          <p className="text-gray-700" style={{ whiteSpace: 'pre-line' }}>
+            {formData.utførtArbeid || "Ingen kommentarer til arbeidet."}
+          </p>
+        </div>
 
         {/* Oppsummering */}
         <div className="w-1/3">

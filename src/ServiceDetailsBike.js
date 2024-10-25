@@ -806,7 +806,7 @@ function ServiceDetails() {
             .sort((a, b) => a.priority - b.priority)  // Sorter etter priority
             .map((price) => (
                 <option key={price._id} value={price._id}>
-                    {price.title} - {price.price} kr)
+                    {price.title} - {price.price} kr 
                 </option>
             ))}
     </select>
