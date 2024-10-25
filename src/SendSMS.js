@@ -10,13 +10,13 @@ function SendSMS() {
   const [filteredSmsTemplates, setFilteredSmsTemplates] = useState([]);
   const [smsArchive, setSmsArchive] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [highlightedSmsId, setHighlightedSmsId] = useState(null); // Ny state for fremhevet SMS
   const [formData, setFormData] = useState({
     telefonnummer: customer?.phoneNumber || '',
     meldingstekst: '',
     kundeNavn: `${customer?.firstName || ''} ${customer?.lastName || ''}`,
   });
 
-  // Hent butikknavn fra cookie
   const selectedStore = Cookies.get('selectedStore') || 'Ukjent butikk';
 
   useEffect(() => {
@@ -34,16 +34,10 @@ function SendSMS() {
       try {
         const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/smstemplates');
         const data = await response.json();
-
-        // Filtrer SMS-maler basert på rute
         let filteredTemplates = data;
-        if (orderDetails) {
-          filteredTemplates = data.filter(template => template.type === 'ordre');
-        } else if (serviceDetails) {
-          filteredTemplates = data.filter(template => template.type === 'tjeneste');
-        } else if (customer) {
-          filteredTemplates = data.filter(template => template.type === 'kunde');
-        }
+        if (orderDetails) filteredTemplates = data.filter(template => template.type === 'ordre');
+        else if (serviceDetails) filteredTemplates = data.filter(template => template.type === 'tjeneste');
+        else if (customer) filteredTemplates = data.filter(template => template.type === 'kunde');
         setFilteredSmsTemplates(filteredTemplates);
       } catch (error) {
         console.error('Feil ved henting av SMS-maler:', error);
@@ -88,22 +82,15 @@ function SendSMS() {
     const selectedTemplate = filteredSmsTemplates.find(template => template._id === e.target.value);
     if (selectedTemplate) {
       let updatedMessage = selectedTemplate.tekst;
-
-      // Erstatt %ordreid% hvis det finnes og vi har ordredata
       if (updatedMessage.includes('%ordreid%') && orderDetails) {
         updatedMessage = updatedMessage.replace('%ordreid%', orderDetails.ordreid);
       }
-
-      // Erstatt %serviceid% hvis det finnes og vi har servicedata
       if (updatedMessage.includes('%serviceid%') && serviceDetails) {
         updatedMessage = updatedMessage.replace('%serviceid%', serviceDetails.serviceid);
       }
-
-      // Erstatt %butikk% med butikknavn fra cookies
       if (updatedMessage.includes('%butikk%')) {
         updatedMessage = updatedMessage.replace('%butikk%', selectedStore);
       }
-
       setFormData((prevData) => ({
         ...prevData,
         meldingstekst: updatedMessage,
@@ -114,36 +101,65 @@ function SendSMS() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const smsData = {
-      ...formData,
-      sendtDato: new Date().toISOString(),
-    };
+    const { telefonnummer, meldingstekst, kundeNavn } = formData;
+    const username = process.env.REACT_APP_VIANETT_USERNAME;
+    const password = process.env.REACT_APP_VIANETT_PASSWORD;
+    const msgid = new Date().getTime(); // Unik ID for melding
+    const smsUrl = `https://smsc.vianett.no/v3/send?username=${username}&password=${password}&SenderAddress=Sporten&msgid=${msgid}&tel=${telefonnummer}&msg=${encodeURIComponent(meldingstekst)}&pricegroup=0`;
 
     try {
-      const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/smsarchives', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(smsData),
-      });
+      const response = await fetch(smsUrl, { method: 'GET' });
+      const responseData = await response.text();
 
-      if (response.ok) {
-        alert('SMS sendt og lagret i arkivet!');
+      if (response.ok && responseData.includes("200|OK")) {
+        alert("SMS sendt og lagret i arkivet!");
+
+        // Lagre sendt melding i `smsarchives`
+        const smsArchiveData = {
+          telefonnummer,
+          meldingstekst,
+          kundeNavn,
+          sendtDato: new Date().toISOString(),
+        };
+
+        const archiveResponse = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/smsarchives', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(smsArchiveData),
+        });
+
+        if (!archiveResponse.ok) {
+          console.error("Feil ved lagring av SMS i arkivet:", archiveResponse.statusText);
+        }
+
+        // Hent oppdatert SMS-arkiv og sett state
         const updatedArchive = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/smsarchives');
         const updatedArchiveData = await updatedArchive.json();
         setSmsArchive(updatedArchiveData.reverse());
 
+        // Sett ID-en for siste sendte SMS som fremhevet
+        setHighlightedSmsId(updatedArchiveData[0]._id);
+
+        // Fjern fremhevingen etter 5 sekunder
+        setTimeout(() => {
+          setHighlightedSmsId(null);
+        }, 5000);
+
+        // Tøm skjemaet
         setFormData({
           telefonnummer: '',
           meldingstekst: '',
           kundeNavn: '',
         });
       } else {
-        console.error('Feil ved sending av SMS');
+        console.error("Feil ved sending av SMS:", responseData);
+        alert("Kunne ikke sende SMS. Vennligst sjekk innstillingene dine.");
       }
     } catch (error) {
       console.error('Feil ved kommunikasjon med serveren:', error);
+      alert("En feil oppstod ved sending av SMS.");
     }
   };
 
@@ -252,7 +268,12 @@ function SendSMS() {
         </thead>
         <tbody>
           {lastTenSms.map((sms) => (
-            <tr key={sms._id} className="hover:bg-gray-50">
+            <tr
+              key={sms._id}
+              className={`hover:bg-gray-50 ${
+                sms._id === highlightedSmsId ? 'border-2 border-green-500' : ''
+              }`}
+            >
               <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{sms.kundeNavn || 'Ukjent'}</td>
               <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{sms.telefonnummer}</td>
               <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{sms.meldingstekst}</td>
