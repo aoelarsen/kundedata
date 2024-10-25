@@ -10,7 +10,8 @@ function SendSMS() {
   const [filteredSmsTemplates, setFilteredSmsTemplates] = useState([]);
   const [smsArchive, setSmsArchive] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [highlightedSmsId, setHighlightedSmsId] = useState(null); // Ny state for fremhevet SMS
+  const [customerSearch, setCustomerSearch] = useState(''); // Ny state for kundesøk
+  const [highlightedSmsId, setHighlightedSmsId] = useState(null);
   const [formData, setFormData] = useState({
     telefonnummer: customer?.phoneNumber || '',
     meldingstekst: '',
@@ -67,15 +68,13 @@ function SendSMS() {
     }));
   };
 
-  const handleCustomerChange = (e) => {
-    const selectedCustomer = customers.find(customer => customer._id === e.target.value);
-    if (selectedCustomer) {
-      setFormData((prevData) => ({
-        ...prevData,
-        telefonnummer: selectedCustomer.phoneNumber,
-        kundeNavn: `${selectedCustomer.firstName} ${selectedCustomer.lastName}`,
-      }));
-    }
+  const handleCustomerSelect = (selectedCustomer) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      telefonnummer: selectedCustomer.phoneNumber,
+      kundeNavn: `${selectedCustomer.firstName} ${selectedCustomer.lastName}`,
+    }));
+    setCustomerSearch(''); // Tøm søkefeltet etter valg av kunde
   };
 
   const handleSmsTemplateChange = (e) => {
@@ -100,11 +99,10 @@ function SendSMS() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const { telefonnummer, meldingstekst, kundeNavn } = formData;
     const username = process.env.REACT_APP_VIANETT_USERNAME;
     const password = process.env.REACT_APP_VIANETT_PASSWORD;
-    const msgid = new Date().getTime(); // Unik ID for melding
+    const msgid = new Date().getTime();
     const smsUrl = `https://smsc.vianett.no/v3/send?username=${username}&password=${password}&SenderAddress=Sporten&msgid=${msgid}&tel=${telefonnummer}&msg=${encodeURIComponent(meldingstekst)}&pricegroup=0`;
 
     try {
@@ -113,8 +111,6 @@ function SendSMS() {
 
       if (response.ok && responseData.includes("200|OK")) {
         alert("SMS sendt og lagret i arkivet!");
-
-        // Lagre sendt melding i `smsarchives`
         const smsArchiveData = {
           telefonnummer,
           meldingstekst,
@@ -124,35 +120,21 @@ function SendSMS() {
 
         const archiveResponse = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/smsarchives', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(smsArchiveData),
         });
 
-        if (!archiveResponse.ok) {
-          console.error("Feil ved lagring av SMS i arkivet:", archiveResponse.statusText);
-        }
+        if (!archiveResponse.ok) console.error("Feil ved lagring av SMS i arkivet:", archiveResponse.statusText);
 
-        // Hent oppdatert SMS-arkiv og sett state
         const updatedArchive = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/smsarchives');
         const updatedArchiveData = await updatedArchive.json();
         setSmsArchive(updatedArchiveData.reverse());
 
-        // Sett ID-en for siste sendte SMS som fremhevet
         setHighlightedSmsId(updatedArchiveData[0]._id);
 
-        // Fjern fremhevingen etter 5 sekunder
-        setTimeout(() => {
-          setHighlightedSmsId(null);
-        }, 5000);
+        setTimeout(() => setHighlightedSmsId(null), 5000);
 
-        // Tøm skjemaet
-        setFormData({
-          telefonnummer: '',
-          meldingstekst: '',
-          kundeNavn: '',
-        });
+        setFormData({ telefonnummer: '', meldingstekst: '', kundeNavn: '' });
       } else {
         console.error("Feil ved sending av SMS:", responseData);
         alert("Kunne ikke sende SMS. Vennligst sjekk innstillingene dine.");
@@ -175,6 +157,15 @@ function SendSMS() {
     );
   });
 
+  const filteredCustomers =
+    customerSearch.length >= 2
+      ? customers.filter((customer) =>
+          `${customer.firstName} ${customer.lastName} ${customer.phoneNumber}`
+            .toLowerCase()
+            .includes(customerSearch.toLowerCase())
+        )
+      : [];
+
   const lastTenSms = filteredSmsArchive.slice(0, 5);
 
   const formatDateTime = (dateString) => {
@@ -189,16 +180,30 @@ function SendSMS() {
     <div className="max-w-5xl mx-auto py-8 bg-white shadow-lg rounded-lg p-6 mb-4">
       <h2 className="text-3xl font-bold mb-6 text-center">Send SMS</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
+
+        {/* Kundesøkefelt */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">Velg Kunde</label>
-          <select value={customer?._id || ''} onChange={handleCustomerChange} className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm">
-            <option value="">Velg en kunde</option>
-            {customers.map((customer) => (
-              <option key={customer._id} value={customer._id}>
-                {customer.firstName} {customer.lastName} - {customer.phoneNumber}
-              </option>
-            ))}
-          </select>
+          <label className="block text-sm font-medium text-gray-700">Søk etter kunde (navn eller telefonnummer)</label>
+          <input
+            type="text"
+            value={customerSearch}
+            onChange={(e) => setCustomerSearch(e.target.value)}
+            className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
+            placeholder="Skriv inn navn eller telefonnummer"
+          />
+          {filteredCustomers.length > 0 && (
+            <ul className="border border-gray-300 rounded-md mt-2 bg-white max-h-40 overflow-y-auto">
+              {filteredCustomers.map((customer) => (
+                <li
+                  key={customer._id}
+                  onClick={() => handleCustomerSelect(customer)}
+                  className="cursor-pointer p-2 hover:bg-gray-100"
+                >
+                  {customer.firstName} {customer.lastName} - {customer.phoneNumber}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
         <div>
@@ -245,7 +250,7 @@ function SendSMS() {
         </div>
       </form>
 
-      {/* Søkefelt */}
+      {/* Søkefelt for SMS-arkiv */}
       <div className="mt-8 mb-4">
         <input
           type="text"
@@ -270,9 +275,7 @@ function SendSMS() {
           {lastTenSms.map((sms) => (
             <tr
               key={sms._id}
-              className={`hover:bg-gray-50 ${
-                sms._id === highlightedSmsId ? 'border-2 border-green-500' : ''
-              }`}
+              className={`hover:bg-gray-50 ${sms._id === highlightedSmsId ? 'border-2 border-green-500' : ''}`}
             >
               <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{sms.kundeNavn || 'Ukjent'}</td>
               <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{sms.telefonnummer}</td>
