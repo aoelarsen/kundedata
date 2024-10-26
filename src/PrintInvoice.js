@@ -70,48 +70,56 @@ function PrintInvoice({ serviceDetails, customer, formData, calculateTotalPrice,
       </div>
 
       {/* Arbeid */}
-      <h3 className="text-xl font-semibold text-black mb-4">Arbeid</h3>
-      <table className="w-full table-auto mb-6">
-        <thead className="bg-gray-200 text-black">
-          <tr>
-            <th className="p-2 text-left">Beskrivelse</th>
-            <th className="p-2 text-right">Pris</th>
+      {formData.arbeid.length > 0 && (
+  <>
+    <h3 className="text-xl font-semibold text-black mb-4">Arbeid</h3>
+    <table className="w-full table-auto mb-6">
+      <thead className="bg-gray-200 text-black">
+        <tr>
+          <th className="p-2 text-left">Beskrivelse</th>
+          <th className="p-2 text-right">Pris</th>
+        </tr>
+      </thead>
+      <tbody>
+        {formData.arbeid.map((work, index) => (
+          <tr key={index} className="bg-gray-50 border-b">
+            <td className="p-2 text-gray-700">{work.title}</td>
+            <td className="p-2 text-right text-gray-700">{work.price} kr</td>
           </tr>
-        </thead>
-        <tbody>
-          {formData.arbeid.map((work, index) => (
-            <tr key={index} className="bg-gray-50 border-b">
-              <td className="p-2 text-gray-700">{work.title}</td>
-              <td className="p-2 text-right text-gray-700">{work.price} kr</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+        ))}
+      </tbody>
+    </table>
+  </>
+)}
 
       {/* Deler */}
-      <h3 className="text-xl font-semibold text-black mb-4">Deler</h3>
-      <table className="w-full table-auto mb-6">
-        <thead className="bg-gray-200 text-black">
-          <tr>
-            <th className="p-2 text-left">Varemerke</th>
-            <th className="p-2 text-left">Produkt</th>
-            <th className="p-2 text-left">EAN</th>
-            <th className="p-2 text-right">Pris</th>
+      {formData.deler.length > 0 && (
+  <>
+    <h3 className="text-xl font-semibold text-black mb-4">Deler</h3>
+    <table className="w-full table-auto mb-6">
+      <thead className="bg-gray-200 text-black">
+        <tr>
+          <th className="p-2 text-left">Varemerke</th>
+          <th className="p-2 text-left">Produkt</th>
+          <th className="p-2 text-left">EAN</th>
+          <th className="p-2 text-right">Pris</th>
+        </tr>
+      </thead>
+      <tbody>
+        {formData.deler.map((part, index) => (
+          <tr key={index} className="bg-gray-50 border-b">
+            <td className="p-2 text-gray-700">{part.brand}</td>
+            <td className="p-2 text-gray-700">{part.product}</td>
+            <td className="p-2 text-gray-700 text-center">
+              {part.ean && part.ean.length === 13 ? <Barcode ean={part.ean} /> : part.ean}
+            </td>
+            <td className="p-2 text-right text-gray-700">{part.price} kr</td>
           </tr>
-        </thead>
-        <tbody>
-          {formData.deler.map((part, index) => (
-            <tr key={index} className="bg-gray-50 border-b">
-              <td className="p-2 text-gray-700">{part.brand}</td>
-              <td className="p-2 text-gray-700">{part.product}</td>
-              <td className="p-2 text-gray-700 text-center">
-                {part.ean && part.ean.length === 13 ? <Barcode ean={part.ean} /> : part.ean}
-              </td>
-              <td className="p-2 text-right text-gray-700">{part.price} kr</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+        ))}
+      </tbody>
+    </table>
+  </>
+)}
 
       {/* Kommentar og Oppsummering */}
       <div className="flex justify-between mb-4">
