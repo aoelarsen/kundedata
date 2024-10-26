@@ -1374,41 +1374,7 @@ app.get('/parts', async (req, res) => {
 });
 
 
-const users = [
-  { username: 'Slemmestad', password: bcrypt.hashSync('casper11', 10) },
-  { username: 'Røyken', password: bcrypt.hashSync('casper11', 10) }
-];
 
-// Endepunkt for autentisering
-app.post('/auth/login', async (req, res) => {
-  const { username, password } = req.body;
-  const user = users.find(u => u.username === username);
-
-  if (user && await bcrypt.compare(password, user.password)) {
-    // Generer JWT
-    const token = jwt.sign({ username: user.username }, JWT_SECRET, { expiresIn: '1h' });
-    res.json({ token });
-  } else {
-    res.status(401).json({ message: 'Feil brukernavn eller passord' });
-  }
-});
-
-// Middleware for å validere JWT
-const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-  if (!token) return res.sendStatus(401);
-
-  jwt.verify(token, JWT_SECRET, (err, user) => {
-    if (err) return res.sendStatus(403);
-    req.user = user;
-    next();
-  });
-};
-
-app.get('/protected-data', authenticateToken, (req, res) => {
-  res.json({ message: 'Dette er beskyttet data', user: req.user });
-});
 
 
 // Start the server
