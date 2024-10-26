@@ -1373,7 +1373,7 @@ app.get('/parts', async (req, res) => {
   }
 });
 
-/ Dummy-brukere
+
 const users = [
   { username: 'store1', password: bcrypt.hashSync('password1', 10) },
   { username: 'store2', password: bcrypt.hashSync('password2', 10) }
