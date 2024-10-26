@@ -1,24 +1,26 @@
 // auth.js
-export const users = [
-    { username: 'store1', password: 'password1' },
-    { username: 'store2', password: 'password2' }
-];
+export const login = async (username, password) => {
+    const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+    });
 
-export const login = (username, password) => {
-    const user = users.find(
-        (user) => user.username === username && user.password === password
-    );
-    if (user) {
-        localStorage.setItem('authenticatedUser', JSON.stringify(user));
+    if (response.ok) {
+        const { token } = await response.json();
+        localStorage.setItem('token', token);
         return true;
     }
     return false;
 };
 
 export const logout = () => {
-    localStorage.removeItem('authenticatedUser');
+    localStorage.removeItem('token');
 };
 
 export const isAuthenticated = () => {
-    return localStorage.getItem('authenticatedUser') !== null;
+    return localStorage.getItem('token') !== null;
 };
+
+// Hent token fra localStorage og legg det til i headers
+export const getToken = () => localStorage.getItem('token');

@@ -78,3 +78,5 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 
 ### npm install jsbarcode
 
+### npm install jsonwebtoken bcrypt
+
