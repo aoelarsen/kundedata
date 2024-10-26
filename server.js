@@ -1375,8 +1375,8 @@ app.get('/parts', async (req, res) => {
 
 
 const users = [
-  { username: 'store1', password: bcrypt.hashSync('password1', 10) },
-  { username: 'store2', password: bcrypt.hashSync('password2', 10) }
+  { username: 'Slemmestad', password: bcrypt.hashSync('casper11', 10) },
+  { username: 'Røyken', password: bcrypt.hashSync('casper11', 10) }
 ];
 
 // Endepunkt for autentisering
