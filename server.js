@@ -3,9 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 
 const app = express();
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
-const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key';
+
 
 // Bruk Heroku's dynamisk tildelte port, eller 5000 som fallback lokalt
 const port = process.env.PORT || 5001;
