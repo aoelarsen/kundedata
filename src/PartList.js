@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
 function PartList() {
     const [parts, setParts] = useState([]);
     const navigate = useNavigate();
@@ -8,7 +10,7 @@ function PartList() {
     useEffect(() => {
         const fetchParts = async () => {
             try {
-                const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/parts');
+                const response = await fetch(`${API_BASE_URL}/parts`);
                 const data = await response.json();
                 setParts(data);
             } catch (error) {

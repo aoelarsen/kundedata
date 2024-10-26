@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
 function SmsTemplateList() {
     const [smsTemplates, setSmsTemplates] = useState([]); // Sett tom array som initial verdi
     const navigate = useNavigate();
@@ -8,7 +10,7 @@ function SmsTemplateList() {
     useEffect(() => {
         const fetchSmsTemplates = async () => {
             try {
-                const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/smstemplates');
+                const response = await fetch(`${API_BASE_URL}/smstemplates`);
                 if (!response.ok) {
                     throw new Error('Feil ved henting av SMS-maler');
                 }
@@ -24,7 +26,7 @@ function SmsTemplateList() {
 
     const handleSelectSmsTemplate = (smsTemplateId) => {
         console.log("Valgt SMS-mal ID:", smsTemplateId); // Logg ID-en som sendes
-        navigate(`/sms-template-change/${smsTemplateId}`);
+        navigate(`/ sms - template - change / ${smsTemplateId}`);
     };
 
     const handleAddSmsTemplate = () => {

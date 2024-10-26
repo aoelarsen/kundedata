@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
+
 function CreateOrder() {
   const { customerNumber } = useParams();
   const navigate = useNavigate();
@@ -24,7 +27,7 @@ function CreateOrder() {
   useEffect(() => {
     const fetchLastOrderId = async () => {
       try {
-        const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders/last-order-id');
+        const response = await fetch(`${API_BASE_URL}/orders/last-order-id`);
         const data = await response.json();
         const lastOrderId = parseInt(data.lastOrderId, 10);
         const nextOrderId = isNaN(lastOrderId) ? 1 : lastOrderId + 1;
@@ -40,7 +43,7 @@ function CreateOrder() {
 
     const fetchEmployees = async () => {
       try {
-        const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/employees');
+        const response = await fetch(`${API_BASE_URL} / employees`);
         const data = await response.json();
         setEmployees(data);
       } catch (error) {
@@ -94,7 +97,7 @@ function CreateOrder() {
     console.log('Sender ordredata til server:', newOrder);
 
     try {
-      const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders', {
+      const response = await fetch(`${API_BASE_URL}/orders`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -167,7 +170,7 @@ function CreateOrder() {
           <div>
             <label className="block text-sm font-medium text-gray-700">Kommentar</label>
             <textarea
-            name="Kommentar"
+              name="Kommentar"
               value={formData.Kommentar}
               onChange={handleChange}
               rows="3"

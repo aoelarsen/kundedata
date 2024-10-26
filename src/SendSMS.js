@@ -3,6 +3,8 @@ import { useLocation } from 'react-router-dom';
 import { format } from 'date-fns';
 import Cookies from 'js-cookie';
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
 function SendSMS() {
   const location = useLocation();
   const { orderDetails, serviceDetails, customer } = location.state || {};
@@ -23,7 +25,7 @@ function SendSMS() {
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
-        const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/customers');
+        const response = await fetch(`${API_BASE_URL}/customers`);
         const data = await response.json();
         setCustomers(data);
       } catch (error) {
@@ -33,7 +35,7 @@ function SendSMS() {
 
     const fetchSmsTemplates = async () => {
       try {
-        const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/smstemplates');
+        const response = await fetch(`${API_BASE_URL}/smstemplates`);
         const data = await response.json();
         let filteredTemplates = data;
         if (orderDetails) filteredTemplates = data.filter(template => template.type === 'ordre');
@@ -47,7 +49,7 @@ function SendSMS() {
 
     const fetchSmsArchive = async () => {
       try {
-        const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/smsarchives');
+        const response = await fetch(`${API_BASE_URL}/smsarchives`);
         const data = await response.json();
         setSmsArchive(data.reverse());
       } catch (error) {
@@ -118,7 +120,7 @@ function SendSMS() {
           sendtDato: new Date().toISOString(),
         };
 
-        const archiveResponse = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/smsarchives', {
+        const archiveResponse = await fetch(`${API_BASE_URL}/smsarchives`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(smsArchiveData),
@@ -126,7 +128,7 @@ function SendSMS() {
 
         if (!archiveResponse.ok) console.error("Feil ved lagring av SMS i arkivet:", archiveResponse.statusText);
 
-        const updatedArchive = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/smsarchives');
+        const updatedArchive = await fetch(`${API_BASE_URL}/smsarchives`);
         const updatedArchiveData = await updatedArchive.json();
         setSmsArchive(updatedArchiveData.reverse());
 
@@ -160,10 +162,10 @@ function SendSMS() {
   const filteredCustomers =
     customerSearch.length >= 2
       ? customers.filter((customer) =>
-          `${customer.firstName} ${customer.lastName} ${customer.phoneNumber}`
-            .toLowerCase()
-            .includes(customerSearch.toLowerCase())
-        )
+        `${customer.firstName} ${customer.lastName} ${customer.phoneNumber}`
+          .toLowerCase()
+          .includes(customerSearch.toLowerCase())
+      )
       : [];
 
   const lastTenSms = filteredSmsArchive.slice(0, 5);

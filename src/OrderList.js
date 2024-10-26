@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import { format, parse } from 'date-fns'; // Importer format-funksjonen fra date-fns
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
+
 function OrderList() {
   const [orders, setOrders] = useState([]);
   const [filteredOrders, setFilteredOrders] = useState([]); // State for filtrerte ordrer
@@ -21,7 +24,7 @@ function OrderList() {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders');
+        const response = await fetch(`${API_BASE_URL}/orders`);
         if (response.ok) {
           const data = await response.json();
 

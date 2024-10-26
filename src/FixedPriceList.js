@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 function FixedPriceList() {
     const [fixedPrices, setFixedPrices] = useState([]);
@@ -30,11 +31,11 @@ function FixedPriceList() {
         return null;
     };
 
-      // Hent fastpriser og tjenestetyper når komponenten laster
-      useEffect(() => {
+    // Hent fastpriser og tjenestetyper når komponenten laster
+    useEffect(() => {
         const fetchFixedPrices = async () => {
             try {
-                const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/fixedprices');
+                const response = await fetch(`${API_BASE_URL}/fixedprices`);
                 const data = await response.json();
                 setFixedPrices(data);
 
@@ -57,7 +58,7 @@ function FixedPriceList() {
 
         const fetchServiceTypes = async () => {
             try {
-                const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/servicetypes');
+                const response = await fetch(`${API_BASE_URL}/servicetypes`);
                 const data = await response.json();
                 setServiceTypes(data);
             } catch (error) {

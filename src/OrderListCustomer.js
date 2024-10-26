@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
 function OrderList({ customerId }) {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -8,7 +10,7 @@ function OrderList({ customerId }) {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders?kundeid=${customerId}`);
+        const response = await fetch(`${API_BASE_URL} / orders?kundeid=${customerId}`);
         if (response.ok) {
           const data = await response.json();
           setOrders(data);

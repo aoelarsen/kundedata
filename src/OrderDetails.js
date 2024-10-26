@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom'; 
+import { useParams, useNavigate } from 'react-router-dom';
 import { format, parse } from 'date-fns'; // Importer format-funksjonen fra date-fns
+
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 function OrderDetails() {
   const { id } = useParams(); // Henter _id fra URL (MongoDB ObjectId)
@@ -19,36 +21,36 @@ function OrderDetails() {
   const [employees, setEmployees] = useState([]); // For å holde ansatte data
   const [updateMessage, setUpdateMessage] = useState(''); // For å vise oppdateringsmelding
 
-// Funksjon for å parse datoformatet fra serveren og returnere en formatert dato
-const parseCustomDateString = (dateString) => {
-  // Prøver å parse streng med formatet 'd.M.yyyy, HH:mm:ss' (forventet format fra databasen)
-  const parsedDate = parse(dateString, 'd.M.yyyy, HH:mm:ss', new Date());
-  return isNaN(parsedDate) ? null : parsedDate;
-};
+  // Funksjon for å parse datoformatet fra serveren og returnere en formatert dato
+  const parseCustomDateString = (dateString) => {
+    // Prøver å parse streng med formatet 'd.M.yyyy, HH:mm:ss' (forventet format fra databasen)
+    const parsedDate = parse(dateString, 'd.M.yyyy, HH:mm:ss', new Date());
+    return isNaN(parsedDate) ? null : parsedDate;
+  };
 
-// Funksjon for å formatere datoen
-const formatDate = (dateString) => {
-  // Hvis datoen er ugyldig eller ikke eksisterer, returner "Ukjent dato"
-  if (!dateString) {
-    return "Ukjent dato";
-  }
+  // Funksjon for å formatere datoen
+  const formatDate = (dateString) => {
+    // Hvis datoen er ugyldig eller ikke eksisterer, returner "Ukjent dato"
+    if (!dateString) {
+      return "Ukjent dato";
+    }
 
-  const parsedDate = parseCustomDateString(dateString);
+    const parsedDate = parseCustomDateString(dateString);
 
-  if (!parsedDate) {
-    return "Ugyldig dato";
-  }
+    if (!parsedDate) {
+      return "Ugyldig dato";
+    }
 
-  // Returner formatert dato i ønsket format
-  return format(parsedDate, 'd.M.yyyy HH:mm');
-};
-  
+    // Returner formatert dato i ønsket format
+    return format(parsedDate, 'd.M.yyyy HH:mm');
+  };
+
 
   // Hent ordredetaljer
   useEffect(() => {
     const fetchOrder = async () => {
       try {
-        const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders/${id}`);
+        const response = await fetch(`${API_BASE_URL} / orders/${id}`);
         if (response.ok) {
           const order = await response.json();
           console.log('Ordre hentet:', order);
@@ -77,7 +79,7 @@ const formatDate = (dateString) => {
 
     const fetchCustomer = async (kundeid) => {
       try {
-        const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customers?customerNumber`);
+        const response = await fetch(`${API_BASE_URL} / customers?customerNumber`);
         if (response.ok) {
           const customerData = await response.json();  // Forventer en liste av kunder
           const customer = customerData.find(c => c.customerNumber === kundeid);
@@ -103,7 +105,7 @@ const formatDate = (dateString) => {
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/employees');
+        const response = await fetch(`${API_BASE_URL}/employees`);
         if (response.ok) {
           const employeesData = await response.json();
           console.log('Ansatte hentet:', employeesData);
@@ -136,7 +138,7 @@ const formatDate = (dateString) => {
     };
 
     try {
-      const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders/${id}`, {
+      const response = await fetch(`${API_BASE_URL} / orders/${id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -209,15 +211,15 @@ const formatDate = (dateString) => {
   return (
     <div className="max-w-5xl mx-auto py-8 bg-white shadow-lg rounded-lg p-6 mb-4">
       <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Kundeordre</h2>
-{/* Vis registrert og endret dato */}
-{orderDetails && (
-  <div className="mb-6">
-    <p><strong>Registrert dato:</strong> {formatDate(orderDetails.RegistrertDato)}</p>
-    {orderDetails.Endretdato && (
-      <p><strong>Endret dato:</strong> {formatDate(orderDetails.Endretdato)}</p>
-    )}
-  </div>
-)}
+      {/* Vis registrert og endret dato */}
+      {orderDetails && (
+        <div className="mb-6">
+          <p><strong>Registrert dato:</strong> {formatDate(orderDetails.RegistrertDato)}</p>
+          {orderDetails.Endretdato && (
+            <p><strong>Endret dato:</strong> {formatDate(orderDetails.Endretdato)}</p>
+          )}
+        </div>
+      )}
 
       {customer && (
         <div className="bg-gray-100 p-6 rounded-lg mb-6 relative">

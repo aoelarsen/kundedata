@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
+
 function EmployeeForm() {
     const [formData, setFormData] = useState({
         navn: '',
@@ -22,16 +25,16 @@ function EmployeeForm() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-    
+
         try {
-            const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/employees', {
+            const response = await fetch(`${API_BASE_URL}/employees`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(formData),
             });
-    
+
             if (response.ok) {
                 navigate('/employee-list'); // Navigerer tilbake til listen over ansatte
             } else {

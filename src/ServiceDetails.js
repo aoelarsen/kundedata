@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { format, parse } from 'date-fns'; // Importer date-fns for formatering
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
 function ServiceDetails() {
   const { id } = useParams(); // Henter _id fra URL (MongoDB ObjectId)
   const navigate = useNavigate(); // For navigering
@@ -24,7 +26,7 @@ function ServiceDetails() {
     const parsedDate = parse(dateString, 'd.M.yyyy, HH:mm:ss', new Date());
     return isNaN(parsedDate) ? null : parsedDate;
   };
-  
+
   const formatDateTime = (dateString) => {
     if (!dateString) {
       return "Ukjent dato";
@@ -40,7 +42,7 @@ function ServiceDetails() {
   useEffect(() => {
     const fetchService = async () => {
       try {
-        const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/services/${id}`);
+        const response = await fetch(`${API_BASE_URL} / services/${id}`);
         if (response.ok) {
           const service = await response.json();
           setServiceDetails(service); // Setter serviceDetails med data fra API
@@ -67,7 +69,7 @@ function ServiceDetails() {
 
     const fetchCustomer = async (kundeid) => {
       try {
-        const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customers?customerNumber`);
+        const response = await fetch(`${API_BASE_URL} / customers?customerNumber`);
         if (response.ok) {
           const customerData = await response.json();
           const customer = customerData.find(c => c.customerNumber === kundeid);
@@ -86,7 +88,7 @@ function ServiceDetails() {
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/employees');
+        const response = await fetch(`${API_BASE_URL}/employees`);
         if (response.ok) {
           const employeesData = await response.json();
           setEmployees(employeesData);
@@ -108,21 +110,21 @@ function ServiceDetails() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     const updatedService = {
       ...formData,
       endretdato: new Date().toLocaleString('no-NO', { timeZone: 'Europe/Oslo' }),
     };
-  
+
     try {
-      const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/services/${id}`, {
+      const response = await fetch(`${API_BASE_URL} / services/${id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(updatedService),
       });
-  
+
       if (response.ok) {
         setUpdateMessage('Tjenesten er oppdatert');
         if (customer) {

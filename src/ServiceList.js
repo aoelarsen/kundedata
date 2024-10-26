@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import { format, parse } from 'date-fns';
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
 function ServiceList() {
   const [serviceTypes, setServiceTypes] = useState([]); // State for tjenestetyper
   const [serviceTypeFilter, setServiceTypeFilter] = useState(Cookies.get('serviceTypeFilter') || ''); // Hent serviceType fra cookies eller sett default til ''
@@ -20,7 +22,7 @@ function ServiceList() {
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/services');
+        const response = await fetch(`${API_BASE_URL}/services`);
         if (response.ok) {
           const data = await response.json();
 
@@ -46,7 +48,7 @@ function ServiceList() {
   useEffect(() => {
     const fetchServiceTypes = async () => {
       try {
-        const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/servicetypes');
+        const response = await fetch(`${API_BASE_URL}/servicetypes`);
         if (response.ok) {
           const data = await response.json();
           setServiceTypes(data); // Sett tjenestetyper fra API-et

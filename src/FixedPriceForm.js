@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 function FixedPriceForm() {
     const [formData, setFormData] = useState({
@@ -16,7 +17,7 @@ function FixedPriceForm() {
         // Hent tjenestetyper fra backend
         const fetchServiceTypes = async () => {
             try {
-                const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/servicetypes');
+                const response = await fetch(`${API_BASE_URL}/servicetypes`);
                 const data = await response.json();
                 setServiceTypes(data);
             } catch (error) {
@@ -37,16 +38,16 @@ function FixedPriceForm() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-    
+
         try {
-            const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/fixedprices', {
+            const response = await fetch(`${API_BASE_URL}/fixedprices`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(formData),
             });
-    
+
             if (response.ok) {
                 navigate('/fixed-price-list'); // Navigerer tilbake til listen over fastpriser
             } else {

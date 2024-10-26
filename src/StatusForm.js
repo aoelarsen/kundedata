@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
 function StatusForm() {
     const [formData, setFormData] = useState({
         navn: '',
@@ -21,7 +23,7 @@ function StatusForm() {
         e.preventDefault();
 
         try {
-            const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/statuses', {
+            const response = await fetch(`${API_BASE_URL}/statuses`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

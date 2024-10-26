@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
 function StatusChange() {
   const { id } = useParams();  // Henter ID fra URL
   const [status, setStatus] = useState({ navn: '', beskrivelse: '' });
@@ -12,7 +14,7 @@ function StatusChange() {
   useEffect(() => {
     const fetchStatus = async () => {
       try {
-        const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/statuses/${id}`);
+        const response = await fetch(`${API_BASE_URL} / statuses/${id}`);
         if (!response.ok) {
           if (response.status === 404) {
             setError('Status ikke funnet');
@@ -42,7 +44,7 @@ function StatusChange() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/statuses/${id}`, {
+      const response = await fetch(`${API_BASE_URL} / statuses/${id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

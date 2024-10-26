@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
 function SmsTemplateChange() {
     const { id } = useParams();
     const [formData, setFormData] = useState({
@@ -16,7 +18,7 @@ function SmsTemplateChange() {
         console.log("ID hentet fra URL:", id); // Logg ID-en som brukes
         const fetchSmsTemplate = async () => {
             try {
-                const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/smstemplates/${id}`);
+                const response = await fetch(`${API_BASE_URL} / smstemplates/${id}`);
                 if (response.ok) {
                     const data = await response.json();
                     setFormData(data);
@@ -27,10 +29,10 @@ function SmsTemplateChange() {
                 console.error('Feil ved kommunikasjon med serveren:', error);
             }
         };
-    
+
         fetchSmsTemplate();
     }, [id]);
-    
+
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -44,7 +46,7 @@ function SmsTemplateChange() {
         e.preventDefault();
 
         try {
-            const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/smstemplates/${id}`, {
+            const response = await fetch(`${API_BASE_URL} / smstemplates/${id}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',

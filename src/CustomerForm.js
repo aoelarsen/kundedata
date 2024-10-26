@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
+
 function CustomerForm({ addCustomer, customers, phoneNumber, setSearchQuery }) {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     phoneNumber: '',
     email: '',
-    customerNumber: '', 
-    status: 'aktiv' 
+    customerNumber: '',
+    status: 'aktiv'
   });
 
   const [errorMessage, setErrorMessage] = useState('');
@@ -17,7 +20,7 @@ function CustomerForm({ addCustomer, customers, phoneNumber, setSearchQuery }) {
   useEffect(() => {
     setFormData((prevData) => ({
       ...prevData,
-      phoneNumber: phoneNumber 
+      phoneNumber: phoneNumber
     }));
   }, [phoneNumber]);
 
@@ -27,7 +30,7 @@ function CustomerForm({ addCustomer, customers, phoneNumber, setSearchQuery }) {
 
     setFormData((prevData) => ({
       ...prevData,
-      customerNumber: nextCustomerNumber 
+      customerNumber: nextCustomerNumber
     }));
   }, [customers]);
 
@@ -42,7 +45,7 @@ function CustomerForm({ addCustomer, customers, phoneNumber, setSearchQuery }) {
       const existingCustomer = customers.find(customer => customer.phoneNumber === value);
       if (existingCustomer) {
         setErrorMessage('Kunde er allerede registrert.');
-        setSearchQuery(value); 
+        setSearchQuery(value);
       } else {
         setErrorMessage('');
         setSearchQuery('');
@@ -69,7 +72,7 @@ function CustomerForm({ addCustomer, customers, phoneNumber, setSearchQuery }) {
     };
 
     try {
-      const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/customers', {
+      const response = await fetch(`${API_BASE_URL}/customers`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -80,7 +83,7 @@ function CustomerForm({ addCustomer, customers, phoneNumber, setSearchQuery }) {
       if (response.ok) {
         const addedCustomer = await response.json();
         addCustomer(addedCustomer);
-        navigate(`/customer-details/${addedCustomer._id}`); 
+        navigate(`/customer-details/${addedCustomer._id}`);
       } else {
         console.error('Feil ved registrering av kunde:', response.statusText);
       }

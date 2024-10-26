@@ -4,6 +4,8 @@ import Cookies from 'js-cookie';
 // Hent dagens dato i formatet yyyy-mm-dd for input type="date"
 const today = new Date().toISOString().split('T')[0];
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
 function TodoList() {
   const [dailyTasks, setDailyTasks] = useState([]);
   const [customTasks, setCustomTasks] = useState([]);
@@ -20,7 +22,7 @@ function TodoList() {
   // Hent daglige oppgaver
   const fetchDailyTasks = useCallback(async () => {
     try {
-      const dailyTasksResponse = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/dailytasks');
+      const dailyTasksResponse = await fetch(`${API_BASE_URL}/dailytasks`);
       const dailyTasksData = await dailyTasksResponse.json();
 
 
@@ -38,7 +40,7 @@ function TodoList() {
 
 
             // Oppdater oppgaven i databasen hvis datoen ikke samsvarer med dagens dato
-            const updateResponse = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/dailytasks/${task._id}`, {
+            const updateResponse = await fetch(`${API_BASE_URL} / dailytasks/${task._id}`, {
               method: 'PATCH',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ completed: false, completedBy: null, dateCompleted: null }),
@@ -81,7 +83,7 @@ function TodoList() {
     try {
       console.log("Starter henting av egendefinerte oppgaver...");
 
-      const customTasksResponse = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks');
+      const customTasksResponse = await fetch(`${API_BASE_URL}/customtasks`);
       const customTasksData = await customTasksResponse.json();
 
       console.log("Rådata fra API-et:", customTasksData);
@@ -103,7 +105,7 @@ function TodoList() {
             console.log(`Oppgave "${task.task}" har en utførtdato (${completedDate}) som ikke samsvarer med dagens dato (${today}) og vil bli slettet.`);
 
             // Slett oppgaven fra customtasks
-            const deleteResponse = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks/${task._id}`, {
+            const deleteResponse = await fetch(`${API_BASE_URL} / customtasks/${task._id}`, {
               method: 'DELETE',
             });
 
@@ -143,7 +145,7 @@ function TodoList() {
   // Hent fullførte oppgaver
   const fetchCompletedTasks = useCallback(async () => {
     try {
-      const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks');
+      const response = await fetch(`${API_BASE_URL}/completedtasks`);
       const data = await response.json();
 
       const filteredTasks = data.filter(task => task.store === butikkid);
@@ -170,7 +172,7 @@ function TodoList() {
     }
 
     try {
-      const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks', {
+      const response = await fetch(`${API_BASE_URL}/customtasks`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -206,13 +208,13 @@ function TodoList() {
     };
 
     try {
-      await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks', {
+      await fetch(`${API_BASE_URL}/completedtasks`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(bodyData),
       });
 
-      const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/dailytasks/${taskId}`, {
+      const response = await fetch(`${API_BASE_URL} / dailytasks/${taskId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ completed: true, completedBy: employee, dateCompleted: new Date().toISOString() }),
@@ -249,14 +251,14 @@ function TodoList() {
 
     try {
       // Legg til oppgaven i 'completedtasks' collection
-      await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks', {
+      await fetch(`${API_BASE_URL}/completedtasks`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(bodyData),
       });
 
       // Oppdater 'customtasks' med utførtdato og ansatt
-      const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks/${taskId}`, {
+      const response = await fetch(`${API_BASE_URL} / customtasks/${taskId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ completedBy: employee, dateCompleted: new Date().toISOString() }),
@@ -290,7 +292,7 @@ function TodoList() {
       console.log('Sender følgende data til completedtasks:', bodyData);
 
       // Legg til oppgaven i 'completedtasks' collection med ny ansatt
-      const completedResponse = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks', {
+      const completedResponse = await fetch(`${API_BASE_URL}/completedtasks`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(bodyData),
@@ -306,7 +308,7 @@ function TodoList() {
       console.log('Sender følgende data til customtasks PATCH:', patchData);
 
       // Oppdater 'customtasks' for å sette `extraEmployeeAdded` til true
-      const patchResponse = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customtasks/${taskId}`, {
+      const patchResponse = await fetch(`${API_BASE_URL} / customtasks/${taskId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(patchData),

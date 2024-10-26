@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
+
 function CreateService() {
   const { customerNumber } = useParams();
   const navigate = useNavigate();
@@ -25,7 +28,7 @@ function CreateService() {
   useEffect(() => {
     const fetchLastServiceId = async () => {
       try {
-        const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/services/last-service-id');
+        const response = await fetch(`${API_BASE_URL}/services/last-service-id`);
         const data = await response.json();
         const lastServiceId = parseInt(data.lastServiceId, 10);
         const nextServiceId = isNaN(lastServiceId) ? 1 : lastServiceId + 1;
@@ -41,7 +44,7 @@ function CreateService() {
 
     const fetchEmployees = async () => {
       try {
-        const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/employees');
+        const response = await fetch(`${API_BASE_URL}/employees`);
         const data = await response.json();
         setEmployees(data);
       } catch (error) {
@@ -51,7 +54,7 @@ function CreateService() {
 
     const fetchServiceTypes = async () => {
       try {
-        const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/servicetypes');
+        const response = await fetch(`${API_BASE_URL}/servicetypes`);
         const data = await response.json();
         setServiceTypes(data); // Sett tjenestetyper fra API-et
       } catch (error) {
@@ -111,7 +114,7 @@ function CreateService() {
     };
 
     try {
-      const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/services', {
+      const response = await fetch(`${API_BASE_URL}/services`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

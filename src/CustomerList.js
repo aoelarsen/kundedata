@@ -1,6 +1,8 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom'; // Sørg for at Link er importert
 
+
+
 function CustomerList({ customers }) {
   const navigate = useNavigate();
 
@@ -30,7 +32,7 @@ function CustomerList({ customers }) {
             </thead>
             <tbody>
               {customers.map((customer) => (
-                <tr 
+                <tr
                   key={customer._id} // Endret til _id
                   className="hover:bg-gray-50 cursor-pointer"
                   onClick={() => handleSelectCustomer(customer)}

@@ -2,6 +2,9 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import Cookies from 'js-cookie';
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
+
 function CompletedTasks() {
     const [completedTasks, setCompletedTasks] = useState([]);
 
@@ -10,7 +13,7 @@ function CompletedTasks() {
     // Hent fullførte oppgaver
     const fetchCompletedTasks = useCallback(async () => {
         try {
-            const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/completedtasks');
+            const response = await fetch(`${API_BASE_URL}/completedtasks`);
             const data = await response.json();
 
             const filteredTasks = data.filter(task => task.store === butikkid);

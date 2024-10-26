@@ -3,6 +3,8 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { format, parse } from 'date-fns'; // Importer nødvendige funksjoner fra date-fns
 import Cookies from 'js-cookie'; // Importer Cookies for å hente butikkid
 
+
+
 // Funksjon for å parse datoformatet fra serveren og returnere en formatert dato
 const parseCustomDateString = (dateString) => {
   const parsedDate = parse(dateString, 'd.M.yyyy, HH:mm:ss', new Date());
@@ -19,6 +21,9 @@ const formatDate = (dateString) => {
   return format(parsedDate, 'd.M.yyyy HH:mm'); // Formaterer dato til '21.9.2024 19:02'
 };
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
+
 function CustomerDetails() {
   const { id } = useParams(); // Dette vil nå referere til _id fra MongoDB
   const [customer, setCustomer] = useState(null);
@@ -34,7 +39,7 @@ function CustomerDetails() {
   useEffect(() => {
     const fetchCustomer = async () => {
       try {
-        const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customers/${id}`);
+        const response = await fetch(`${API_BASE_URL}/customers/${id}`);
         if (response.ok) {
           const customerData = await response.json();
           setCustomer(customerData);
@@ -51,7 +56,7 @@ function CustomerDetails() {
 
     const fetchOrders = async (customerNumber) => {
       try {
-        const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/orders?kundeid=${customerNumber}`);
+        const response = await fetch(`${API_BASE_URL}/orders?kundeid=${customerNumber}`);
         if (response.ok) {
           let ordersData = await response.json();
 
@@ -72,7 +77,7 @@ function CustomerDetails() {
 
     const fetchServices = async (customerNumber) => {
       try {
-        const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/services?kundeid=${customerNumber}`);
+        const response = await fetch(`${API_BASE_URL}/services?kundeid=${customerNumber}`);
         if (response.ok) {
           let servicesData = await response.json();
 
@@ -93,7 +98,7 @@ function CustomerDetails() {
 
     const fetchSmsArchive = async (phoneNumber) => {
       try {
-        const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/smsarchives?telefonnummer=${phoneNumber}`);
+        const response = await fetch(`${API_BASE_URL}/smsarchives?telefonnummer=${phoneNumber}`);
         if (response.ok) {
           const smsData = await response.json();
           setSmsArchive(smsData.sort((a, b) => new Date(b.sendtDato) - new Date(a.sendtDato)));

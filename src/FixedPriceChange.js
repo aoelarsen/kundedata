@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 function FixedPriceChange() {
     const { id } = useParams();
@@ -18,7 +19,7 @@ function FixedPriceChange() {
         // Hent fastprisen basert på ID
         const fetchFixedPrice = async () => {
             try {
-                const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/fixedprices/${id}`);
+                const response = await fetch(`${API_BASE_URL} / fixedprices/${id}`);
                 if (response.ok) {
                     const data = await response.json();
                     setFormData(data);
@@ -33,7 +34,7 @@ function FixedPriceChange() {
         // Hent tjenestetyper
         const fetchServiceTypes = async () => {
             try {
-                const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/servicetypes');
+                const response = await fetch(`${API_BASE_URL}/servicetypes`);
                 const data = await response.json();
                 setServiceTypes(data);
             } catch (error) {
@@ -57,7 +58,7 @@ function FixedPriceChange() {
         e.preventDefault();
 
         try {
-            const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/fixedprices/${id}`, {
+            const response = await fetch(`${API_BASE_URL} / fixedprices/${id}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -126,7 +127,7 @@ function FixedPriceChange() {
                         ))}
                     </select>
                 </div>
-                                {/* Nytt prioritet-felt */}
+                {/* Nytt prioritet-felt */}
                 <div>
                     <label className="block text-sm font-medium text-gray-700">Prioritet</label>
                     <input

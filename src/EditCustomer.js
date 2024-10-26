@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
+
 function EditCustomer() {
   const { id } = useParams(); // Fanger opp id fra URL-en
   const navigate = useNavigate(); // Brukes til å navigere programmatisk
@@ -15,7 +18,7 @@ function EditCustomer() {
   useEffect(() => {
     const fetchCustomer = async () => {
       try {
-        const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customers/${id}`);
+        const response = await fetch(`${API_BASE_URL} / customers/${id}`);
         if (response.ok) {
           const customer = await response.json();
           setFormData({
@@ -55,7 +58,7 @@ function EditCustomer() {
     console.log("Oppdaterer kunde med data:", updatedCustomer);
 
     try {
-      const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customers/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/customers/${id}`, {
         method: 'PATCH', // Endret fra PUT til PATCH for delvis oppdatering
         headers: {
           'Content-Type': 'application/json',
@@ -123,8 +126,8 @@ function EditCustomer() {
           />
         </div>
         <div className="text-center">
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className="bg-green-500 text-white px-6 py-3 rounded hover:bg-green-600"
           >
             Lagre endringer

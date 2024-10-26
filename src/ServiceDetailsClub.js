@@ -5,13 +5,15 @@ import 'jspdf-autotable'; // Importer for tabeller i PDF
 import PrintInvoice from './PrintInvoice'; // Importer den utskriftsvennlige komponenten
 
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
 
 function ServiceDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-    // Ny loading state
-    const [isLoading, setIsLoading] = useState(true);
+  // Ny loading state
+  const [isLoading, setIsLoading] = useState(true);
 
 
   const [formData, setFormData] = useState({
@@ -46,8 +48,8 @@ function ServiceDetails() {
     window.scrollTo(0, 0);
   }, []);
 
-   // Funksjon som sjekker beskrivelse når siden lastes
-   useEffect(() => {
+  // Funksjon som sjekker beskrivelse når siden lastes
+  useEffect(() => {
     if (!formData.beskrivelse.trim()) {
       setIsDescriptionEmpty(true); // Sett isDescriptionEmpty til true hvis beskrivelse er tom
     }
@@ -96,7 +98,7 @@ function ServiceDetails() {
     // Oppdater backend
     try {
       const updatedService = { deler: updatedParts };
-      await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/services/${id}`, {
+      await fetch(`${API_BASE_URL} / services/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updatedService),
@@ -125,7 +127,7 @@ function ServiceDetails() {
   useEffect(() => {
     const fetchParts = async () => {
       try {
-        const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/parts');
+        const response = await fetch(`${API_BASE_URL}/parts`);
         if (!response.ok) {
           throw new Error(`Feil ved henting av deler: ${response.statusText}`);
         }
@@ -159,7 +161,7 @@ function ServiceDetails() {
   useEffect(() => {
     const fetchFixedPrices = async () => {
       try {
-        const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/fixedprices');
+        const response = await fetch(`${API_BASE_URL}/fixedprices`);
         if (response.ok) {
           const prices = await response.json();
           setFixedPrices(prices);
@@ -176,7 +178,7 @@ function ServiceDetails() {
   useEffect(() => {
     const fetchParts = async () => {
       try {
-        const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/parts'); // URL til serveren din
+        const response = await fetch(`${API_BASE_URL}/parts`); // URL til serveren din
         if (!response.ok) {
           throw new Error(`Feil ved henting av deler: ${response.statusText}`);
         }
@@ -194,45 +196,45 @@ function ServiceDetails() {
   const handleAddWork = async (e) => {
     const selectedWork = fixedPrices.find(price => price._id === e.target.value && price.serviceType === "Tekstiltrykking");
     if (selectedWork) {
-        // Legg til title, price, og description i arbeid-arrayen
-        const updatedWork = [...formData.arbeid, {
-            title: selectedWork.title,
-            price: selectedWork.price,
-            description: selectedWork.description || "Ingen beskrivelse tilgjengelig" // Bruk description eller fallback
-        }];
+      // Legg til title, price, og description i arbeid-arrayen
+      const updatedWork = [...formData.arbeid, {
+        title: selectedWork.title,
+        price: selectedWork.price,
+        description: selectedWork.description || "Ingen beskrivelse tilgjengelig" // Bruk description eller fallback
+      }];
 
-        // Oppdater formData i frontend
-        setFormData((prevData) => ({
-            ...prevData,
-            arbeid: updatedWork, // Oppdaterer arbeid med title, price, og description
-        }));
+      // Oppdater formData i frontend
+      setFormData((prevData) => ({
+        ...prevData,
+        arbeid: updatedWork, // Oppdaterer arbeid med title, price, og description
+      }));
 
-        // Oppdater backend inkludert description
-        try {
-            const updatedService = {
-                arbeid: updatedWork.map(work => ({
-                    title: work.title,
-                    price: work.price,
-                    description: work.description  // Sørg for å inkludere beskrivelsen
-                })),
-            };
+      // Oppdater backend inkludert description
+      try {
+        const updatedService = {
+          arbeid: updatedWork.map(work => ({
+            title: work.title,
+            price: work.price,
+            description: work.description  // Sørg for å inkludere beskrivelsen
+          })),
+        };
 
-            const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/services/${id}`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(updatedService), // Send oppdaterte arbeid inkludert description til backend
-            });
+        const response = await fetch(`${API_BASE_URL} / services/${id}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(updatedService), // Send oppdaterte arbeid inkludert description til backend
+        });
 
-            if (!response.ok) {
-                console.error('Feil ved oppdatering av arbeid:', response.statusText);
-            }
-        } catch (error) {
-            console.error('Feil ved kommunikasjon med serveren:', error);
+        if (!response.ok) {
+          console.error('Feil ved oppdatering av arbeid:', response.statusText);
         }
+      } catch (error) {
+        console.error('Feil ved kommunikasjon med serveren:', error);
+      }
     }
-};
+  };
 
 
 
@@ -247,24 +249,24 @@ function ServiceDetails() {
     console.log("Valgt arbeid for kopiering:", selectedWork);
 
     if (selectedWork && selectedWork.description) {
-        // Log hva som blir kopiert hvis det er en beskrivelse
-        console.log("Kopierer beskrivelse fra backend:", selectedWork.description);
+      // Log hva som blir kopiert hvis det er en beskrivelse
+      console.log("Kopierer beskrivelse fra backend:", selectedWork.description);
 
-        // Oppdater utført arbeid med beskrivelse fra det valgte arbeidet
-        const newUtførtArbeid = `${selectedWork.description}\n\n${formData.utførtArbeid}`.trim();
+      // Oppdater utført arbeid med beskrivelse fra det valgte arbeidet
+      const newUtførtArbeid = `${selectedWork.description}\n\n${formData.utførtArbeid}`.trim();
 
-        setFormData((prevData) => ({
-            ...prevData,
-            utførtArbeid: newUtførtArbeid,
-        }));
+      setFormData((prevData) => ({
+        ...prevData,
+        utførtArbeid: newUtførtArbeid,
+      }));
 
-        // Log den oppdaterte verdien for utført arbeid
-        console.log("Oppdatert utført arbeid med kopi:", newUtførtArbeid);
+      // Log den oppdaterte verdien for utført arbeid
+      console.log("Oppdatert utført arbeid med kopi:", newUtførtArbeid);
     } else {
-        // Hvis beskrivelsen mangler, log en feilmelding
-        console.error("Ingen beskrivelse tilgjengelig for det valgte arbeidet.");
+      // Hvis beskrivelsen mangler, log en feilmelding
+      console.error("Ingen beskrivelse tilgjengelig for det valgte arbeidet.");
     }
-};
+  };
 
 
 
@@ -280,7 +282,7 @@ function ServiceDetails() {
   useEffect(() => {
     const fetchService = async () => {
       try {
-        const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/services/${id}`);
+        const response = await fetch(`${API_BASE_URL} / services/${id}`);
         if (response.ok) {
           const service = await response.json();
           setServiceDetails(service);
@@ -297,27 +299,27 @@ function ServiceDetails() {
             Farge: service.Farge || '',
           });
 
-    // Sett isDescriptionEmpty basert på den hentede beskrivelsen
-    if (!service.Beskrivelse || !service.Beskrivelse.trim()) {
-      setIsDescriptionEmpty(true);
-    } else {
-      setIsDescriptionEmpty(false);
-    }
+          // Sett isDescriptionEmpty basert på den hentede beskrivelsen
+          if (!service.Beskrivelse || !service.Beskrivelse.trim()) {
+            setIsDescriptionEmpty(true);
+          } else {
+            setIsDescriptionEmpty(false);
+          }
 
-    if (service.kundeid) {
-      fetchCustomer(service.kundeid);
-    }
-  } else {
-    console.error('Tjeneste ble ikke funnet');
-  }
-} catch (error) {
-  console.error('Feil ved henting av tjenesten:', error);
-}
-};
+          if (service.kundeid) {
+            fetchCustomer(service.kundeid);
+          }
+        } else {
+          console.error('Tjeneste ble ikke funnet');
+        }
+      } catch (error) {
+        console.error('Feil ved henting av tjenesten:', error);
+      }
+    };
 
     const fetchCustomer = async (kundeid) => {
       try {
-        const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/customers?customerNumber`);
+        const response = await fetch(`${API_BASE_URL} / customers?customerNumber`);
         if (response.ok) {
           const customerData = await response.json();
           const customer = customerData.find(c => c.customerNumber === kundeid);
@@ -337,7 +339,7 @@ function ServiceDetails() {
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/employees');
+        const response = await fetch(`${API_BASE_URL}/employees`);
         if (response.ok) {
           const employeesData = await response.json();
           setEmployees(employeesData);
@@ -371,7 +373,7 @@ function ServiceDetails() {
     console.log("Lagrer følgende felt i databasen:", updatedFields);
 
     try {
-      const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/services/${id}`, {
+      const response = await fetch(`${API_BASE_URL} / services/${id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -423,7 +425,7 @@ function ServiceDetails() {
     console.log('Oppdaterer tjeneste med data:', updatedService); // Logger oppdaterte data
 
     try {
-      const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/services/${id}`, {
+      const response = await fetch(`${API_BASE_URL} / services/${id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -463,7 +465,7 @@ function ServiceDetails() {
           }))
         };
 
-        const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/services/${id}`, {
+        const response = await fetch(`${API_BASE_URL} / services/${id}`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
@@ -515,7 +517,7 @@ function ServiceDetails() {
           }))
         };
 
-        const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/services/${id}`, {
+        const response = await fetch(`${API_BASE_URL} / services/${id}`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
@@ -656,10 +658,10 @@ function ServiceDetails() {
     navigate('/sendsms', { state: { serviceDetails, customer } });
   };
 
-    // Hvis siden er i ferd med å laste, vis et lasteskjermbilde
-    if (isLoading) {
-      return <div className="text-center py-10">Laster inn data...</div>;
-    }
+  // Hvis siden er i ferd med å laste, vis et lasteskjermbilde
+  if (isLoading) {
+    return <div className="text-center py-10">Laster inn data...</div>;
+  }
 
   return (
     <div className="max-w-5xl mx-auto py-8 bg-white shadow-lg rounded-lg p-6 mb-4">
@@ -798,146 +800,146 @@ function ServiceDetails() {
         </div>
 
         <div className={`p-4 border ${isWorkEmpty ? 'border-red-500' : 'border-gray-300'} rounded-lg`}>
-    <label className="block text-sm font-medium text-gray-700">Velg arbeid fra listen:</label>
-    <select onChange={handleAddWork} className="mt-1 block w-full p-2 border border-gray-300 rounded-md">
-        <option value="">Velg arbeid</option>
-        {fixedPrices
-            .filter(price => price.serviceType === "Tekstiltrykking")  // Filtrer på "Tekstiltrykking"
-            .sort((a, b) => a.priority - b.priority)  // Sorter etter priority
-            .map((price) => (
+          <label className="block text-sm font-medium text-gray-700">Velg arbeid fra listen:</label>
+          <select onChange={handleAddWork} className="mt-1 block w-full p-2 border border-gray-300 rounded-md">
+            <option value="">Velg arbeid</option>
+            {fixedPrices
+              .filter(price => price.serviceType === "Tekstiltrykking")  // Filtrer på "Tekstiltrykking"
+              .sort((a, b) => a.priority - b.priority)  // Sorter etter priority
+              .map((price) => (
                 <option key={price._id} value={price._id}>
-                    {price.title} - {price.price} kr 
+                  {price.title} - {price.price} kr
                 </option>
-            ))}
-    </select>
-    {isWorkEmpty && (
-        <p className="text-red-500 text-sm mt-2">Legg til arbeid.</p>
-    )}
-</div>
+              ))}
+          </select>
+          {isWorkEmpty && (
+            <p className="text-red-500 text-sm mt-2">Legg til arbeid.</p>
+          )}
+        </div>
 
 
 
-{/* Valgt arbeid, deler, priser og knapp */}
-{!isWorkEmpty && (
-  <div className="p-4 border border-gray-300 rounded-lg">
-    {/* Arbeid */}
-    <h3 className="text-lg font-semibold mb-4">Arbeid:</h3>
-    <ul>
-      {formData.arbeid.map((item, index) => (
-        <li key={index} className="flex justify-between items-center">
-          <span>{item.title} - {item.price} kr</span>
-          <div className="flex space-x-2">
+        {/* Valgt arbeid, deler, priser og knapp */}
+        {!isWorkEmpty && (
+          <div className="p-4 border border-gray-300 rounded-lg">
+            {/* Arbeid */}
+            <h3 className="text-lg font-semibold mb-4">Arbeid:</h3>
+            <ul>
+              {formData.arbeid.map((item, index) => (
+                <li key={index} className="flex justify-between items-center">
+                  <span>{item.title} - {item.price} kr</span>
+                  <div className="flex space-x-2">
+                    <button
+                      type="button"
+                      onClick={() => handleCopyWork(index)}
+                      className="text-blue-500 hover:text-blue-700"
+                    >
+                      Kopi
+                    </button>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        // Oppdaterer kun state
+                        const updatedWork = formData.arbeid.filter((_, i) => i !== index);
+                        setFormData((prevData) => ({
+                          ...prevData,
+                          arbeid: updatedWork,
+                        }));
+
+                        // Oppdater backend
+                        try {
+                          const updatedService = { arbeid: updatedWork };
+                          await fetch(`${API_BASE_URL} / services/${id}`, {
+                            method: 'PATCH',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(updatedService),
+                          });
+                        } catch (error) {
+                          console.error('Feil ved fjerning av arbeid:', error);
+                        }
+                      }}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      Fjern
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+
+            <p className="text-lg font-bold mt-4 mb-4 text-left">Totalt arbeid: {calculateTotalWorkPrice()} kr</p>
+
+            {/* Deler */}
+            <h3 className="text-lg font-semibold mb-4">Deler:</h3>
+            <ul>
+              {formData.deler.map((part, index) => (
+                <li key={index} className="flex justify-between items-center">
+                  <span>{part.ean} - {part.product} - {part.price} kr</span>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      // Oppdaterer kun state
+                      const updatedParts = formData.deler.filter((_, i) => i !== index);
+                      setFormData((prevData) => ({
+                        ...prevData,
+                        deler: updatedParts,
+                      }));
+
+                      // Oppdater backend
+                      try {
+                        const updatedService = { deler: updatedParts };
+                        await fetch(`${API_BASE_URL} / services/${id}`, {
+                          method: 'PATCH',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify(updatedService),
+                        });
+                      } catch (error) {
+                        console.error('Feil ved fjerning av del:', error);
+                      }
+                    }}
+                    className="text-red-500 hover:text-red-700"
+                  >
+                    Fjern
+                  </button>
+                </li>
+              ))}
+            </ul>
+
+            <p className="text-lg font-bold mt-4 text-left">Totalt deler: {calculateTotalPartsPrice()} kr</p>
+
+            {/* Totalpris */}
+            <p className="text-lg font-bold mt-4 text-right">Totalpris: {calculateTotalPrice()} kr</p>
+
+            {/* Knapp for å generere PDF */}
             <button
-              type="button"
-              onClick={() => handleCopyWork(index)}
-              className="text-blue-500 hover:text-blue-700"
+              onClick={handlePrint}
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mt-4"
             >
-              Kopi
+              Skriv ut fakturaside
             </button>
-            <button
-              type="button"
-              onClick={async () => {
-                // Oppdaterer kun state
-                const updatedWork = formData.arbeid.filter((_, i) => i !== index);
-                setFormData((prevData) => ({
-                  ...prevData,
-                  arbeid: updatedWork,
-                }));
 
-                // Oppdater backend
-                try {
-                  const updatedService = { arbeid: updatedWork };
-                  await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/services/${id}`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(updatedService),
-                  });
-                } catch (error) {
-                  console.error('Feil ved fjerning av arbeid:', error);
-                }
-              }}
-              className="text-red-500 hover:text-red-700"
-            >
-              Fjern
-            </button>
+            {/* Render den utskriftsvennlige komponenten i bakgrunnen (ikke synlig) */}
+            <div style={{ display: 'none' }}>
+              <PrintInvoice serviceDetails={serviceDetails} customer={customer} formData={formData} calculateTotalPrice={calculateTotalPrice} />
+            </div>
           </div>
-        </li>
-      ))}
-    </ul>
+        )}
 
-    <p className="text-lg font-bold mt-4 mb-4 text-left">Totalt arbeid: {calculateTotalWorkPrice()} kr</p>
-
-    {/* Deler */}
-    <h3 className="text-lg font-semibold mb-4">Deler:</h3>
-    <ul>
-      {formData.deler.map((part, index) => (
-        <li key={index} className="flex justify-between items-center">
-          <span>{part.ean} - {part.product} - {part.price} kr</span>
-          <button
-            type="button"
-            onClick={async () => {
-              // Oppdaterer kun state
-              const updatedParts = formData.deler.filter((_, i) => i !== index);
-              setFormData((prevData) => ({
-                ...prevData,
-                deler: updatedParts,
-              }));
-
-              // Oppdater backend
-              try {
-                const updatedService = { deler: updatedParts };
-                await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/services/${id}`, {
-                  method: 'PATCH',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(updatedService),
-                });
-              } catch (error) {
-                console.error('Feil ved fjerning av del:', error);
-              }
-            }}
-            className="text-red-500 hover:text-red-700"
-          >
-            Fjern
-          </button>
-        </li>
-      ))}
-    </ul>
-
-    <p className="text-lg font-bold mt-4 text-left">Totalt deler: {calculateTotalPartsPrice()} kr</p>
-
-    {/* Totalpris */}
-    <p className="text-lg font-bold mt-4 text-right">Totalpris: {calculateTotalPrice()} kr</p>
-
-    {/* Knapp for å generere PDF */}
-    <button
-      onClick={handlePrint}
-      className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mt-4"
-    >
-      Skriv ut fakturaside
-    </button>
-
-    {/* Render den utskriftsvennlige komponenten i bakgrunnen (ikke synlig) */}
-    <div style={{ display: 'none' }}>
-      <PrintInvoice serviceDetails={serviceDetails} customer={customer} formData={formData} calculateTotalPrice={calculateTotalPrice} />
-    </div>
-  </div>
-)}
-
-{/* Beskrivelse */}
-<div className={`p-4 border ${isDescriptionEmpty ? 'border-red-500' : 'border-gray-300'} rounded-lg`}>
-  <label className="block text-sm font-medium text-gray-700">
-    Kundens ønsker til servicen: (Skriv utfyllende om hvilket arbeid som ønskes utføres)
-  </label>
-  <textarea
-    name="beskrivelse"
-    value={formData.beskrivelse}
-    onChange={(e) => setFormData({ ...formData, beskrivelse: e.target.value })}
-    required
-    rows="3"
-    className="mt-1 block w-full p-2 border border-gray-300 rounded-md resize-y"
-  />
-  {isDescriptionEmpty && <p className="text-red-500 text-sm mt-2">Beskrivelse må fylles ut.</p>}
-</div>
+        {/* Beskrivelse */}
+        <div className={`p-4 border ${isDescriptionEmpty ? 'border-red-500' : 'border-gray-300'} rounded-lg`}>
+          <label className="block text-sm font-medium text-gray-700">
+            Kundens ønsker til servicen: (Skriv utfyllende om hvilket arbeid som ønskes utføres)
+          </label>
+          <textarea
+            name="beskrivelse"
+            value={formData.beskrivelse}
+            onChange={(e) => setFormData({ ...formData, beskrivelse: e.target.value })}
+            required
+            rows="3"
+            className="mt-1 block w-full p-2 border border-gray-300 rounded-md resize-y"
+          />
+          {isDescriptionEmpty && <p className="text-red-500 text-sm mt-2">Beskrivelse må fylles ut.</p>}
+        </div>
 
 
 

@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
+
 function EmployeeChange() {
     const { id } = useParams();
     const [formData, setFormData] = useState({
@@ -16,7 +19,7 @@ function EmployeeChange() {
     useEffect(() => {
         const fetchEmployee = async () => {
             try {
-                const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/employees/${id}`);
+                const response = await fetch(`${API_BASE_URL} / employees/${id}`);
                 if (response.ok) {
                     const data = await response.json();
                     setFormData(data);
@@ -43,7 +46,7 @@ function EmployeeChange() {
         e.preventDefault();
 
         try {
-            const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/employees/${id}`, {
+            const response = await fetch(`${API_BASE_URL} / employees/${id}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',

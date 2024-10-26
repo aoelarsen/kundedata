@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
 function SmsTemplateForm() {
     const [formData, setFormData] = useState({
         tittel: '',
@@ -23,7 +25,7 @@ function SmsTemplateForm() {
         e.preventDefault();
 
         try {
-            const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/smstemplates', {
+            const response = await fetch(`${API_BASE_URL}/smstemplates`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

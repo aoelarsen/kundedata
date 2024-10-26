@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
 function StatusList() {
     const [statuses, setStatuses] = useState([]);
     const navigate = useNavigate();
@@ -8,7 +10,7 @@ function StatusList() {
     useEffect(() => {
         const fetchStatuses = async () => {
             try {
-                const response = await fetch('https://kundesamhandling-acdc6a9165f8.herokuapp.com/statuses');
+                const response = await fetch(`${API_BASE_URL}/statuses`);
                 if (!response.ok) {
                     throw new Error('Feil ved henting av statuser');
                 }
@@ -42,7 +44,7 @@ function StatusList() {
                     Legg til status
                 </button>
             </div>
-            
+
             {statuses.length > 0 ? (
                 <table className="min-w-full bg-white border border-gray-300 rounded-lg">
                     <thead>

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
 function PartChange() {
     const { id } = useParams();
     const [formData, setFormData] = useState({
@@ -15,7 +17,7 @@ function PartChange() {
     useEffect(() => {
         const fetchPart = async () => {
             try {
-                const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/parts/${id}`);
+                const response = await fetch(`${API_BASE_URL} / parts/${id}`);
                 if (response.ok) {
                     const data = await response.json();
                     setFormData(data);
@@ -42,7 +44,7 @@ function PartChange() {
         e.preventDefault();
 
         try {
-            const response = await fetch(`https://kundesamhandling-acdc6a9165f8.herokuapp.com/parts/${id}`, {
+            const response = await fetch(`${API_BASE_URL} / parts/${id}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
