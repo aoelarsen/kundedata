@@ -1,6 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
+import { logout } from './auth';
+
+
+
+
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 function NavBar() {
@@ -13,7 +18,12 @@ function NavBar() {
   const [isStoreModalOpen, setIsStoreModalOpen] = useState(false);
   const [isEmployeeModalOpen, setIsEmployeeModalOpen] = useState(false); // Legger til modal for ansattvalg
   const settingsRef = useRef(null);
+  const navigate = useNavigate();
 
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   useEffect(() => {
     // Sjekk først om butikk er valgt
@@ -161,6 +171,10 @@ function NavBar() {
             {selectedStore && (
               <span className="text-white ml-4">Butikk: {selectedStore}</span>
             )}
+            <nav>
+              <Link to="/">Hjem</Link>
+              <button onClick={handleLogout}>Logg ut</button>
+            </nav>
           </div>
 
           <div className="flex items-center space-x-4">

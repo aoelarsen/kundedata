@@ -36,6 +36,9 @@ import FixedPriceChange from './FixedPriceChange';
 import PartList from './PartList';
 import PartForm from './PartForm';
 import PartChange from './PartChange';
+import Login from './Login';
+
+
 
 function App() {
   const [customers, setCustomers] = useState([]);
@@ -136,6 +139,7 @@ function App() {
         <NavBar />
         <div className="p-4">
           <Routes>
+            <Route path="/login" element={<Login />} />
             <Route
               path="/"
               element={
@@ -213,7 +217,10 @@ function App() {
             <Route path="/status-list" element={<StatusList />} />
             <Route path="/status-change/:id" element={<StatusChange />} />
             <Route path="/sendsms" element={<SendSMS />} />
-            <Route path="/todo" element={<TodoList />} />
+            <Route
+              path="/todo"
+              element={<ProtectedRoute element={<TodoList />} />} // Eksempel på en beskyttet rute
+            />
 
             <Route path="/service-details-bike/:id" element={<ServiceDetailsBike />} />
             <Route path="/service-details-ski/:id" element={<ServiceDetailsSki />} />
