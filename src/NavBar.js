@@ -171,10 +171,6 @@ function NavBar() {
             {selectedStore && (
               <span className="text-white ml-4">Butikk: {selectedStore}</span>
             )}
-            <nav>
-              <Link to="/">Hjem</Link>
-              <button onClick={handleLogout}>Logg ut</button>
-            </nav>
           </div>
 
           <div className="flex items-center space-x-4">
@@ -219,6 +215,9 @@ function NavBar() {
                       Bytt butikk
                     </button>
                   </li>
+                  <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">
+                    Logg ut
+                  </button>
                 </ul>
               )}
             </div>
