@@ -19,7 +19,7 @@ function FixedPriceChange() {
         // Hent fastprisen basert på ID
         const fetchFixedPrice = async () => {
             try {
-                const response = await fetch(`${API_BASE_URL} / fixedprices/${id}`);
+                const response = await fetch(`${API_BASE_URL}/fixedprices/${id}`);
                 if (response.ok) {
                     const data = await response.json();
                     setFormData(data);
@@ -58,7 +58,7 @@ function FixedPriceChange() {
         e.preventDefault();
 
         try {
-            const response = await fetch(`${API_BASE_URL} / fixedprices/${id}`, {
+            const response = await fetch(`${API_BASE_URL}/fixedprices/${id}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',

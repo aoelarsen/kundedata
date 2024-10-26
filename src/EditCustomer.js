@@ -18,7 +18,7 @@ function EditCustomer() {
   useEffect(() => {
     const fetchCustomer = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL} / customers/${id}`);
+        const response = await fetch(`${API_BASE_URL}/customers/${id}`);
         if (response.ok) {
           const customer = await response.json();
           setFormData({

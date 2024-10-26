@@ -14,7 +14,7 @@ function StatusChange() {
   useEffect(() => {
     const fetchStatus = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL} / statuses/${id}`);
+        const response = await fetch(`${API_BASE_URL}/statuses/${id}`);
         if (!response.ok) {
           if (response.status === 404) {
             setError('Status ikke funnet');
@@ -44,7 +44,7 @@ function StatusChange() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`${API_BASE_URL} / statuses/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/statuses/${id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

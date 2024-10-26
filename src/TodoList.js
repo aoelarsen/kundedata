@@ -40,7 +40,7 @@ function TodoList() {
 
 
             // Oppdater oppgaven i databasen hvis datoen ikke samsvarer med dagens dato
-            const updateResponse = await fetch(`${API_BASE_URL} / dailytasks/${task._id}`, {
+            const updateResponse = await fetch(`${API_BASE_URL}/dailytasks/${task._id}`, {
               method: 'PATCH',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ completed: false, completedBy: null, dateCompleted: null }),
@@ -105,7 +105,7 @@ function TodoList() {
             console.log(`Oppgave "${task.task}" har en utførtdato (${completedDate}) som ikke samsvarer med dagens dato (${today}) og vil bli slettet.`);
 
             // Slett oppgaven fra customtasks
-            const deleteResponse = await fetch(`${API_BASE_URL} / customtasks/${task._id}`, {
+            const deleteResponse = await fetch(`${API_BASE_URL}/customtasks/${task._id}`, {
               method: 'DELETE',
             });
 
@@ -214,7 +214,7 @@ function TodoList() {
         body: JSON.stringify(bodyData),
       });
 
-      const response = await fetch(`${API_BASE_URL} / dailytasks/${taskId}`, {
+      const response = await fetch(`${API_BASE_URL}/dailytasks/${taskId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ completed: true, completedBy: employee, dateCompleted: new Date().toISOString() }),
@@ -258,7 +258,7 @@ function TodoList() {
       });
 
       // Oppdater 'customtasks' med utførtdato og ansatt
-      const response = await fetch(`${API_BASE_URL} / customtasks/${taskId}`, {
+      const response = await fetch(`${API_BASE_URL}/customtasks/${taskId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ completedBy: employee, dateCompleted: new Date().toISOString() }),
@@ -308,7 +308,7 @@ function TodoList() {
       console.log('Sender følgende data til customtasks PATCH:', patchData);
 
       // Oppdater 'customtasks' for å sette `extraEmployeeAdded` til true
-      const patchResponse = await fetch(`${API_BASE_URL} / customtasks/${taskId}`, {
+      const patchResponse = await fetch(`${API_BASE_URL}/customtasks/${taskId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(patchData),

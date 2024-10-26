@@ -43,7 +43,7 @@ function CreateOrder() {
 
     const fetchEmployees = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL} / employees`);
+        const response = await fetch(`${API_BASE_URL}/employees`);
         const data = await response.json();
         setEmployees(data);
       } catch (error) {

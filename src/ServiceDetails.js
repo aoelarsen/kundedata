@@ -42,7 +42,7 @@ function ServiceDetails() {
   useEffect(() => {
     const fetchService = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL} / services/${id}`);
+        const response = await fetch(`${API_BASE_URL}/services/${id}`);
         if (response.ok) {
           const service = await response.json();
           setServiceDetails(service); // Setter serviceDetails med data fra API
@@ -69,7 +69,7 @@ function ServiceDetails() {
 
     const fetchCustomer = async (kundeid) => {
       try {
-        const response = await fetch(`${API_BASE_URL} / customers?customerNumber`);
+        const response = await fetch(`${API_BASE_URL}/customers?customerNumber`);
         if (response.ok) {
           const customerData = await response.json();
           const customer = customerData.find(c => c.customerNumber === kundeid);
@@ -117,7 +117,7 @@ function ServiceDetails() {
     };
 
     try {
-      const response = await fetch(`${API_BASE_URL} / services/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/services/${id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

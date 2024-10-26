@@ -98,7 +98,7 @@ function ServiceDetails() {
     // Oppdater backend
     try {
       const updatedService = { deler: updatedParts };
-      await fetch(`${API_BASE_URL} / services/${id}`, {
+      await fetch(`${API_BASE_URL}/services/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updatedService),
@@ -216,7 +216,7 @@ function ServiceDetails() {
           })),
         };
 
-        const response = await fetch(`${API_BASE_URL} / services/${id}`, {
+        const response = await fetch(`${API_BASE_URL}/services/${id}`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
@@ -280,7 +280,7 @@ function ServiceDetails() {
   useEffect(() => {
     const fetchService = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL} / services/${id}`);
+        const response = await fetch(`${API_BASE_URL}/services/${id}`);
         if (response.ok) {
           const service = await response.json();
           setServiceDetails(service);
@@ -317,7 +317,7 @@ function ServiceDetails() {
 
     const fetchCustomer = async (kundeid) => {
       try {
-        const response = await fetch(`${API_BASE_URL} / customers?customerNumber`);
+        const response = await fetch(`${API_BASE_URL}/customers?customerNumber`);
         if (response.ok) {
           const customerData = await response.json();
           const customer = customerData.find(c => c.customerNumber === kundeid);
@@ -371,7 +371,7 @@ function ServiceDetails() {
     console.log("Lagrer følgende felt i databasen:", updatedFields);
 
     try {
-      const response = await fetch(`${API_BASE_URL} / services/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/services/${id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -423,7 +423,7 @@ function ServiceDetails() {
     console.log('Oppdaterer tjeneste med data:', updatedService); // Logger oppdaterte data
 
     try {
-      const response = await fetch(`${API_BASE_URL} / services/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/services/${id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -463,7 +463,7 @@ function ServiceDetails() {
           }))
         };
 
-        const response = await fetch(`${API_BASE_URL} / services/${id}`, {
+        const response = await fetch(`${API_BASE_URL}/services/${id}`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
@@ -515,7 +515,7 @@ function ServiceDetails() {
           }))
         };
 
-        const response = await fetch(`${API_BASE_URL} / services/${id}`, {
+        const response = await fetch(`${API_BASE_URL}/services/${id}`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
@@ -848,7 +848,7 @@ function ServiceDetails() {
                         // Oppdater backend
                         try {
                           const updatedService = { arbeid: updatedWork };
-                          await fetch(`${API_BASE_URL} / services/${id}`, {
+                          await fetch(`${API_BASE_URL}/services/${id}`, {
                             method: 'PATCH',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify(updatedService),
@@ -887,7 +887,7 @@ function ServiceDetails() {
                       // Oppdater backend
                       try {
                         const updatedService = { deler: updatedParts };
-                        await fetch(`${API_BASE_URL} / services/${id}`, {
+                        await fetch(`${API_BASE_URL}/services/${id}`, {
                           method: 'PATCH',
                           headers: { 'Content-Type': 'application/json' },
                           body: JSON.stringify(updatedService),

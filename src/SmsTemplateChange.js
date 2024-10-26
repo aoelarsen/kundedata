@@ -18,7 +18,7 @@ function SmsTemplateChange() {
         console.log("ID hentet fra URL:", id); // Logg ID-en som brukes
         const fetchSmsTemplate = async () => {
             try {
-                const response = await fetch(`${API_BASE_URL} / smstemplates/${id}`);
+                const response = await fetch(`${API_BASE_URL}/smstemplates/${id}`);
                 if (response.ok) {
                     const data = await response.json();
                     setFormData(data);
@@ -46,7 +46,7 @@ function SmsTemplateChange() {
         e.preventDefault();
 
         try {
-            const response = await fetch(`${API_BASE_URL} / smstemplates/${id}`, {
+            const response = await fetch(`${API_BASE_URL}/smstemplates/${id}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',

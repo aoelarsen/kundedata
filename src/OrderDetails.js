@@ -50,7 +50,7 @@ function OrderDetails() {
   useEffect(() => {
     const fetchOrder = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL} / orders/${id}`);
+        const response = await fetch(`${API_BASE_URL}/orders/${id}`);
         if (response.ok) {
           const order = await response.json();
           console.log('Ordre hentet:', order);
@@ -79,7 +79,7 @@ function OrderDetails() {
 
     const fetchCustomer = async (kundeid) => {
       try {
-        const response = await fetch(`${API_BASE_URL} / customers?customerNumber`);
+        const response = await fetch(`${API_BASE_URL}/customers?customerNumber`);
         if (response.ok) {
           const customerData = await response.json();  // Forventer en liste av kunder
           const customer = customerData.find(c => c.customerNumber === kundeid);
@@ -138,7 +138,7 @@ function OrderDetails() {
     };
 
     try {
-      const response = await fetch(`${API_BASE_URL} / orders/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/orders/${id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

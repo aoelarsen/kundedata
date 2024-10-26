@@ -10,7 +10,7 @@ function OrderList({ customerId }) {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL} / orders?kundeid=${customerId}`);
+        const response = await fetch(`${API_BASE_URL}/orders?kundeid=${customerId}`);
         if (response.ok) {
           const data = await response.json();
           setOrders(data);

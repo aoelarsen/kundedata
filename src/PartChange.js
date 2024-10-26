@@ -17,7 +17,7 @@ function PartChange() {
     useEffect(() => {
         const fetchPart = async () => {
             try {
-                const response = await fetch(`${API_BASE_URL} / parts/${id}`);
+                const response = await fetch(`${API_BASE_URL}/parts/${id}`);
                 if (response.ok) {
                     const data = await response.json();
                     setFormData(data);
@@ -44,7 +44,7 @@ function PartChange() {
         e.preventDefault();
 
         try {
-            const response = await fetch(`${API_BASE_URL} / parts/${id}`, {
+            const response = await fetch(`${API_BASE_URL}/parts/${id}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
