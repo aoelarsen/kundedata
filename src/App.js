@@ -217,10 +217,7 @@ function App() {
             <Route path="/status-list" element={<StatusList />} />
             <Route path="/status-change/:id" element={<StatusChange />} />
             <Route path="/sendsms" element={<SendSMS />} />
-            <Route
-              path="/todo"
-              element={<ProtectedRoute element={<TodoList />} />} // Eksempel på en beskyttet rute
-            />
+            <Route path="/todo" element={<TodoList />} />
 
             <Route path="/service-details-bike/:id" element={<ServiceDetailsBike />} />
             <Route path="/service-details-ski/:id" element={<ServiceDetailsSki />} />
