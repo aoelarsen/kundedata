@@ -96,7 +96,7 @@ function SmsTemplateChange() {
                     </select>
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Tekst</label>
+                    <label className="block text-sm font-medium text-gray-700">Tekst </label>
                     <textarea
                         name="tekst"
                         value={formData.tekst}
@@ -104,6 +104,7 @@ function SmsTemplateChange() {
                         required
                         className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm"
                     />
+                    <p className="block text-xs font-small text-gray-700">Generering av referansenummer: (%ordreid%) (%serviceid%) (%butikk%)</p>
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700">Status</label>

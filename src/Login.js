@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Cookies from 'js-cookie';
 import { login } from './auth';
 
 function Login() {
@@ -11,7 +12,16 @@ function Login() {
     const handleSubmit = (e) => {
         e.preventDefault();
         if (login(username, password)) {
-            navigate('/'); // Tilpass dette til ønsket innloggingsside
+            // Velg butikk basert på brukernavn
+            if (username === 'Slemmestad') {
+                Cookies.set('selectedStore', 'Slemmestad');
+                Cookies.set('butikkid', '1'); // Sett butikk-ID for Slemmestad
+            } else if (username === 'Røyken') {
+                Cookies.set('selectedStore', 'Røyken');
+                Cookies.set('butikkid', '2'); // Sett butikk-ID for Røyken
+            }
+
+            navigate('/'); // Naviger til startsiden
         } else {
             setError('Feil brukernavn eller passord');
         }
@@ -21,7 +31,6 @@ function Login() {
         <div className="flex items-center justify-center min-h-screen bg-gray-100">
             <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
                 <h2 className="text-2xl font-semibold text-gray-800 text-center mb-6">Logg inn</h2>
-
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
                         <label className="block text-gray-700">Brukernavn:</label>

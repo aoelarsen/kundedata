@@ -104,7 +104,7 @@ function FixedPriceList() {
                     Legg til fastpris
                 </button>
             </div>
-
+    
             {/* Nedtrekksmeny for filtrering etter servicetype */}
             <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-2">Filtrer etter tjenestetype:</label>
@@ -119,16 +119,16 @@ function FixedPriceList() {
                     ))}
                 </select>
             </div>
-
+    
             {filteredPrices.length > 0 ? (
                 <table className="min-w-full bg-white border border-gray-300 rounded-lg">
                     <thead>
                         <tr className="bg-gray-100">
                             <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Tittel</th>
                             <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Pris</th>
-                            <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Beskrivelse</th>
-                            <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Tjenestetype</th>
-                            <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Prioritet</th>
+                            <th className="hidden md:table-cell px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Beskrivelse</th>
+                            <th className="hidden md:table-cell px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Tjenestetype</th>
+                            <th className="hidden md:table-cell px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Prioritet</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -136,9 +136,9 @@ function FixedPriceList() {
                             <tr key={price._id} className="hover:bg-gray-50 cursor-pointer" onClick={() => handleEditFixedPrice(price._id)}>
                                 <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{price.title}</td>
                                 <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{price.price} kr</td>
-                                <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{price.description}</td>
-                                <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{price.serviceType}</td>
-                                <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{price.priority}</td>
+                                <td className="hidden md:table-cell px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{price.description}</td>
+                                <td className="hidden md:table-cell px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{price.serviceType}</td>
+                                <td className="hidden md:table-cell px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{price.priority}</td>
                             </tr>
                         ))}
                     </tbody>
@@ -148,6 +148,7 @@ function FixedPriceList() {
             )}
         </div>
     );
+    
 }
 
 export default FixedPriceList;

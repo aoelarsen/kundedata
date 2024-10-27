@@ -136,6 +136,14 @@ function NavBar() {
     }
   };
 
+  useEffect(() => {
+    const storeFromCookie = Cookies.get('selectedStore');
+    if (storeFromCookie && storeFromCookie !== selectedStore) {
+      setSelectedStore(storeFromCookie);
+    }
+  }, [selectedStore]); // Legg til `selectedStore` her
+  
+  
   return (
     <>
       <nav className="bg-gray-800 p-4">
@@ -145,7 +153,7 @@ function NavBar() {
               Søk/Registrer
             </Link>
 
-
+ 
 
             {/* Employee dropdown */}
             <select

@@ -26,7 +26,7 @@ function SmsTemplateList() {
 
     const handleSelectSmsTemplate = (smsTemplateId) => {
         console.log("Valgt SMS-mal ID:", smsTemplateId); // Logg ID-en som sendes
-        navigate(`/ sms - template - change / ${smsTemplateId}`);
+        navigate(`/sms-template-change/${smsTemplateId}`);
     };
 
     const handleAddSmsTemplate = () => {

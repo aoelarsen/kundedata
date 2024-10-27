@@ -133,16 +133,19 @@ function App() {
     );
   };
 
-  return (
-    <Router>
-      <div>
-        <NavBar />
-        <div className="p-4">
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route
-              path="/"
-              element={
+
+return (
+  <Router>
+    <div>
+      <NavBar />
+      <div className="p-4">
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute element={
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <SearchBar
@@ -160,82 +163,175 @@ function App() {
                   </div>
                   <CompletedTasks />
                 </div>
-              }
-            />
-            <Route
-              path="/customer-list"
-              element={
-                <CustomerList
-                  customers={customers}
-                  deleteCustomer={(id) => setCustomers(customers.filter(customer => customer.id !== id))}
-                />
-              }
-            />
-            <Route
-              path="/customer-details/:id"
-              element={<CustomerDetails customers={customers} />}
-            />
-            <Route
-              path="/edit-customer/:id"
-              element={<EditCustomer customers={customers} updateCustomer={updateCustomer} />}
-            />
-            <Route
-              path="/order-details/:id"
-              element={<OrderDetails />}
-            />
-            <Route
-              path="/ordre"
-              element={<OrderList orders={orders} />}
-            />
-            <Route
-              path="/service-details/:id"
-              element={<ServiceDetails />}
-            />
-            <Route path="/service" element={<ServiceList services={services} />} />
-
-            <Route path="/hjelpemidler" element={<Calculator />} />
-            <Route path="/sms-template-change/:id" element={<SmsTemplateChange />} />
-
-            <Route path="/sms-templates" element={<SmsTemplateList />} />
-            <Route path="/sms-template-form" element={<SmsTemplateForm />} />
-            <Route path="/employees" element={<EmployeeList />} />
-            <Route path="/employee-list" element={<EmployeeList />} />
-            <Route path="/employee-change/:id" element={<EmployeeChange />} />
-            <Route path="/employee-form" element={<EmployeeForm />} />
-
-            {/* Protected routes for CreateOrder and CreateService */}
-            <Route
-              path="/create-order/:customerNumber"
-              element={<ProtectedRoute element={<CreateOrder />} />}
-            />
-            <Route
-              path="/create-service/:customerNumber"
-              element={<ProtectedRoute element={<CreateService />} />}
-            />
-
-            <Route path="/status-form" element={<StatusForm />} />
-            <Route path="/status-list" element={<StatusList />} />
-            <Route path="/status-change/:id" element={<StatusChange />} />
-            <Route path="/sendsms" element={<SendSMS />} />
-            <Route path="/todo" element={<TodoList />} />
-
-            <Route path="/service-details-bike/:id" element={<ServiceDetailsBike />} />
-            <Route path="/service-details-ski/:id" element={<ServiceDetailsSki />} />
-            <Route path="/service-details-skate/:id" element={<ServiceDetailsSkate />} />
-            <Route path="/service-details-club/:id" element={<ServiceDetailsClub />} />
-            <Route path="/fixed-price-form" element={<FixedPriceForm />} />
-            <Route path="/fixed-price-list" element={<FixedPriceList />} />
-            <Route path="/fixed-price-change/:id" element={<FixedPriceChange />} />
-            <Route path="/part-form" element={<PartForm />} /> {/* Legge til ny del */}
-            <Route path="/part-list" element={<PartList />} /> {/* Vise liste over deler */}
-            <Route path="/part-change/:id" element={<PartChange />} /> {/* Endre en eksisterende del */}
-
-
-          </Routes>
-        </div>
+              } />
+            }
+          />
+          
+          <Route
+            path="/customer-list"
+            element={<ProtectedRoute element={<CustomerList customers={customers} deleteCustomer={(id) => setCustomers(customers.filter(customer => customer.id !== id))} />} />}
+          />
+          
+          <Route
+            path="/customer-details/:id"
+            element={<ProtectedRoute element={<CustomerDetails customers={customers} />} />}
+          />
+          
+          <Route
+            path="/edit-customer/:id"
+            element={<ProtectedRoute element={<EditCustomer customers={customers} updateCustomer={updateCustomer} />} />}
+          />
+          
+          <Route
+            path="/order-details/:id"
+            element={<ProtectedRoute element={<OrderDetails />} />}
+          />
+          
+          <Route
+            path="/ordre"
+            element={<ProtectedRoute element={<OrderList orders={orders} />} />}
+          />
+          
+          <Route
+            path="/service-details/:id"
+            element={<ProtectedRoute element={<ServiceDetails />} />}
+          />
+          
+          <Route
+            path="/service"
+            element={<ProtectedRoute element={<ServiceList services={services} />} />}
+          />
+          
+          <Route
+            path="/hjelpemidler"
+            element={<ProtectedRoute element={<Calculator />} />}
+          />
+          
+          <Route
+            path="/sms-template-change/:id"
+            element={<ProtectedRoute element={<SmsTemplateChange />} />}
+          />
+          
+          <Route
+            path="/sms-templates"
+            element={<ProtectedRoute element={<SmsTemplateList />} />}
+          />
+          
+          <Route
+            path="/sms-template-form"
+            element={<ProtectedRoute element={<SmsTemplateForm />} />}
+          />
+          
+          <Route
+            path="/employees"
+            element={<ProtectedRoute element={<EmployeeList />} />}
+          />
+          
+          <Route
+            path="/employee-list"
+            element={<ProtectedRoute element={<EmployeeList />} />}
+          />
+          
+          <Route
+            path="/employee-change/:id"
+            element={<ProtectedRoute element={<EmployeeChange />} />}
+          />
+          
+          <Route
+            path="/employee-form"
+            element={<ProtectedRoute element={<EmployeeForm />} />}
+          />
+          
+          <Route
+            path="/create-order/:customerNumber"
+            element={<ProtectedRoute element={<CreateOrder />} />}
+          />
+          
+          <Route
+            path="/create-service/:customerNumber"
+            element={<ProtectedRoute element={<CreateService />} />}
+          />
+          
+          <Route
+            path="/status-form"
+            element={<ProtectedRoute element={<StatusForm />} />}
+          />
+          
+          <Route
+            path="/status-list"
+            element={<ProtectedRoute element={<StatusList />} />}
+          />
+          
+          <Route
+            path="/status-change/:id"
+            element={<ProtectedRoute element={<StatusChange />} />}
+          />
+          
+          <Route
+            path="/sendsms"
+            element={<ProtectedRoute element={<SendSMS />} />}
+          />
+          
+          <Route
+            path="/todo"
+            element={<ProtectedRoute element={<TodoList />} />}
+          />
+          
+          <Route
+            path="/service-details-bike/:id"
+            element={<ProtectedRoute element={<ServiceDetailsBike />} />}
+          />
+          
+          <Route
+            path="/service-details-ski/:id"
+            element={<ProtectedRoute element={<ServiceDetailsSki />} />}
+          />
+          
+          <Route
+            path="/service-details-skate/:id"
+            element={<ProtectedRoute element={<ServiceDetailsSkate />} />}
+          />
+          
+          <Route
+            path="/service-details-club/:id"
+            element={<ProtectedRoute element={<ServiceDetailsClub />} />}
+          />
+          
+          <Route
+            path="/fixed-price-form"
+            element={<ProtectedRoute element={<FixedPriceForm />} />}
+          />
+          
+          <Route
+            path="/fixed-price-list"
+            element={<ProtectedRoute element={<FixedPriceList />} />}
+          />
+          
+          <Route
+            path="/fixed-price-change/:id"
+            element={<ProtectedRoute element={<FixedPriceChange />} />}
+          />
+          
+          <Route
+            path="/part-form"
+            element={<ProtectedRoute element={<PartForm />} />}
+          />
+          
+          <Route
+            path="/part-list"
+            element={<ProtectedRoute element={<PartList />} />}
+          />
+          
+          <Route
+            path="/part-change/:id"
+            element={<ProtectedRoute element={<PartChange />} />}
+          />
+        </Routes>
       </div>
-    </Router>
-  );
+    </div>
+  </Router>
+);
+
 
 }
 

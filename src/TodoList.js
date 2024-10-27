@@ -11,6 +11,8 @@ function TodoList() {
   const [customTasks, setCustomTasks] = useState([]);
   const [newCustomTask, setNewCustomTask] = useState('');
   const [completedTasks, setCompletedTasks] = useState([]);
+  const [highlightedTaskId, setHighlightedTaskId] = useState(null); // Legg til denne for ramme rundt ny oppgave
+
 
   // Hent butikk-ID fra cookies som i OrderList
   const butikkid = parseInt(Cookies.get('butikkid'), 10) || null;
@@ -200,83 +202,104 @@ function TodoList() {
   // Funksjon for å markere en daglig oppgave som fullført
   const handleCompleteDailyTask = async (taskId, taskDescription) => {
     const bodyData = {
-      task: taskDescription,
-      taskType: 'daily',
-      dateCompleted: new Date().toISOString(),
-      employee,
-      store: butikkid,
+        task: taskDescription,
+        taskType: 'daily',
+        dateCompleted: new Date().toISOString(),
+        employee,
+        store: butikkid,
     };
 
     try {
-      await fetch(`${API_BASE_URL}/completedtasks`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(bodyData),
-      });
+        // Legg til fullført oppgave i completedtasks-tabellen
+        const completedResponse = await fetch(`${API_BASE_URL}/completedtasks`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(bodyData),
+        });
 
-      const response = await fetch(`${API_BASE_URL}/dailytasks/${taskId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ completed: true, completedBy: employee, dateCompleted: new Date().toISOString() }),
-      });
+        if (!completedResponse.ok) throw new Error('Feil ved oppdatering av completedtasks');
+        
+        const completedData = await completedResponse.json();
+        const completedTaskId = completedData._id; // Hent ID-en til fullført oppgave
 
-      if (response.ok) {
-        setDailyTasks(prevTasks =>
-          prevTasks.map(task =>
-            task._id === taskId
-              ? { ...task, completed: true, completedBy: employee, dateCompleted: new Date().toISOString().split('T')[0] }
-              : task
-          )
-        );
-        console.log("Oppgave fullført:", taskDescription);
-      }
+        // Oppdater dailytask som fullført i databasen
+        const response = await fetch(`${API_BASE_URL}/dailytasks/${taskId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ completed: true, completedBy: employee, dateCompleted: new Date().toISOString() }),
+        });
+
+        if (response.ok) {
+            setDailyTasks(prevTasks =>
+                prevTasks.map(task =>
+                    task._id === taskId
+                        ? { ...task, completed: true, completedBy: employee, dateCompleted: new Date().toISOString().split('T')[0] }
+                        : task
+                )
+            );
+            await fetchCompletedTasks(); // Oppdater fullførte oppgaver
+            setHighlightedTaskId(completedTaskId); // Marker den nylig fullførte oppgaven
+            setTimeout(() => setHighlightedTaskId(null), 5000); // Fjern markeringen etter 5 sekunder
+        } else {
+            console.error('Feil ved oppdatering av dailytasks', response.statusText);
+        }
     } catch (error) {
-      console.error('Feil ved oppdatering av daglig oppgave:', error);
+        console.error('Feil ved håndtering av daglig oppgave:', error);
     }
-  };
-
+};
 
 
 
   // Funksjon for å markere en egendefinert oppgave som fullført
   const handleCompleteCustomTask = async (taskId, taskDescription, dueDate) => {
     const bodyData = {
-      task: taskDescription,
-      taskType: 'custom',
-      dueDate,
-      dateCompleted: new Date().toISOString(),
-      employee,
-      store: butikkid,
+        task: taskDescription,
+        taskType: 'custom',
+        dueDate,
+        dateCompleted: new Date().toISOString(),
+        employee,
+        store: butikkid,
     };
 
     try {
-      // Legg til oppgaven i 'completedtasks' collection
-      await fetch(`${API_BASE_URL}/completedtasks`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(bodyData),
-      });
+        // Legg til fullført oppgave i completedtasks-tabellen
+        const completedResponse = await fetch(`${API_BASE_URL}/completedtasks`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(bodyData),
+        });
 
-      // Oppdater 'customtasks' med utførtdato og ansatt
-      const response = await fetch(`${API_BASE_URL}/customtasks/${taskId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ completedBy: employee, dateCompleted: new Date().toISOString() }),
-      });
+        if (!completedResponse.ok) throw new Error('Feil ved lagring i completedtasks');
+        
+        const completedData = await completedResponse.json();
+        const completedTaskId = completedData._id; // Hent ID-en til fullført oppgave
 
-      if (response.ok) {
-        setCustomTasks((prevTasks) =>
-          prevTasks.map((task) =>
-            task._id === taskId
-              ? { ...task, completedBy: employee, dateCompleted: new Date(), completed: !!employee }
-              : task
-          )
-        );
-      }
+        // Oppdater customtask som fullført i databasen
+        const response = await fetch(`${API_BASE_URL}/customtasks/${taskId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ completedBy: employee, dateCompleted: new Date().toISOString() }),
+        });
+
+        if (response.ok) {
+            setCustomTasks(prevTasks =>
+                prevTasks.map(task =>
+                    task._id === taskId
+                        ? { ...task, completedBy: employee, dateCompleted: new Date(), completed: !!employee }
+                        : task
+                )
+            );
+            await fetchCompletedTasks(); // Oppdater fullførte oppgaver
+            setHighlightedTaskId(completedTaskId); // Marker den nylig fullførte oppgaven
+            setTimeout(() => setHighlightedTaskId(null), 5000); // Fjern markeringen etter 5 sekunder
+        } else {
+            console.error('Feil ved oppdatering av customtasks', response.statusText);
+        }
     } catch (error) {
-      console.error('Feil ved oppdatering av egendefinert oppgave:', error);
+        console.error('Feil ved håndtering av egendefinert oppgave:', error);
     }
-  };
+};  
+
 
   const handleAddEmployeeToCompletedTask = async (taskId, taskDescription, dueDate) => {
     const bodyData = {
@@ -448,7 +471,10 @@ function TodoList() {
           </thead>
           <tbody>
             {completedTasks.map((task) => (
-              <tr key={task._id} className="hover:bg-gray-50">
+              <tr
+                key={task._id}
+                className={`hover:bg-gray-50 ${task._id === highlightedTaskId ? 'border-2 border-green-500' : ''}`}
+              >
                 <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{task.task}</td>
                 <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{task.employee}</td>
                 <td className="hidden md:table-cell px-6 py-4 border-b border-gray-200 text-sm text-gray-700">

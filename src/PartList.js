@@ -44,8 +44,8 @@ function PartList() {
                 <table className="min-w-full bg-white border border-gray-300 rounded-lg">
                     <thead>
                         <tr className="bg-gray-100">
-                            <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">EAN-kode</th>
-                            <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Varemerke</th>
+                            <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600 hidden md:table-cell">EAN-kode</th>
+                            <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600 hidden md:table-cell">Varemerke</th>
                             <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Produkt</th>
                             <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Pris</th>
                         </tr>
@@ -53,8 +53,8 @@ function PartList() {
                     <tbody>
                         {parts.map((part) => (
                             <tr key={part._id} className="hover:bg-gray-50 cursor-pointer" onClick={() => handleEditPart(part._id)}>
-                                <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{part.ean}</td>
-                                <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{part.brand}</td>
+                                <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{part.ean}</td>
+                                <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700 hidden md:table-cell">{part.brand}</td>
                                 <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{part.product}</td>
                                 <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{part.price}</td>
                             </tr>
@@ -66,6 +66,7 @@ function PartList() {
             )}
         </div>
     );
+    
 }
 
 export default PartList;
