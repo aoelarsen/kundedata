@@ -35,6 +35,18 @@ function NavBar() {
     }
   }, []);
 
+  useEffect(() => {
+    // Update selectedStore when storeUpdated event is triggered
+    const handleStoreUpdate = () => {
+      setSelectedStore(Cookies.get('selectedStore') || '');
+    };
+
+    window.addEventListener('storeUpdated', handleStoreUpdate);
+
+    return () => {
+      window.removeEventListener('storeUpdated', handleStoreUpdate);
+    };
+  }, []);
 
   useEffect(() => {
     const fetchEmployees = async () => {
@@ -138,12 +150,19 @@ function NavBar() {
 
   useEffect(() => {
     const storeFromCookie = Cookies.get('selectedStore');
+    const storeIdFromCookie = Cookies.get('butikkid');
+
     if (storeFromCookie && storeFromCookie !== selectedStore) {
       setSelectedStore(storeFromCookie);
     }
-  }, [selectedStore]); // Legg til `selectedStore` her
-  
-  
+    if (storeIdFromCookie) {
+      // Kan også sette butikkid som state om ønskelig
+      console.log(`Butikk-ID fra cookie er ${storeIdFromCookie}`);
+    }
+  }, [selectedStore]);
+
+
+
   return (
     <>
       <nav className="bg-gray-800 p-4">
@@ -153,7 +172,7 @@ function NavBar() {
               Søk/Registrer
             </Link>
 
- 
+
 
             {/* Employee dropdown */}
             <select

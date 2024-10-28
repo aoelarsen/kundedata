@@ -12,16 +12,17 @@ function Login() {
     const handleSubmit = (e) => {
         e.preventDefault();
         if (login(username, password)) {
-            // Velg butikk basert på brukernavn
             if (username === 'Slemmestad') {
-                Cookies.set('selectedStore', 'Sport1 Slemmestad');
-                Cookies.set('butikkid', '1'); // Sett butikk-ID for Slemmestad
+                Cookies.set('selectedStore', 'Sport1 Slemmestad', { expires: 7 });
+                Cookies.set('butikkid', '2', { expires: 7 });
             } else if (username === 'Røyken') {
-                Cookies.set('selectedStore', 'Sport1 Røyken');
-                Cookies.set('butikkid', '2'); // Sett butikk-ID for Røyken
+                Cookies.set('selectedStore', 'Sport1 Røyken', { expires: 7 });
+                Cookies.set('butikkid', '1', { expires: 7 });
             }
 
-            navigate('/'); // Naviger til startsiden
+            // Send custom event after setting cookies
+            window.dispatchEvent(new Event('storeUpdated'));
+            navigate('/');
         } else {
             setError('Feil brukernavn eller passord');
         }
