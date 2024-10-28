@@ -14,10 +14,10 @@ function Login() {
         if (login(username, password)) {
             // Velg butikk basert på brukernavn
             if (username === 'Slemmestad') {
-                Cookies.set('selectedStore', 'Slemmestad');
+                Cookies.set('selectedStore', 'Sport1 Slemmestad');
                 Cookies.set('butikkid', '1'); // Sett butikk-ID for Slemmestad
             } else if (username === 'Røyken') {
-                Cookies.set('selectedStore', 'Røyken');
+                Cookies.set('selectedStore', 'Sport1 Røyken');
                 Cookies.set('butikkid', '2'); // Sett butikk-ID for Røyken
             }
 
