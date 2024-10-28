@@ -458,33 +458,38 @@ function TodoList() {
         </div>
       </div>
 
-      {/* Siste 10 fullførte oppgaver */}
-      <div className="mt-8">
-        <h3 className="text-2xl font-bold mb-4">Siste 10 fullførte oppgaver</h3>
-        <table className="min-w-full bg-white border border-gray-300 rounded-lg">
-          <thead>
+   {/* Siste 10 fullførte oppgaver */}
+<div className="mt-8">
+    <h3 className="text-2xl font-bold mb-4">Siste 10 fullførte oppgaver</h3>
+    <table className="min-w-full bg-white border border-gray-300 rounded-lg">
+        <thead>
             <tr className="bg-gray-100">
-              <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Oppgave</th>
-              <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Utført av</th>
-              <th className="hidden md:table-cell px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Dato</th>
+                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Oppgave</th>
+                <th className="px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Utført av</th>
+                <th className="hidden md:table-cell px-6 py-3 border-b border-gray-200 text-left text-sm font-semibold text-gray-600">Dato</th>
             </tr>
-          </thead>
-          <tbody>
-            {completedTasks.map((task) => (
-              <tr
-                key={task._id}
-                className={`hover:bg-gray-50 ${task._id === highlightedTaskId ? 'border-2 border-green-500' : ''}`}
-              >
-                <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{task.task}</td>
-                <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{task.employee}</td>
-                <td className="hidden md:table-cell px-6 py-4 border-b border-gray-200 text-sm text-gray-700">
-                  {new Date(task.dateCompleted).toLocaleDateString()} {new Date(task.dateCompleted).toLocaleTimeString()}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+        </thead>
+        <tbody>
+            {completedTasks
+                .filter((task) => task.store === butikkid)  // Filtrer på butikkid
+                .slice(0, 10)  // Vis de siste 10 oppgavene
+                .reverse()  // Sorter nyeste først
+                .map((task) => (
+                    <tr
+                        key={task._id}
+                        className={`hover:bg-gray-50 ${task._id === highlightedTaskId ? 'border-2 border-green-500' : ''}`}
+                    >
+                        <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{task.task}</td>
+                        <td className="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">{task.employee}</td>
+                        <td className="hidden md:table-cell px-6 py-4 border-b border-gray-200 text-sm text-gray-700">
+                            {new Date(task.dateCompleted).toLocaleDateString()} {new Date(task.dateCompleted).toLocaleTimeString()}
+                        </td>
+                    </tr>
+                ))}
+        </tbody>
+    </table>
+</div>
+
     </div>
   );
 
