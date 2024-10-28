@@ -28,23 +28,27 @@ function OrderList() {
         if (response.ok) {
           const data = await response.json();
 
-          // Filtrer ordrer for alle ordre-tabellen basert på valgt butikkid og statusfilter
-          const filteredAllOrders = butikkid
-            ? data.filter(order => order.butikkid === butikkid && order.Status === statusFilter)
-            : data.filter(order => order.Status === statusFilter);
+// Filtrer ordrer for alle ordre-tabellen basert på valgt butikkid og statusfilter
+const filteredAllOrders = data.filter(order => 
+  order.butikkid === butikkid &&
+  (statusFilter === 'Aktiv' ? order.Status !== 'Avsluttet' : order.Status === statusFilter)
+);
+
 
           setOrders(filteredAllOrders);
           setFilteredOrders(filteredAllOrders);
 
-          // Filtrer ordrer for ansatt-tabellen (kun "Aktiv" status brukes for ansatte)
-          const filteredEmployeeOrders = data.filter(
-            order => order.Ansatt === selectedEmployee && order.Status === 'Aktiv'
-          );
+// Oppdater filtreringen av ansattes ordrer til å ekskludere de med status "Avsluttet"
+const filteredEmployeeOrders = data.filter(
+  order => order.Ansatt === selectedEmployee && order.Status !== 'Avsluttet' && order.butikkid === butikkid
+);
 
-          // Sorter ansattes ordrer etter eldste først
-          filteredEmployeeOrders.sort((a, b) => new Date(a.RegistrertDato) - new Date(b.RegistrertDato));
+// Sorter ansattes ordrer etter eldste først
+filteredEmployeeOrders.sort((a, b) => new Date(a.RegistrertDato) - new Date(b.RegistrertDato));
 
-          setEmployeeOrders(filteredEmployeeOrders);
+setEmployeeOrders(filteredEmployeeOrders);
+
+
         } else {
           console.error('Feil ved henting av ordrer:', response.statusText);
         }
@@ -201,6 +205,7 @@ function OrderList() {
           className="p-2 border border-gray-300 rounded-md"
         >
           <option value="Aktiv">Aktiv</option>
+          <option value="AktivKLUBB">Aktiv KLUBB</option>
           <option value="Avsluttet">Avsluttet</option>
         </select>
       </div>
