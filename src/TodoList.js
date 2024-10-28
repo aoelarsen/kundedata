@@ -473,7 +473,7 @@ function TodoList() {
             {completedTasks
                 .filter((task) => task.store === butikkid)  // Filtrer på butikkid
                 .slice(0, 10)  // Vis de siste 10 oppgavene
-                .reverse()  // Sorter nyeste først
+                .sort((a, b) => new Date(b.dateCompleted) - new Date(a.dateCompleted)) // Sorter nyeste først
                 .map((task) => (
                     <tr
                         key={task._id}
