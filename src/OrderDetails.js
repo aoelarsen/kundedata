@@ -162,16 +162,16 @@ function OrderDetails() {
     }
   };
 
- // Funksjon for å skrive ut labelen
-const handlePrintLabel = () => {
-  if (customer && orderDetails) {
-    const printWindow = window.open('', '', 'width=500,height=300');
+  // Funksjon for å skrive ut labelen
+  const handlePrintLabel = () => {
+    if (customer && orderDetails) {
+      const printWindow = window.open('', '', 'width=500,height=300');
 
-    // Hent dagens dato og formatter den til "dd.MM.yyyy"
-    const today = new Date();
-    const formattedDate = `${today.getDate().toString().padStart(2, '0')}.${(today.getMonth() + 1).toString().padStart(2, '0')}.${today.getFullYear()}`;
+      // Hent dagens dato og formatter den til "dd.MM.yyyy"
+      const today = new Date();
+      const formattedDate = `${today.getDate().toString().padStart(2, '0')}.${(today.getMonth() + 1).toString().padStart(2, '0')}.${today.getFullYear()}`;
 
-    printWindow.document.write(`
+      printWindow.document.write(`
       <html>
         <head>
           <style>
@@ -201,11 +201,11 @@ const handlePrintLabel = () => {
         </body>
       </html>
     `);
-    printWindow.document.close();
-    printWindow.focus();
-    printWindow.print();
-  }
-};
+      printWindow.document.close();
+      printWindow.focus();
+      printWindow.print();
+    }
+  };
 
 
   // Funksjon for å navigere til SendSMS.js
@@ -319,7 +319,7 @@ const handlePrintLabel = () => {
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
           >
             <option value="Aktiv">Aktiv</option>
-            <option value="AktivKlubb">Aktiv KLUBB</option>
+            <option value="AktivKLUBB">Aktiv KLUBB</option>
             <option value="Avsluttet">Avsluttet</option>
           </select>
         </div>

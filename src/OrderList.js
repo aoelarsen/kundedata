@@ -28,27 +28,24 @@ function OrderList() {
         if (response.ok) {
           const data = await response.json();
 
-// Filtrer ordrer for alle ordre-tabellen basert på valgt butikkid og statusfilter
-const filteredAllOrders = data.filter(order => 
-  order.butikkid === butikkid &&
-  (statusFilter === 'Aktiv' ? order.Status !== 'Avsluttet' : order.Status === statusFilter)
-);
-
+          // Filtrer ordrer basert på valgt butikkid og statusfilter
+          const filteredAllOrders = data.filter(order =>
+            order.butikkid === butikkid &&
+            ((statusFilter === 'Aktiv' && order.Status !== 'Avsluttet') ||
+              (statusFilter === 'AktivKLUBB' && order.Status === 'AktivKLUBB') ||
+              (statusFilter === 'Avsluttet' && order.Status === 'Avsluttet'))
+          );
 
           setOrders(filteredAllOrders);
           setFilteredOrders(filteredAllOrders);
 
-// Oppdater filtreringen av ansattes ordrer til å ekskludere de med status "Avsluttet"
-const filteredEmployeeOrders = data.filter(
-  order => order.Ansatt === selectedEmployee && order.Status !== 'Avsluttet' && order.butikkid === butikkid
-);
+          // Filtrering for ansattes ordrer ekskluderer avsluttede ordrer
+          const filteredEmployeeOrders = data.filter(
+            order => order.Ansatt === selectedEmployee && order.Status !== 'Avsluttet' && order.butikkid === butikkid
+          );
 
-// Sorter ansattes ordrer etter eldste først
-filteredEmployeeOrders.sort((a, b) => new Date(a.RegistrertDato) - new Date(b.RegistrertDato));
-
-setEmployeeOrders(filteredEmployeeOrders);
-
-
+          filteredEmployeeOrders.sort((a, b) => new Date(a.RegistrertDato) - new Date(b.RegistrertDato));
+          setEmployeeOrders(filteredEmployeeOrders);
         } else {
           console.error('Feil ved henting av ordrer:', response.statusText);
         }
@@ -56,6 +53,7 @@ setEmployeeOrders(filteredEmployeeOrders);
         console.error('Feil ved kommunikasjon med serveren:', error);
       }
     };
+
 
     fetchOrders();
   }, [butikkid, statusFilter, selectedEmployee]);
