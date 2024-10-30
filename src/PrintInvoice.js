@@ -52,7 +52,7 @@ function PrintInvoice({ serviceDetails, customer, formData, calculateTotalPrice,
         `}
       </style>
       {/* Kundeinfo og Servicenummer */}
-      <div className="border border-gray-300 p-2 mb-4 rounded-lg">
+      <div className="border border-gray-300 p-2 mb-4">
         <div className="flex justify-between">
           <div className="w-1/2">
             <p className="text-gray-600">{customer.firstName} {customer.lastName}</p>
@@ -71,60 +71,60 @@ function PrintInvoice({ serviceDetails, customer, formData, calculateTotalPrice,
 
       {/* Arbeid */}
       {formData.arbeid.length > 0 && (
-  <>
-    <h3 className="text-xl font-semibold text-black mb-4">Arbeid</h3>
-    <table className="w-full table-auto mb-6">
-      <thead className="bg-gray-200 text-black">
-        <tr>
-          <th className="p-2 text-left">Beskrivelse</th>
-          <th className="p-2 text-right">Pris</th>
-        </tr>
-      </thead>
-      <tbody>
-        {formData.arbeid.map((work, index) => (
-          <tr key={index} className="bg-gray-50 border-b">
-            <td className="p-2 text-gray-700">{work.title}</td>
-            <td className="p-2 text-right text-gray-700">{work.price} kr</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </>
-)}
+        <>
+          <h3 className="text-xl font-semibold text-black mb-4">Arbeid</h3>
+          <table className="w-full table-auto mb-6">
+            <thead className="bg-gray-200 text-black">
+              <tr>
+                <th className="p-2 text-left">Beskrivelse</th>
+                <th className="p-2 text-right">Pris</th>
+              </tr>
+            </thead>
+            <tbody>
+              {formData.arbeid.map((work, index) => (
+                <tr key={index} className="bg-gray-50 border-b">
+                  <td className="p-2 text-gray-700">{work.title}</td>
+                  <td className="p-2 text-right text-gray-700">{work.price} kr</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      )}
 
       {/* Deler */}
       {formData.deler.length > 0 && (
-  <>
-    <h3 className="text-xl font-semibold text-black mb-4">Deler</h3>
-    <table className="w-full table-auto mb-6">
-      <thead className="bg-gray-200 text-black">
-        <tr>
-          <th className="p-2 text-left">Varemerke</th>
-          <th className="p-2 text-left">Produkt</th>
-          <th className="p-2 text-left">EAN</th>
-          <th className="p-2 text-right">Pris</th>
-        </tr>
-      </thead>
-      <tbody>
-        {formData.deler.map((part, index) => (
-          <tr key={index} className="bg-gray-50 border-b">
-            <td className="p-2 text-gray-700">{part.brand}</td>
-            <td className="p-2 text-gray-700">{part.product}</td>
-            <td className="p-2 text-gray-700 text-center">
-              {part.ean && part.ean.length === 13 ? <Barcode ean={part.ean} /> : part.ean}
-            </td>
-            <td className="p-2 text-right text-gray-700">{part.price} kr</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </>
-)}
+        <>
+          <h3 className="text-xl font-semibold text-black mb-4">Deler</h3>
+          <table className="w-full table-auto mb-6">
+            <thead className="bg-gray-200 text-black">
+              <tr>
+                <th className="p-2 text-left">Varemerke</th>
+                <th className="p-2 text-left">Produkt</th>
+                <th className="p-2 text-left">EAN</th>
+                <th className="p-2 text-right">Pris</th>
+              </tr>
+            </thead>
+            <tbody>
+              {formData.deler.map((part, index) => (
+                <tr key={index} className="bg-gray-50 border-b">
+                  <td className="p-2 text-gray-700">{part.brand}</td>
+                  <td className="p-2 text-gray-700">{part.product}</td>
+                  <td className="p-2 text-gray-700 text-center">
+                    {part.ean && part.ean.length === 13 ? <Barcode ean={part.ean} /> : part.ean}
+                  </td>
+                  <td className="p-2 text-right text-gray-700">{part.price} kr</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      )}
 
       {/* Kommentar og Oppsummering */}
       <div className="flex justify-between mb-4">
         {/* Kommentar */}
-        <div className="border border-gray-300 p-2 rounded-lg w-2/3 mr-4">
+        <div className="border border-gray-300 p-2 w-2/3 mr-4">
           <h3 className="text-xl font-semibold text-gray-800 mb-2">Kommentar til arbeidet</h3>
           <p className="text-gray-700" style={{ whiteSpace: 'pre-line' }}>
             {formData.utførtArbeid || "Ingen kommentarer til arbeidet."}

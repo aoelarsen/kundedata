@@ -802,7 +802,7 @@ function ServiceDetails() {
           <select onChange={handleAddWork} className="mt-1 block w-full p-2 border border-gray-300 rounded-md">
             <option value="">Velg arbeid</option>
             {fixedPrices
-              .filter(price => price.serviceType === "Tekstiltrykking")  // Endret fra Sykkelservice til Skiservice
+              .filter(price => price.serviceType === "Skøyteslip")  // Endret fra Sykkelservice til Skiservice
               .sort((a, b) => a.priority - b.priority)
               .map((price) => (
                 <option key={price._id} value={price._id}>
